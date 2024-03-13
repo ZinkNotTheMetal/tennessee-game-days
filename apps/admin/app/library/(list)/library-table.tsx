@@ -53,9 +53,7 @@ export function LibraryGameTable({
                   {
                     libraryItems.filter(
                       (item) =>
-                        item.barcode.toUpperCase().startsWith(
-                          query.toUpperCase()
-                        ) ||
+                        item.barcode.toUpperCase().startsWith(query.toUpperCase()) ||
                         item.alias?.toUpperCase().includes(query.toUpperCase()) ||
                         item.boardGameGeekThing.itemName.toUpperCase().includes(
                           query.toUpperCase()
