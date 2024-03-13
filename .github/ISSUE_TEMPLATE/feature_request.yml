@@ -1,0 +1,26 @@
+---
+name: 🚀 Feature Request
+description: Want to see something that I might have missed? Start a new request for it!
+title: '[Feature]: '
+labels: ["feature"]
+assignees: ["ZinkNotTheMetal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!!!
+        Please provide a clear and concise description of what the bug is.
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: New feature you are looking for
+      description: Tell us what you would like to see added to the application
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Any additional context or links?
+      description: Place any additional links / screenshots / whatever to give us a clue as to what's going on
+    validations:
+      required: false
