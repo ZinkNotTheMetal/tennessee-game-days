@@ -1,0 +1,203 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+  output = "./docs"
+}
+
+model CentralizedBarcode {
+  id               Int          @id @default(autoincrement()) @map(name: "id")
+  barcode          String       @map(name: "barcode")
+  entityType       EntityType   @map(name: "entity_type")
+  entityId         Int          @map(name: "entity_id")
+
+  @@unique([barcode])
+  @@unique([entityType, entityId])
+
+  @@map("centralized_barcodes")
+}
+
+// Define the Enum type
+enum EntityType {
+  Attendee
+  LibraryItem
+  PlayToWinItem
+}
+
+model Convention {
+  id               Int          @id @default(autoincrement()) @map(name: "id")
+  name             String       @unique @map(name: "name")
+  startDateUtc     DateTime?    @map(name: "start_date_utc")
+  endDateUtc       DateTime?    @map(name: "end_date_utc")
+  updatedAtUtc     DateTime     @default(now()) @map(name: "date_updated_utc")
+  isCancelled      Boolean      @default(false) @map(name: "is_cancelled")
+  venueId          Int?         @map(name: "venue_id")
+  venue            Venue?       @relation(fields: [venueId], references: [id])
+
+  PlayToWinGames   PlayToWinItem[]
+
+  @@map("conventions")
+}
+
+model Venue {
+  id             Int          @id @default(autoincrement()) @map(name: "id")
+  name           String       @unique @map(name: "name")
+  streetNumber   String       @map(name: "street_number")
+  streetName     String       @map(name: "street_name")
+  city           String       @map(name: "city")
+  stateProvince  String       @map(name: "state_province")
+  postalCode     String       @map(name: "postal_code")
+  latitude       Decimal?     @map(name: "latitude")
+  longitude      Decimal?     @map(name: "longitude")
+  convention     Convention[]
+
+  @@map("venues")
+}
+
+// Could be Accessory / Expansion / Board Game / ... w/e else
+model BoardGameGeekThing {
+  boardGameGeekId      Int             @id @unique @map(name: "bgg_id")
+  itemName             String          @map(name: "bgg_item_name")
+  type                 String          @map(name: "item_type")
+  description          String?         @map(name: "description")
+  thumbnailUrl         String?         @map(name: "thumbnail_url")
+  imageUrl             String?         @map(name: "full_image_url")
+  yearPublished        Int?            @map(name: "year_published")
+  playingTimeMinutes   Int?            @map(name: "playing_time_min")
+  minimumPlayerCount   Int?            @map(name: "min_player_count")
+  maximumPlayerCount   Int?            @map(name: "max_player_count")
+  minimumPlayerAge     Int?            @map(name: "min_player_age")
+  
+  ranking              Int?            @map(name: "bgg_game_ranking")
+  votedBestPlayerCount Int?            @map(name: "best_player_count")
+  averageUserRating    Decimal?        @map(name: "bgg_average_rating") @db.Decimal(5,3)
+  complexityRating     Decimal?        @map(name: "bgg_weight_rating") @db.Decimal(5,3)
+  
+  libraryItems         LibraryItem[]
+  libraryItemContains  AdditionalLibraryItemContent[]
+  playToWinGames       PlayToWinItem[]
+  gameMechanics        GameMechanic[]
+
+  @@map("board_game_geek_items")
+}
+
+model Mechanic {
+  id                   Int             @id @default(autoincrement()) @map(name: "id")
+  name                 String          @unique @map(name: "name")
+
+  gameMechanics        GameMechanic[]
+
+  @@map("bgg_mechanics")
+}
+
+model GameMechanic {
+  boardGameGeekId       Int                 @map(name: "bgg_id")
+  boardGameGeekThing    BoardGameGeekThing  @relation(fields: [boardGameGeekId], references: [boardGameGeekId])
+  mechanicId            Int                 @map(name: "mechanic_id")
+  mechanic              Mechanic            @relation(fields: [mechanicId], references: [id])
+
+  @@unique([boardGameGeekId, mechanicId])
+  @@index([boardGameGeekId, mechanicId])
+  @@map("game_mechanics")
+}
+
+
+
+model LibraryItem {
+  id                      Int                 @id @default(autoincrement()) @map(name: "id")
+  boardGameGeekThingId    Int                 @map(name: "bgg_thing_id")
+  boardGameGeekThing      BoardGameGeekThing  @relation(fields: [boardGameGeekThingId], references: [boardGameGeekId])
+  barcode                 String              @map(name: "barcode")
+  alias                   String?             @map(name: "alias")
+  owner                   String              @map(name: "owner")
+  isHidden                Boolean             @map(name: "is_hidden")
+  isCheckedOut            Boolean             @map(name: "is_checked_out")
+  totalCheckedOutMinutes  Int                 @map(name: "minutes_checked_out") @default(0)
+  dateAddedUtc            DateTime            @default(now()) @map(name: "date_added_utc")
+  updatedAtUtc            DateTime            @default(now()) @map(name: "date_updated_utc")
+
+  @@unique([barcode])
+  checkOutEvents        LibraryCheckoutEvent[]
+  additionalContent     AdditionalLibraryItemContent[]
+
+  @@map("library_items")
+}
+
+// Naming gets weird if it's chips or something, but if it's an expansion it makes sense
+model AdditionalLibraryItemContent {
+  libraryItemId         Int                 @map(name: "library_item_id")
+  libraryItem           LibraryItem         @relation(fields: [libraryItemId], references: [id])
+  boardGameGeekThingId  Int                 @map(name: "game_item_id")
+
+  additionalContent     BoardGameGeekThing  @relation(fields: [boardGameGeekThingId], references: [boardGameGeekId])
+
+  @@map("library_item_contents")
+  @@unique([libraryItemId, boardGameGeekThingId])
+  @@index([libraryItemId, boardGameGeekThingId])
+}
+
+// Add Library Item Expansions
+
+model Person {
+  id              Int                   @id @default(autoincrement()) @map(name: "id")
+  firstName       String                @map(name: "first_name")
+  preferredName   String?               @map(name: "preferred_name")
+  lastName        String                @map(name: "last_name")
+  email           String?               @map(name: "email")
+  phoneNumber     String?               @map(name: "phone_number")
+  attendee        Attendee[]
+
+  @@map("people")
+}
+
+model PlayToWinItem {
+  id                    Int                 @id @default(autoincrement()) @map(name: "id")
+  boardGameGeekThingId  Int                 @map(name: "bgg_thing_id")
+  boardGameGeekThing    BoardGameGeekThing  @relation(fields: [boardGameGeekThingId], references: [boardGameGeekId])
+  gameName              String?             @map(name: "game_name")
+  conventionId          Int                 @map(name: "convention_id")
+  convention            Convention          @relation(fields: [conventionId], references: [id])
+  isHidden              Boolean             @map(name: "is_hidden")
+  // is_checked_out?
+
+  @@map("play_to_win_items")
+}
+
+
+model LibraryCheckoutEvent {
+  id                         String             @id @default(cuid()) @map(name: "id")
+  libraryGameBarCodeScanned  Int                @map(name: "libary_game_barcode_scanned")
+  libraryCopyId              Int                @map(name: "library_item_id")
+  library                    LibraryItem        @relation(fields: [libraryCopyId], references: [id])
+  attendeeId                 Int                @map(name: "checkout_attendee_id")
+  attendee                   Attendee           @relation(fields: [attendeeId], references: [id])
+  checkedOutTime             DateTime           @default(now()) @map("checked_out_time_utc")
+  checkedInTime              DateTime?          @map("checked_in_time_utc")
+
+  @@map("library_checkout_events")
+}
+
+model Attendee {
+  id              Int         @id @default(autoincrement()) @map(name: "id")
+  personId        Int         @map(name: "person_id")
+  person          Person      @relation(fields: [personId], references: [id])
+  isCheckedIn     Boolean     @default(false) @map(name: "is_checked_in")
+  checkedInUtc    DateTime?   @map(name: "checked_in_utc")
+
+  checkOutEvents  LibraryCheckoutEvent[]
+
+  @@map("attendees")
+}

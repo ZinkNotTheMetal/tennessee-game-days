@@ -1,0 +1,25 @@
+{
+  "name": "@repo/tgd-database",
+  "version": "0.0.0",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "5.11.0",
+    "@repo/board-game-geek-shared": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "boardgamegeekclient": "1.9.1",
+    "he": "^1.2.0",
+    "ts-node": "10.9.2"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^7.3.0",
+    "prisma": "5.11.0",
+    "prisma-dbml-generator": "^0.12.0"
+  },
+  "scripts": {
+    "db:migrate": "dotenv -e .env.local pnpm dlx prisma migrate dev",
+    "db:seed": "dotenv -e .env.local ts-node ./prisma/seed/initial-data.ts",
+    "db:generate": "prisma generate",
+    "db:publish:documentation": "pnpm db:generate && pnpm dbdocs build ./prisma/docs/schema.dbml --project=TennesseeGameDays",
+    "db:push": "prisma db push --skip-generate"
+  }
+}

@@ -5,11 +5,10 @@ const nextConfig = {
   compiler: {
     removeConsole: false,
   },
-  transpilePackages: ["ui"],
   images: {
     domains: ["cf.geekdo-images.com", "wowjohn.com"],
   },
   swcMinify: true,
 };
 
-module.exports = nextConfig
+module.exports = nextConfig;

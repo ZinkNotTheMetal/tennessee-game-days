@@ -1,0 +1,173 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table centralized_barcodes {
+  id Int [pk, increment]
+  barcode String [unique, not null]
+  entityType EntityType [not null]
+  entityId Int [not null]
+
+  indexes {
+    (entityType, entityId) [unique]
+  }
+}
+
+Table conventions {
+  id Int [pk, increment]
+  name String [unique, not null]
+  startDateUtc DateTime
+  endDateUtc DateTime
+  updatedAtUtc DateTime [default: `now()`, not null]
+  isCancelled Boolean [not null, default: false]
+  venueId Int
+  venue venues
+  PlayToWinGames play_to_win_items [not null]
+}
+
+Table venues {
+  id Int [pk, increment]
+  name String [unique, not null]
+  streetNumber String [not null]
+  streetName String [not null]
+  city String [not null]
+  stateProvince String [not null]
+  postalCode String [not null]
+  latitude Decimal
+  longitude Decimal
+  convention conventions [not null]
+}
+
+Table board_game_geek_items {
+  boardGameGeekId Int [pk]
+  itemName String [not null]
+  type String [not null]
+  description String
+  thumbnailUrl String
+  imageUrl String
+  yearPublished Int
+  playingTimeMinutes Int
+  minimumPlayerCount Int
+  maximumPlayerCount Int
+  minimumPlayerAge Int
+  ranking Int
+  votedBestPlayerCount Int
+  averageUserRating Decimal
+  complexityRating Decimal
+  libraryItems library_items [not null]
+  libraryItemContains library_item_contents [not null]
+  playToWinGames play_to_win_items [not null]
+  gameMechanics game_mechanics [not null]
+}
+
+Table bgg_mechanics {
+  id Int [pk, increment]
+  name String [unique, not null]
+  gameMechanics game_mechanics [not null]
+}
+
+Table game_mechanics {
+  boardGameGeekId Int [not null]
+  boardGameGeekThing board_game_geek_items [not null]
+  mechanicId Int [not null]
+  mechanic bgg_mechanics [not null]
+
+  indexes {
+    (boardGameGeekId, mechanicId) [unique]
+  }
+}
+
+Table library_items {
+  id Int [pk, increment]
+  boardGameGeekThingId Int [not null]
+  boardGameGeekThing board_game_geek_items [not null]
+  barcode String [unique, not null]
+  alias String
+  owner String [not null]
+  isHidden Boolean [not null]
+  isCheckedOut Boolean [not null]
+  totalCheckedOutMinutes Int [not null, default: 0]
+  dateAddedUtc DateTime [default: `now()`, not null]
+  updatedAtUtc DateTime [default: `now()`, not null]
+  checkOutEvents library_checkout_events [not null]
+  additionalContent library_item_contents [not null]
+}
+
+Table library_item_contents {
+  libraryItemId Int [not null]
+  libraryItem library_items [not null]
+  boardGameGeekThingId Int [not null]
+  additionalContent board_game_geek_items [not null]
+
+  indexes {
+    (libraryItemId, boardGameGeekThingId) [unique]
+  }
+}
+
+Table people {
+  id Int [pk, increment]
+  firstName String [not null]
+  preferredName String
+  lastName String [not null]
+  email String
+  phoneNumber String
+  attendee attendees [not null]
+}
+
+Table play_to_win_items {
+  id Int [pk, increment]
+  boardGameGeekThingId Int [not null]
+  boardGameGeekThing board_game_geek_items [not null]
+  gameName String
+  conventionId Int [not null]
+  convention conventions [not null]
+  isHidden Boolean [not null]
+}
+
+Table library_checkout_events {
+  id String [pk]
+  libraryGameBarCodeScanned Int [not null]
+  libraryCopyId Int [not null]
+  library library_items [not null]
+  attendeeId Int [not null]
+  attendee attendees [not null]
+  checkedOutTime DateTime [default: `now()`, not null]
+  checkedInTime DateTime
+}
+
+Table attendees {
+  id Int [pk, increment]
+  personId Int [not null]
+  person people [not null]
+  isCheckedIn Boolean [not null, default: false]
+  checkedInUtc DateTime
+  checkOutEvents library_checkout_events [not null]
+}
+
+Enum EntityType {
+  Attendee
+  LibraryItem
+  PlayToWinItem
+}
+
+Ref: conventions.venueId > venues.id
+
+Ref: game_mechanics.boardGameGeekId > board_game_geek_items.boardGameGeekId
+
+Ref: game_mechanics.mechanicId > bgg_mechanics.id
+
+Ref: library_items.boardGameGeekThingId > board_game_geek_items.boardGameGeekId
+
+Ref: library_item_contents.libraryItemId > library_items.id
+
+Ref: library_item_contents.boardGameGeekThingId > board_game_geek_items.boardGameGeekId
+
+Ref: play_to_win_items.boardGameGeekThingId > board_game_geek_items.boardGameGeekId
+
+Ref: play_to_win_items.conventionId > conventions.id
+
+Ref: library_checkout_events.libraryCopyId > library_items.id
+
+Ref: library_checkout_events.attendeeId > attendees.id
+
+Ref: attendees.personId > people.id
