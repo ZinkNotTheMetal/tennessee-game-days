@@ -61,7 +61,7 @@ Table board_game_geek_items {
 }
 
 Table bgg_mechanics {
-  id Int [pk, increment]
+  id Int [pk]
   name String [unique, not null]
   gameMechanics game_mechanics [not null]
 }
