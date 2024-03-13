@@ -62,16 +62,16 @@ CREATE TABLE "board_game_geek_items" (
 
 -- CreateTable
 CREATE TABLE "bgg_mechanics" (
-    "id" SERIAL NOT NULL,
+    "bgg_mechanic_id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
 
-    CONSTRAINT "bgg_mechanics_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "bgg_mechanics_pkey" PRIMARY KEY ("bgg_mechanic_id")
 );
 
 -- CreateTable
 CREATE TABLE "game_mechanics" (
     "bgg_id" INTEGER NOT NULL,
-    "mechanic_id" INTEGER NOT NULL
+    "bgg_mechanic_id" INTEGER NOT NULL
 );
 
 -- CreateTable
@@ -160,10 +160,10 @@ CREATE UNIQUE INDEX "board_game_geek_items_bgg_id_key" ON "board_game_geek_items
 CREATE UNIQUE INDEX "bgg_mechanics_name_key" ON "bgg_mechanics"("name");
 
 -- CreateIndex
-CREATE INDEX "game_mechanics_bgg_id_mechanic_id_idx" ON "game_mechanics"("bgg_id", "mechanic_id");
+CREATE INDEX "game_mechanics_bgg_id_bgg_mechanic_id_idx" ON "game_mechanics"("bgg_id", "bgg_mechanic_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "game_mechanics_bgg_id_mechanic_id_key" ON "game_mechanics"("bgg_id", "mechanic_id");
+CREATE UNIQUE INDEX "game_mechanics_bgg_id_bgg_mechanic_id_key" ON "game_mechanics"("bgg_id", "bgg_mechanic_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "library_items_barcode_key" ON "library_items"("barcode");
@@ -181,7 +181,7 @@ ALTER TABLE "conventions" ADD CONSTRAINT "conventions_venue_id_fkey" FOREIGN KEY
 ALTER TABLE "game_mechanics" ADD CONSTRAINT "game_mechanics_bgg_id_fkey" FOREIGN KEY ("bgg_id") REFERENCES "board_game_geek_items"("bgg_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "game_mechanics" ADD CONSTRAINT "game_mechanics_mechanic_id_fkey" FOREIGN KEY ("mechanic_id") REFERENCES "bgg_mechanics"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "game_mechanics" ADD CONSTRAINT "game_mechanics_bgg_mechanic_id_fkey" FOREIGN KEY ("bgg_mechanic_id") REFERENCES "bgg_mechanics"("bgg_mechanic_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "library_items" ADD CONSTRAINT "library_items_bgg_thing_id_fkey" FOREIGN KEY ("bgg_thing_id") REFERENCES "board_game_geek_items"("bgg_id") ON DELETE RESTRICT ON UPDATE CASCADE;

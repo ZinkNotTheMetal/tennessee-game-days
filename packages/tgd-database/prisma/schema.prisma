@@ -95,7 +95,7 @@ model BoardGameGeekThing {
 }
 
 model Mechanic {
-  id                   Int             @id @default(autoincrement()) @map(name: "id")
+  id                   Int             @id @map(name: "bgg_mechanic_id")
   name                 String          @unique @map(name: "name")
 
   gameMechanics        GameMechanic[]
@@ -106,15 +106,13 @@ model Mechanic {
 model GameMechanic {
   boardGameGeekId       Int                 @map(name: "bgg_id")
   boardGameGeekThing    BoardGameGeekThing  @relation(fields: [boardGameGeekId], references: [boardGameGeekId])
-  mechanicId            Int                 @map(name: "mechanic_id")
+  mechanicId            Int                 @map(name: "bgg_mechanic_id")
   mechanic              Mechanic            @relation(fields: [mechanicId], references: [id])
 
   @@unique([boardGameGeekId, mechanicId])
   @@index([boardGameGeekId, mechanicId])
   @@map("game_mechanics")
 }
-
-
 
 model LibraryItem {
   id                      Int                 @id @default(autoincrement()) @map(name: "id")
@@ -153,7 +151,7 @@ model AdditionalLibraryItemContent {
 
 model Person {
   id              Int                   @id @default(autoincrement()) @map(name: "id")
-  firstName       String                @map(name: "first_name")
+  firstName        String                @map(name: "first_name")
   preferredName   String?               @map(name: "preferred_name")
   lastName        String                @map(name: "last_name")
   email           String?               @map(name: "email")
