@@ -27,8 +27,8 @@ importers:
         specifier: ^20.11.24
         version: 20.11.24
       '@types/react':
-        specifier: ^18.2.61
-        version: 18.2.61
+        specifier: ^18.2.65
+        version: 18.2.65
       '@types/react-dom':
         specifier: ^18.2.19
         version: 18.2.19
@@ -56,49 +56,6 @@ importers:
       tailwindcss:
         specifier: 3.4.1
         version: 3.4.1
-      typescript:
-        specifier: ^5.3.3
-        version: 5.3.3
-
-  apps/docs:
-    dependencies:
-      '@repo/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      next:
-        specifier: ^14.1.1
-        version: 14.1.1(react-dom@18.2.0)(react@18.2.0)
-      react:
-        specifier: ^18.2.0
-        version: 18.2.0
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.2.0(react@18.2.0)
-    devDependencies:
-      '@next/eslint-plugin-next':
-        specifier: ^14.1.1
-        version: 14.1.1
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/eslint-config
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
-      '@types/eslint':
-        specifier: ^8.56.5
-        version: 8.56.5
-      '@types/node':
-        specifier: ^20.11.24
-        version: 20.11.24
-      '@types/react':
-        specifier: ^18.2.61
-        version: 18.2.61
-      '@types/react-dom':
-        specifier: ^18.2.19
-        version: 18.2.19
-      eslint:
-        specifier: ^8.57.0
-        version: 8.57.0
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
@@ -134,8 +91,8 @@ importers:
         specifier: ^20.11.24
         version: 20.11.24
       '@types/react':
-        specifier: ^18.2.61
-        version: 18.2.61
+        specifier: ^18.2.65
+        version: 18.2.65
       '@types/react-dom':
         specifier: ^18.2.19
         version: 18.2.19
@@ -190,8 +147,8 @@ importers:
         specifier: ^20.11.24
         version: 20.11.24
       '@types/react':
-        specifier: ^18.2.61
-        version: 18.2.61
+        specifier: ^18.2.65
+        version: 18.2.65
       '@types/react-dom':
         specifier: ^18.2.19
         version: 18.2.19
@@ -813,10 +770,10 @@ packages:
   /@types/react-dom@18.2.19:
     resolution: {integrity: sha512-aZvQL6uUbIJpjZk4U8JZGbau9KDeAwMfmhyWorxgBkqDIEf6ROjRozcmPIicqsUwPUjbkDfHKgGee1Lq65APcA==}
     dependencies:
-      '@types/react': 18.2.61
+      '@types/react': 18.2.65
 
-  /@types/react@18.2.61:
-    resolution: {integrity: sha512-NURTN0qNnJa7O/k4XUkEW2yfygA+NxS0V5h1+kp9jPwhzZy95q3ADoGMP0+JypMhrZBTTgjKAUlTctde1zzeQA==}
+  /@types/react@18.2.65:
+    resolution: {integrity: sha512-98TsY0aW4jqx/3RqsUXwMDZSWR1Z4CUlJNue8ueS2/wcxZOsz4xmW1X8ieaWVRHcmmQM3R8xVA4XWB3dJnWwDQ==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.3
