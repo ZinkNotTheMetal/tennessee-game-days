@@ -1,3 +1,6 @@
+# PRISMA:
+# https://stackoverflow.com/questions/67746885/prisma-client-did-not-initialize-yet-please-run-prisma-generate-and-try-to-i
+
 FROM node:alpine AS base
 RUN apk add --no-cache libc6-compat && apk update
 ENV PNPM_HOME="/pnpm"
