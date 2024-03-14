@@ -37,24 +37,34 @@ export function LibraryForm({
     setOnSubmitting(true);
     // Updating
     if (libraryItem.id && libraryItem.id > 0) {
-
-      
       // Adding
     } else {
-      fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/add`, {
-        method: 'POST',
-        body: JSON.stringify(data)
-      })
+      fetch(
+        `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/add`,
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+        }
+      )
         .then((response) => {
           if (response.ok) {
-            toast(`Successfully added ${libraryItem.boardGameGeekThing.itemName} to the library`, { type: 'success' })
+            toast(
+              `Successfully added ${libraryItem.boardGameGeekThing.itemName} to the library`,
+              { type: "success" }
+            );
           } else {
-            toast(`Failed to add ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`, { type: 'error' })
+            toast(
+              `Failed to add ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`,
+              { type: "error" }
+            );
           }
         })
         .catch((error) => {
-          toast(`Failed to add ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`, { type: 'error' })
-        })
+          toast(
+            `Failed to add ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`,
+            { type: "error" }
+          );
+        });
     }
 
     router.push("/library");
@@ -63,13 +73,14 @@ export function LibraryForm({
   return (
     <form className="bg-white rounded-xl" onSubmit={handleSubmit(onSubmit)}>
       <div className="grid grid-cols-3 gap-4 py-4">
-        <div className="col-span-1 flex justify-center items-center">
-          <div className="w-64 h-64 rounded overflow-hidden">
+        <div className="col-span-1 px-10 flex justify-center items-center">
+          <div className="relative h-64 w-56">
             <Image
               src={boardGameGeekThing.imageUrl}
               alt={`Image for ${boardGameGeekThing.itemName}`}
-              width={365}
-              height={365}
+              priority={true}
+              fill={true}
+              className="rounded"
             />
           </div>
         </div>
@@ -104,7 +115,7 @@ export function LibraryForm({
               Alias
             </label>
             <input
-              className="w-full p-2 border border-gray-300 rounded"
+              className={`w-full p-2 border border-gray-300 rounded`}
               {...register("alias")}
             />
             <span className="text-sm text-red-500">
@@ -124,11 +135,13 @@ export function LibraryForm({
               Barcode
             </label>
             <input
-              className="w-full p-2 border border-gray-300 rounded"
+              className={`w-full p-2 border ${errors?.barcode ? "border-red-600" : "border-gray-300"} rounded`}
               {...register("barcode", { required: true })}
             />
-            { errors.barcode && (
-              <span className="text-red-600">Barcode is required to add item to library</span>
+            {errors.barcode && (
+              <span className="text-red-600">
+                Barcode is required to add item to library
+              </span>
             )}
           </div>
           <div>
@@ -139,11 +152,13 @@ export function LibraryForm({
               Owner
             </label>
             <input
-              className="w-full p-2 border border-gray-300 rounded"
+              className={`w-full p-2 border ${errors?.owner ? "border-red-600" : "border-gray-300"} rounded`}
               {...register("owner", { required: true })}
             />
-            { errors.owner && (
-              <span className="text-red-600">Owner is required to add item to library</span>
+            {errors.owner && (
+              <span className="text-red-600">
+                Owner is required to add item to library
+              </span>
             )}
           </div>
         </div>
