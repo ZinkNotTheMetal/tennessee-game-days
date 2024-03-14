@@ -9,7 +9,7 @@ export function MapToBoardGameEntity(
 ): IBoardGameGeekEntity {
 
   const entity: IBoardGameGeekEntity = {
-    boardGameGeekId: Number(bggThingDto.id),
+    id: Number(bggThingDto.id),
     itemName: he.decode(String(bggThingDto.name)).replace(/&quot;/g, '"'),
     description: he
       .decode(bggThingDto.description)

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LibraryGameTable } from "./library-table";
-import { ILibraryItem } from "@repo/shared";
+import { ApiListResponse, ILibraryItem } from "@repo/shared";
 import AddGameToLibraryButton from "@/app/components/buttons/add-game-to-library";
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export const revalidate = 0
 async function getLibraryItems() {
   const libraryItemsApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/list`)
 
-  const libraryItems = await libraryItemsApi.json();
+  const libraryItems: ApiListResponse<ILibraryItem> = await libraryItemsApi.json();
 
   libraryItems.list.sort((a: ILibraryItem, b: ILibraryItem) => {
     // If Alias is null, use ItemName for sorting

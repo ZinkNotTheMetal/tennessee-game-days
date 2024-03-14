@@ -46,11 +46,10 @@ export default async function AddLibraryItemToDatabase(
 
   const bggGame: IBoardGameGeekEntity =
     MapToBoardGameEntity(bggResultFromIdToAdd);
-  const { mechanics, boardGameGeekId, ...allOtherProperties } = bggGame;
+  const { mechanics, id, ...allOtherProperties } = bggGame;
 
   // Upsert BGG Game from library
-  console.log("Upserting Bgg Game:", boardGameGeekId);
-  const bggAddedId = await UpsertBggGame(boardGameGeekId, allOtherProperties);
+  const bggAddedId = await UpsertBggGame(id, allOtherProperties);
 
   // Add other content here
   for (const includedItemInBox of includedItems) {
@@ -60,18 +59,14 @@ export default async function AddLibraryItemToDatabase(
 
     let boxContentGame: IBoardGameGeekEntity =
       MapToBoardGameEntity(bggContentInBox);
-    const { mechanics, boardGameGeekId, ...contentProperties } = boxContentGame;
+    const { mechanics, id, ...contentProperties } = boxContentGame;
 
     // Upsert BGG Game from library
-    await UpsertBggGame(boardGameGeekId, contentProperties);
+    await UpsertBggGame(id, contentProperties);
   }
 
-  // Add mechanics to main library item
-  console.log("Add mechanics to game:", bggAddedId);
   await AddMechanicsToDatabase(bggAddedId, mechanics);
 
-  // Add game to library
-  console.log("Add game to library:", bggAddedId);
   const libraryIdAdded = await AddBggGameToLibrary(
     barcode,
     bggAddedId,
@@ -80,7 +75,7 @@ export default async function AddLibraryItemToDatabase(
   );
 
   // Add to centralized barcode
-  console.log("Finally updating item barcode:", bggAddedId);
+  console.log("Successfully Added:", bggAddedId);
   await UpsertLibraryItemBarcode(barcode, libraryIdAdded);
 }
 
@@ -90,12 +85,12 @@ async function AddBggGameToLibrary(
   alias: string | null,
   owner: string
 ): Promise<number> {
-  // Need to be careful, don't have a great way to upsert
+  
   const libraryItem = await prisma.libraryItem.upsert({
     where: { barcode: barcode },
     update: {
       boardGameGeekThing: {
-        connect: { boardGameGeekId: bggId },
+        connect: { id: bggId },
       },
       alias: alias,
       owner: owner,
@@ -105,7 +100,7 @@ async function AddBggGameToLibrary(
     },
     create: {
       boardGameGeekThing: {
-        connect: { boardGameGeekId: bggId },
+        connect: { id: bggId },
       },
       owner: owner,
       alias: alias,
@@ -207,13 +202,13 @@ async function UpsertBggGame(
 ): Promise<number> {
 
   const upsertGame = await prisma.boardGameGeekThing.upsert({
-    where: { boardGameGeekId: bggItemToAdd },
+    where: { id: bggItemToAdd },
     update: bggProperties,
     create: {
       ...bggProperties,
-      boardGameGeekId: bggItemToAdd,
+      id: bggItemToAdd,
     },
   });
 
-  return upsertGame.boardGameGeekId;
+  return upsertGame.id;
 }

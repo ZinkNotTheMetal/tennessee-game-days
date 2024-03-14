@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output = "../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -69,7 +70,7 @@ model Venue {
 
 // Could be Accessory / Expansion / Board Game / ... w/e else
 model BoardGameGeekThing {
-  boardGameGeekId      Int             @id @unique @map(name: "bgg_id")
+  id                   Int             @id @unique @map(name: "bgg_id")
   itemName             String          @map(name: "bgg_item_name")
   type                 String          @map(name: "item_type")
   description          String?         @map(name: "description")
@@ -105,7 +106,7 @@ model Mechanic {
 
 model GameMechanic {
   boardGameGeekId       Int                 @map(name: "bgg_id")
-  boardGameGeekThing    BoardGameGeekThing  @relation(fields: [boardGameGeekId], references: [boardGameGeekId])
+  boardGameGeekThing    BoardGameGeekThing  @relation(fields: [boardGameGeekId], references: [id])
   mechanicId            Int                 @map(name: "bgg_mechanic_id")
   mechanic              Mechanic            @relation(fields: [mechanicId], references: [id])
 
@@ -116,8 +117,8 @@ model GameMechanic {
 
 model LibraryItem {
   id                      Int                 @id @default(autoincrement()) @map(name: "id")
-  boardGameGeekThingId    Int                 @map(name: "bgg_thing_id")
-  boardGameGeekThing      BoardGameGeekThing  @relation(fields: [boardGameGeekThingId], references: [boardGameGeekId])
+  boardGameGeekId         Int                 @map(name: "bgg_id")
+  boardGameGeekThing      BoardGameGeekThing  @relation(fields: [boardGameGeekId], references: [id])
   barcode                 String              @map(name: "barcode")
   alias                   String?             @map(name: "alias")
   owner                   String              @map(name: "owner")
@@ -138,13 +139,13 @@ model LibraryItem {
 model AdditionalLibraryItemContent {
   libraryItemId         Int                 @map(name: "library_item_id")
   libraryItem           LibraryItem         @relation(fields: [libraryItemId], references: [id])
-  boardGameGeekThingId  Int                 @map(name: "game_item_id")
+  boardGameGeekId       Int                 @map(name: "bgg_id")
 
-  additionalContent     BoardGameGeekThing  @relation(fields: [boardGameGeekThingId], references: [boardGameGeekId])
+  additionalContent     BoardGameGeekThing  @relation(fields: [boardGameGeekId], references: [id])
 
   @@map("library_item_contents")
-  @@unique([libraryItemId, boardGameGeekThingId])
-  @@index([libraryItemId, boardGameGeekThingId])
+  @@unique([libraryItemId, boardGameGeekId])
+  @@index([libraryItemId, boardGameGeekId])
 }
 
 // Add Library Item Expansions
@@ -163,8 +164,8 @@ model Person {
 
 model PlayToWinItem {
   id                    Int                 @id @default(autoincrement()) @map(name: "id")
-  boardGameGeekThingId  Int                 @map(name: "bgg_thing_id")
-  boardGameGeekThing    BoardGameGeekThing  @relation(fields: [boardGameGeekThingId], references: [boardGameGeekId])
+  boardGameGeekId       Int                 @map(name: "bgg_id")
+  boardGameGeekThing    BoardGameGeekThing  @relation(fields: [boardGameGeekId], references: [id])
   gameName              String?             @map(name: "game_name")
   conventionId          Int                 @map(name: "convention_id")
   convention            Convention          @relation(fields: [conventionId], references: [id])

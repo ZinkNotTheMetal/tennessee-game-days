@@ -39,7 +39,7 @@ Table venues {
 }
 
 Table board_game_geek_items {
-  boardGameGeekId Int [pk]
+  id Int [pk]
   itemName String [not null]
   type String [not null]
   description String
@@ -79,7 +79,7 @@ Table game_mechanics {
 
 Table library_items {
   id Int [pk, increment]
-  boardGameGeekThingId Int [not null]
+  boardGameGeekId Int [not null]
   boardGameGeekThing board_game_geek_items [not null]
   barcode String [unique, not null]
   alias String
@@ -96,11 +96,11 @@ Table library_items {
 Table library_item_contents {
   libraryItemId Int [not null]
   libraryItem library_items [not null]
-  boardGameGeekThingId Int [not null]
+  boardGameGeekId Int [not null]
   additionalContent board_game_geek_items [not null]
 
   indexes {
-    (libraryItemId, boardGameGeekThingId) [unique]
+    (libraryItemId, boardGameGeekId) [unique]
   }
 }
 
@@ -116,7 +116,7 @@ Table people {
 
 Table play_to_win_items {
   id Int [pk, increment]
-  boardGameGeekThingId Int [not null]
+  boardGameGeekId Int [not null]
   boardGameGeekThing board_game_geek_items [not null]
   gameName String
   conventionId Int [not null]
@@ -152,17 +152,17 @@ Enum EntityType {
 
 Ref: conventions.venueId > venues.id
 
-Ref: game_mechanics.boardGameGeekId > board_game_geek_items.boardGameGeekId
+Ref: game_mechanics.boardGameGeekId > board_game_geek_items.id
 
 Ref: game_mechanics.mechanicId > bgg_mechanics.id
 
-Ref: library_items.boardGameGeekThingId > board_game_geek_items.boardGameGeekId
+Ref: library_items.boardGameGeekId > board_game_geek_items.id
 
 Ref: library_item_contents.libraryItemId > library_items.id
 
-Ref: library_item_contents.boardGameGeekThingId > board_game_geek_items.boardGameGeekId
+Ref: library_item_contents.boardGameGeekId > board_game_geek_items.id
 
-Ref: play_to_win_items.boardGameGeekThingId > board_game_geek_items.boardGameGeekId
+Ref: play_to_win_items.boardGameGeekId > board_game_geek_items.id
 
 Ref: play_to_win_items.conventionId > conventions.id
 

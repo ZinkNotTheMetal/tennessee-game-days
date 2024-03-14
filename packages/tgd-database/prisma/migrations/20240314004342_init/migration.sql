@@ -77,7 +77,7 @@ CREATE TABLE "game_mechanics" (
 -- CreateTable
 CREATE TABLE "library_items" (
     "id" SERIAL NOT NULL,
-    "bgg_thing_id" INTEGER NOT NULL,
+    "bgg_id" INTEGER NOT NULL,
     "barcode" TEXT NOT NULL,
     "alias" TEXT,
     "owner" TEXT NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE "library_items" (
 -- CreateTable
 CREATE TABLE "library_item_contents" (
     "library_item_id" INTEGER NOT NULL,
-    "game_item_id" INTEGER NOT NULL
+    "bgg_id" INTEGER NOT NULL
 );
 
 -- CreateTable
@@ -111,7 +111,7 @@ CREATE TABLE "people" (
 -- CreateTable
 CREATE TABLE "play_to_win_items" (
     "id" SERIAL NOT NULL,
-    "bgg_thing_id" INTEGER NOT NULL,
+    "bgg_id" INTEGER NOT NULL,
     "game_name" TEXT,
     "convention_id" INTEGER NOT NULL,
     "is_hidden" BOOLEAN NOT NULL,
@@ -169,10 +169,10 @@ CREATE UNIQUE INDEX "game_mechanics_bgg_id_bgg_mechanic_id_key" ON "game_mechani
 CREATE UNIQUE INDEX "library_items_barcode_key" ON "library_items"("barcode");
 
 -- CreateIndex
-CREATE INDEX "library_item_contents_library_item_id_game_item_id_idx" ON "library_item_contents"("library_item_id", "game_item_id");
+CREATE INDEX "library_item_contents_library_item_id_bgg_id_idx" ON "library_item_contents"("library_item_id", "bgg_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "library_item_contents_library_item_id_game_item_id_key" ON "library_item_contents"("library_item_id", "game_item_id");
+CREATE UNIQUE INDEX "library_item_contents_library_item_id_bgg_id_key" ON "library_item_contents"("library_item_id", "bgg_id");
 
 -- AddForeignKey
 ALTER TABLE "conventions" ADD CONSTRAINT "conventions_venue_id_fkey" FOREIGN KEY ("venue_id") REFERENCES "venues"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -184,16 +184,16 @@ ALTER TABLE "game_mechanics" ADD CONSTRAINT "game_mechanics_bgg_id_fkey" FOREIGN
 ALTER TABLE "game_mechanics" ADD CONSTRAINT "game_mechanics_bgg_mechanic_id_fkey" FOREIGN KEY ("bgg_mechanic_id") REFERENCES "bgg_mechanics"("bgg_mechanic_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "library_items" ADD CONSTRAINT "library_items_bgg_thing_id_fkey" FOREIGN KEY ("bgg_thing_id") REFERENCES "board_game_geek_items"("bgg_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "library_items" ADD CONSTRAINT "library_items_bgg_id_fkey" FOREIGN KEY ("bgg_id") REFERENCES "board_game_geek_items"("bgg_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "library_item_contents" ADD CONSTRAINT "library_item_contents_library_item_id_fkey" FOREIGN KEY ("library_item_id") REFERENCES "library_items"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "library_item_contents" ADD CONSTRAINT "library_item_contents_game_item_id_fkey" FOREIGN KEY ("game_item_id") REFERENCES "board_game_geek_items"("bgg_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "library_item_contents" ADD CONSTRAINT "library_item_contents_bgg_id_fkey" FOREIGN KEY ("bgg_id") REFERENCES "board_game_geek_items"("bgg_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "play_to_win_items" ADD CONSTRAINT "play_to_win_items_bgg_thing_id_fkey" FOREIGN KEY ("bgg_thing_id") REFERENCES "board_game_geek_items"("bgg_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "play_to_win_items" ADD CONSTRAINT "play_to_win_items_bgg_id_fkey" FOREIGN KEY ("bgg_id") REFERENCES "board_game_geek_items"("bgg_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "play_to_win_items" ADD CONSTRAINT "play_to_win_items_convention_id_fkey" FOREIGN KEY ("convention_id") REFERENCES "conventions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

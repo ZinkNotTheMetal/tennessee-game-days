@@ -1,4 +1,4 @@
-import { IBoardGameGeekThing } from "./board-game-thing";
+import { IBoardGameGeekEntity } from "../../../board-game-geek-shared";
 
 interface ILibraryItem {
   /** @format int32 */
@@ -14,9 +14,9 @@ interface ILibraryItem {
   dateAddedUtc: string;
   updatedAtUtc: string;
   totalCheckedOutMinutes: number;
-  additionalBoxContent: any[]; // TODO: @WZ Fix this when I can test content
+  additionalBoxContent: number[];
   checkOutEvents: any[]; // TODO: @WZ Fix this when I can test checkout events
-  boardGameGeekThing: IBoardGameGeekThing;
+  boardGameGeekThing: IBoardGameGeekEntity;
 }
 
 export type { ILibraryItem };
