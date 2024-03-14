@@ -5,6 +5,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { ILibraryItem } from "@repo/shared";
 
 interface LibraryFormProps {
@@ -34,12 +35,33 @@ export function LibraryForm({
 
   const onSubmit: SubmitHandler<ILibraryItem> = async (data) => {
     setOnSubmitting(true);
+    // Updating
+    if (libraryItem.id && libraryItem.id > 0) {
+
+      
+      // Adding
+    } else {
+      fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/add`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+      })
+        .then((response) => {
+          if (response.ok) {
+            toast(`Successfully added ${libraryItem.boardGameGeekThing.itemName} to the library`, { type: 'success' })
+          } else {
+            toast(`Failed to add ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`, { type: 'error' })
+          }
+        })
+        .catch((error) => {
+          toast(`Failed to add ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`, { type: 'error' })
+        })
+    }
 
     router.push("/library");
   };
 
   return (
-    <form className="bg-white rounded-xl">
+    <form className="bg-white rounded-xl" onSubmit={handleSubmit(onSubmit)}>
       <div className="grid grid-cols-3 gap-4 py-4">
         <div className="col-span-1 flex justify-center items-center">
           <div className="w-64 h-64 rounded overflow-hidden">
@@ -103,8 +125,11 @@ export function LibraryForm({
             </label>
             <input
               className="w-full p-2 border border-gray-300 rounded"
-              {...register("barcode")}
+              {...register("barcode", { required: true })}
             />
+            { errors.barcode && (
+              <span className="text-red-600">Barcode is required to add item to library</span>
+            )}
           </div>
           <div>
             <label
@@ -115,8 +140,11 @@ export function LibraryForm({
             </label>
             <input
               className="w-full p-2 border border-gray-300 rounded"
-              {...register("owner")}
+              {...register("owner", { required: true })}
             />
+            { errors.owner && (
+              <span className="text-red-600">Owner is required to add item to library</span>
+            )}
           </div>
         </div>
 

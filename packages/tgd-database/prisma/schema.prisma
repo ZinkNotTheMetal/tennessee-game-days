@@ -129,7 +129,7 @@ model LibraryItem {
 
   @@unique([barcode])
   checkOutEvents        LibraryCheckoutEvent[]
-  additionalContent     AdditionalLibraryItemContent[]
+  additionalBoxContent  AdditionalLibraryItemContent[]
 
   @@map("library_items")
 }

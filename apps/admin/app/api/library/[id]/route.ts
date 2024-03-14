@@ -31,7 +31,10 @@ export async function GET(
 
   const response = {
     ...libraryItemById,
-    mechanics: [...mechanics.map((m: { mechanic: { id: number, name: string }}) => ({ id: m.mechanic.id, name: m.mechanic.name }))],
+    boardGameGeekThing: { 
+      ...libraryItemById.boardGameGeekThing,
+      mechanics: [...mechanics.map((m: { mechanic: { id: number, name: string }}) => ({ id: m.mechanic.id, name: m.mechanic.name }))]
+    }
   };
 
   return NextResponse.json(response);
