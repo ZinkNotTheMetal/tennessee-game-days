@@ -8,7 +8,7 @@ export async function GET(
   const libraryItemById = await prisma.libraryItem.findFirst({
     where: { id: Number(params.id) },
     include: {
-      additionalContent: true,
+      additionalBoxContent: true,
       checkOutEvents: true,
       boardGameGeekThing: true,
     },

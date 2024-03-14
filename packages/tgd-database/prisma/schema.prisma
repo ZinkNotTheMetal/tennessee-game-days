@@ -140,7 +140,7 @@ model AdditionalLibraryItemContent {
   libraryItem           LibraryItem         @relation(fields: [libraryItemId], references: [id])
   boardGameGeekId       Int                 @map(name: "bgg_id")
 
-  additionalContent     BoardGameGeekThing  @relation(fields: [boardGameGeekId], references: [id])
+  additionalBoxContent     BoardGameGeekThing  @relation(fields: [boardGameGeekId], references: [id])
 
   @@map("library_item_contents")
   @@unique([libraryItemId, boardGameGeekId])

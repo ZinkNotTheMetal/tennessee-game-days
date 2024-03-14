@@ -90,14 +90,14 @@ Table library_items {
   dateAddedUtc DateTime [default: `now()`, not null]
   updatedAtUtc DateTime [default: `now()`, not null]
   checkOutEvents library_checkout_events [not null]
-  additionalContent library_item_contents [not null]
+  additionalBoxContent library_item_contents [not null]
 }
 
 Table library_item_contents {
   libraryItemId Int [not null]
   libraryItem library_items [not null]
   boardGameGeekId Int [not null]
-  additionalContent board_game_geek_items [not null]
+  additionalBoxContent board_game_geek_items [not null]
 
   indexes {
     (libraryItemId, boardGameGeekId) [unique]
