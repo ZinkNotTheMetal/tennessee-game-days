@@ -18,7 +18,7 @@ export async function GET(
     return NextResponse.json({ message: "Game not found" }, { status: 404 });
 
   const mechanics = await prisma.gameMechanic.findMany({
-    where: { boardGameGeekId: libraryItemById.boardGameGeekThingId },
+    where: { boardGameGeekId: libraryItemById.boardGameGeekId },
     select: {
       mechanic: {
         select: {

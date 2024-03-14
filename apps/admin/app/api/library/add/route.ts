@@ -21,17 +21,8 @@ export async function POST(request: NextRequest) {
       data: {
         ...rest,
         boardGameGeekId: upsertBggLibraryGame.id,
-        boardGameGeekThing: {
-          connect: { id: upsertBggLibraryGame.id },
-        },
         isCheckedOut: false,
-        additionalContent: {
-          createMany: {
-            data: libraryItemToAdd.additionalBoxContent.map(bggId => ({
-              boardGameGeekId: bggId,
-            }))
-          }
-        }
+        updatedAtUtc: new Date()
       }
     })
 
@@ -62,7 +53,6 @@ export async function POST(request: NextRequest) {
         }
       })
     }
-
 
     NextResponse.json(
       {
