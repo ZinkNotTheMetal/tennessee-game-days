@@ -1,21 +1,32 @@
 interface IBoardGameGeekEntity {
-  boardGameGeekId: number
-  itemName: string
-  description: string
-  type: string
-  thumbnailUrl: string
-  imageUrl: string
-  yearPublished: number
-  playingTimeMinutes: number
-  minimumPlayerCount: number
-  maximumPlayerCount: number
-  minimumPlayerAge: number
+  /* This is the Board Game Geek Id (URL) */
+  id: number;
+  /* (i.e.) Yokohama */
+  itemName: string;
+  /* BoardGame / expansion / accessory */
+  type: string;
+  /* HTML encoded version of the description */
+  description: string;
+  thumbnailUrl: string;
+  imageUrl: string;
+  /** @format int32 */
+  yearPublished: number;
+  /** @format int32 */
+  playingTimeMinutes: number;
+  /** @format int32 */
+  minimumPlayerCount: number;
+  /** @format int32 */
+  maximumPlayerCount: number;
+  /** @format int32 */
+  minimumPlayerAge: number;
   /** @format double */
-  averageUserRating: number
+  ranking: number | null;
+  /** @format int32 */
+  votedBestPlayerCount: number;
   /** @format double */
-  complexityRating: number
-  ranking: number | null
-  votedBestPlayerCount: number | null
+  averageUserRating: number;
+  /** @format double */
+  complexityRating: number;
   mechanics: {id: number, name: string}[]
 }
 

@@ -469,11 +469,19 @@ const gamesToSeed = [
 
 
 async function main() {
+  let gamesAdded = 0;
+
+  const start = performance.now()
 
   for(const game of gamesToSeed) {
     await AddLibraryItemToDatabase(game.bggIdToAdd, game.barcode, game.alias, game.includedItems)
+    gamesAdded++
   }
 
+  const end = performance.now()
+
+  console.log("Call to add rows took " + (end - start) + " milliseconds.");
+  console.log(`Added ${gamesAdded} library Games`)
 }
 
 main()

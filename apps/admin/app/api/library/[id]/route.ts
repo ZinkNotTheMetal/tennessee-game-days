@@ -8,7 +8,7 @@ export async function GET(
   const libraryItemById = await prisma.libraryItem.findFirst({
     where: { id: Number(params.id) },
     include: {
-      additionalContent: true,
+      additionalBoxContent: true,
       checkOutEvents: true,
       boardGameGeekThing: true,
     },
@@ -18,7 +18,7 @@ export async function GET(
     return NextResponse.json({ message: "Game not found" }, { status: 404 });
 
   const mechanics = await prisma.gameMechanic.findMany({
-    where: { boardGameGeekId: libraryItemById.boardGameGeekThingId },
+    where: { boardGameGeekId: libraryItemById.boardGameGeekId },
     select: {
       mechanic: {
         select: {
@@ -31,7 +31,10 @@ export async function GET(
 
   const response = {
     ...libraryItemById,
-    mechanics: [...mechanics.map((m: { mechanic: { id: number, name: string }}) => ({ id: m.mechanic.id, name: m.mechanic.name }))],
+    boardGameGeekThing: { 
+      ...libraryItemById.boardGameGeekThing,
+      mechanics: [...mechanics.map((m: { mechanic: { id: number, name: string }}) => ({ id: m.mechanic.id, name: m.mechanic.name }))]
+    }
   };
 
   return NextResponse.json(response);
