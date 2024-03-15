@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { ILibraryItem } from "@repo/shared";
+import { FormatBoardGameGeekType } from "../components/bgg-type/format-type";
 
 interface LibraryFormProps {
   id?: number;
@@ -126,7 +127,7 @@ export function LibraryForm({
       </div>
 
       <div className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 px-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 px-2">
           <div>
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
@@ -190,7 +191,7 @@ export function LibraryForm({
             <input
               className="w-full p-2 border border-gray-300 bg-slate-200 rounded"
               disabled
-              {...register("boardGameGeekThing.type")}
+              value={FormatBoardGameGeekType(boardGameGeekThing.type)}
             />
           </div>
 

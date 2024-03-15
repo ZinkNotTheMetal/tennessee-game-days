@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { IBoardGameGeekEntity } from '@repo/board-game-geek-shared'
+import { FormatBoardGameGeekType } from '../bgg-type/format-type'
 
 interface BoardGameGeekResultsProps{
   bggResults: { results: IBoardGameGeekEntity[], totalCount: number}
@@ -86,20 +87,6 @@ function BggResultsTableBody({ results, setItemToAdd }: BggResultsTableBodyProps
   )
 }
 
-export function FormatIBggThingType(type: string): string {
-  switch (type) {
-    case "boardgame":
-      return "Board Game"
-    case "accessory":
-      return "Accessory"
-    case "expansion":
-      return "Expansion"
-    default:
-      return type
-  }
-}
-
-
 interface BggResultRowProps {
   result: IBoardGameGeekEntity,
   onChange: React.ChangeEventHandler<HTMLInputElement>
@@ -131,7 +118,7 @@ function BggResultRow({ result, onChange }: BggResultRowProps) : JSX.Element {
       </td>
       <td className="py-4 px-6 border-b" dangerouslySetInnerHTML={{ __html: result.itemName }} />
       <td className="py-4 px-6 border-b">{result.yearPublished}</td>
-      <td className="py-4 px-6 border-b">{FormatIBggThingType(result.type)}</td>
+      <td className="py-4 px-6 border-b">{FormatBoardGameGeekType(result.type)}</td>
       <td className="py-2 px-6 border-b">
         <Link className="test" href={`https://boardgamegeek.com/boardgame/${result.id}`} target='_blank'>
           <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
