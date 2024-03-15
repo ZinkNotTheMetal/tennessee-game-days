@@ -91,7 +91,8 @@ export function LibraryForm({
           );
         });
     }
-    router.push("/library");
+    router.replace("/library");
+    router.refresh()
   };
 
   return (

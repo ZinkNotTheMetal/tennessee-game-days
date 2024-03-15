@@ -3,6 +3,11 @@ import { LibraryGameTable } from "./library-table";
 import { ApiListResponse, ILibraryItem } from "@repo/shared";
 import AddGameToLibraryButton from "@/app/components/buttons/add-game-to-library";
 
+export const revalidate = 0; //Very important
+
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 export const metadata: Metadata = {
   title: "Game Library",
 };
