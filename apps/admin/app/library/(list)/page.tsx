@@ -7,10 +7,10 @@ export const metadata: Metadata = {
   title: "Game Library",
 };
 
-export const revalidate = 0
-
 async function getLibraryItems() {
-  const libraryItemsApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/list`)
+  const libraryItemsApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/list`, {
+    cache: 'no-store',
+  })
 
   const libraryItems: ApiListResponse<ILibraryItem> = await libraryItemsApi.json();
 

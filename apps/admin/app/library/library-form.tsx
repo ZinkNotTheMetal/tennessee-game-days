@@ -38,10 +38,33 @@ export function LibraryForm({
     setOnSubmitting(true);
     // Updating
     if (libraryItem.id && libraryItem.id > 0) {
-      // Adding
+      fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/edit/${libraryItem.id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(data)
+      })
+        .then((response) => {
+          if (response.ok) {
+            toast(
+              `Successfully edited ${libraryItem.boardGameGeekThing.itemName}`,
+              { type: "success" }
+            );
+          } else {
+            toast(
+              `Failed to edit ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`,
+              { type: "error" }
+            );
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+          toast(
+            `Failed to edit ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`,
+            { type: "error" }
+          );
+        });
     } else {
-      fetch(
-        `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/add`,
+      fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/add`,
         {
           method: "POST",
           body: JSON.stringify(data),
@@ -61,13 +84,13 @@ export function LibraryForm({
           }
         })
         .catch((error) => {
+          console.log(error)
           toast(
             `Failed to add ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`,
             { type: "error" }
           );
         });
     }
-
     router.push("/library");
   };
 

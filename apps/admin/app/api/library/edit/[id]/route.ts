@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma"
-import IAddLibraryItemRequest from "../requests/library-item-add";
+import IEditLibraryItemRequest from "../../requests/library-item-edit";
 
 export const dynamic = "force-dynamic"
 
-export async function POST(request: NextRequest) {
-  const libraryItemToAdd: IAddLibraryItemRequest = await request.json();
-  const { boardGameGeekThing, additionalBoxContent } = libraryItemToAdd;
+export async function PUT(request: NextRequest) {
+  const libraryItemToEdit: IEditLibraryItemRequest = await request.json();
+  
+  const { boardGameGeekThing, additionalBoxContent } = libraryItemToEdit
   const { mechanics, id, ...bggRest } = boardGameGeekThing;
 
   const upsertBggLibraryGame = await prisma.boardGameGeekThing.upsert({
@@ -18,24 +19,32 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  const createdLibraryItem = await prisma.libraryItem.create({
+  const updatedLibraryItem = await prisma.libraryItem.update({
+    where: { id: libraryItemToEdit.id },
     data: {
-      alias: libraryItemToAdd?.alias?.trim() === '' ? null : libraryItemToAdd.alias,
-      barcode: libraryItemToAdd.barcode,
-      isHidden: libraryItemToAdd.isHidden,
-      owner: libraryItemToAdd.owner,
+      alias: libraryItemToEdit?.alias?.trim() === '' ? null : libraryItemToEdit.alias,
+      barcode: libraryItemToEdit.barcode,
+      isHidden: libraryItemToEdit.isHidden,
+      owner: libraryItemToEdit.owner,
       boardGameGeekId: upsertBggLibraryGame.id,
-      isCheckedOut: false,
-      updatedAtUtc: new Date(),
-      dateAddedUtc: new Date()
+      updatedAtUtc: new Date()
     }
   })
 
-  await prisma.centralizedBarcode.create({
-    data: {
-      entityId: Number(createdLibraryItem.id),
+  await prisma.centralizedBarcode.upsert({
+    where: {
+      entityType_entityId: {
+        entityId: Number(updatedLibraryItem.id),
+        entityType: "LibraryItem",
+      },
+    },
+    create: {
+      entityId: Number(updatedLibraryItem.id),
       entityType: "LibraryItem",
-      barcode: libraryItemToAdd.barcode
+      barcode: updatedLibraryItem.barcode
+    },
+    update: {
+      barcode: updatedLibraryItem.barcode
     }
   });
 
@@ -67,14 +76,10 @@ export async function POST(request: NextRequest) {
     })
   }
 
-  // Add centeralized id:
-
-
   return NextResponse.json(
     {
-      message: "Successfully added new game to library",
-      created: `/library/edit/${createdLibraryItem.id}`,
+      message: `Successfully edited ${upsertBggLibraryGame.itemName} in library`
     },
-    { status: 201 }
+    { status: 200 }
   )
 }
