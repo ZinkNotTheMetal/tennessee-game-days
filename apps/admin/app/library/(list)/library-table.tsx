@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Search } from "@/app/components/search/search";
 import { useRouter } from "next/navigation";
 import { ILibraryItem } from "@repo/shared";
+import { FormatBoardGameGeekType } from "@/app/components/bgg-type/format-type";
 
 interface LibraryGameTableProps {
   libraryItems: ILibraryItem[];
@@ -118,7 +119,7 @@ export function GameTableRow({
         {libraryItem.alias ?? libraryItem.boardGameGeekThing.itemName}
       </td>
       <td className="py-3 px-3 hidden lg:table-cell">
-        {libraryItem.boardGameGeekThing.type}
+        {FormatBoardGameGeekType(libraryItem.boardGameGeekThing.type)}
       </td>
       <td className="py-3 px-3">{libraryItem.owner}</td>
       <td className="py-3 px-3 hidden sm:table-cell">

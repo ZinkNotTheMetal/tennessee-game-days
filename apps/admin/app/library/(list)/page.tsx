@@ -3,14 +3,19 @@ import { LibraryGameTable } from "./library-table";
 import { ApiListResponse, ILibraryItem } from "@repo/shared";
 import AddGameToLibraryButton from "@/app/components/buttons/add-game-to-library";
 
+export const revalidate = 0; //Very important
+
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 export const metadata: Metadata = {
   title: "Game Library",
 };
 
-export const revalidate = 0
-
 async function getLibraryItems() {
-  const libraryItemsApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/list`)
+  const libraryItemsApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/list`, {
+    cache: 'no-store',
+  })
 
   const libraryItems: ApiListResponse<ILibraryItem> = await libraryItemsApi.json();
 
