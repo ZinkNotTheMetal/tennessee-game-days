@@ -5,10 +5,28 @@ import { Search } from "@/app/components/search/search";
 import { useRouter } from "next/navigation";
 import { ILibraryItem } from "@repo/shared";
 import { FormatBoardGameGeekType } from "@/app/components/bgg-type/format-type";
+import { FaPersonWalkingArrowRight, FaCircleCheck, FaEyeSlash, FaEye } from "react-icons/fa6";
+import { FcAlphabeticalSortingAz, FcAlphabeticalSortingZa, FcNumericalSorting12, FcNumericalSorting21, } from "react-icons/fc";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  useReactTable,
+  getSortedRowModel,
+  SortingState,
+  Row,
+  FilterFn
+} from "@tanstack/react-table";
 
 interface LibraryGameTableProps {
   libraryItems: ILibraryItem[];
   total: number;
+}
+
+interface ColumnMetaType {
+  sortAscIcon: JSX.Element,
+  sortDescIcon: JSX.Element
 }
 
 export function LibraryGameTable({
@@ -16,6 +34,85 @@ export function LibraryGameTable({
   total,
 }: LibraryGameTableProps): JSX.Element {
   const [query, setQuery] = useState<string>("");
+  const [sorting, setSorting] = useState<SortingState>([])
+  const router = useRouter()
+
+  const columnHelper = createColumnHelper<ILibraryItem>();
+
+  const customGlobalFilter: FilterFn<any> = (row: Row<ILibraryItem>, columnId: string, query: string) => {
+    console.log(query)
+    if (columnId === 'boardGameGeekThing_itemName') {
+      const valueToSearch = row.original.alias || row.original.boardGameGeekThing.itemName
+      return valueToSearch.toLowerCase().startsWith(query.toLowerCase())
+    }
+    const search = query.toLowerCase()
+    // Convert to string
+    const value = String(row.getValue<string>(columnId))
+    return value?.toLowerCase().startsWith(search)
+  };
+
+  const columns = [
+    columnHelper.accessor("barcode", {
+      header: () => "Barcode",
+      meta: {
+        sortAscIcon: <FcNumericalSorting12 />,
+        sortDescIcon: <FcNumericalSorting21 />
+      }
+    }),
+    columnHelper.accessor("boardGameGeekThing.itemName", {
+      header: () => "Game Name",
+      cell: (item) => item.row.original.alias ?? item.getValue(),
+      filterFn: (row, columnId, filterValue) => {
+        console.log('anytime here?')
+        const valueToSearch = row.original.alias || row.original.boardGameGeekThing.itemName
+        return valueToSearch.toLowerCase().includes(filterValue.toLowerCase())
+      },
+      meta: {
+        sortAscIcon: <FcAlphabeticalSortingAz />,
+        sortDescIcon: <FcAlphabeticalSortingZa />,
+      }
+    }),
+    columnHelper.accessor("owner", {
+      header: () => "Owner",
+    }),
+    columnHelper.accessor("isCheckedOut", {
+      header: () => "Checked In?",
+      cell: ({ cell }) => {
+        return (
+          <span className="flex justify-center">
+            {/* Is Checked out is the property */}
+            { cell.getValue() ? <FaPersonWalkingArrowRight className="text-red-400 h-4 w-4" /> : <FaCircleCheck className="text-green-400 h-4 w-4" /> }
+          </span>
+        )
+      }
+    }),
+    columnHelper.accessor("isHidden", {
+      header: () => "Hidden?",
+      cell: ({ cell }) => {
+        return (
+          <span className="flex justify-center">
+            {/* Is Checked out is the property */}
+            { cell.getValue() ? <FaEyeSlash className="text-red-400 h-5 w-5" /> : <FaEye className="text-green-400 h-5 w-5" /> }
+          </span>
+        )
+      },
+    })
+  ];
+
+  const reactTable = useReactTable({
+    data: libraryItems,
+    columns: columns,
+    getCoreRowModel: getCoreRowModel(),
+    state: {
+      globalFilter: query,
+      sorting: sorting
+    },
+    globalFilterFn: customGlobalFilter,
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setQuery,
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
 
   return (
     <>
@@ -24,73 +121,65 @@ export function LibraryGameTable({
           onChange={(e) => {
             setQuery(e.target.value);
           }}
-          placeholder="Search..."
+          placeholder={`Search ${total} games...`}
           value={query}
         />
 
         {libraryItems !== undefined && libraryItems.length > 0 && (
           <table className="min-w-full divide-y-0 divide-gray-300 bg-white rounded-t-xl rounded-b-xl">
-            <GameTableHeader />
+            <thead className="border-b">
+              {reactTable.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th 
+                      key={header.id} 
+                      className="py-2 px-4 text-gray-500 text-center"
+                      colSpan={header.colSpan}
+                      onClick={header.column.getToggleSortingHandler()}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )
+                      }
+                      {/* Render sort icon based on meta properties */}
 
-            <tbody className="text-center">
-              {libraryItems
-                .filter(
-                  (item) =>
-                    item.barcode.toUpperCase().startsWith(query.toUpperCase()) ||
-                    item.alias?.toUpperCase().includes(query.toUpperCase()) ||
-                    item.boardGameGeekThing.itemName.toUpperCase().includes(
-                      query.toUpperCase()
-                    )
-                )
-                .slice(0, 20)
-                .map((item) => (
-                  <GameTableRow key={item.id} Id={item.id} libraryItem={item} />
-                ))}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+
+            <tbody>
+              {reactTable.getRowModel().rows.map((row) => {
+                return (
+                  <tr 
+                    key={row.id}
+                    className="border-b hover:bg-blue-100 hover:cursor-pointer text-center"
+                    onClick={() => {
+                      router.push(`/library/edit/${row.original.id}`)
+                    }}
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      return (
+                        <td className="p-4" key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
             </tbody>
-            <tfoot className="rounded-b-xl">
-              <tr>
-                <td colSpan={6} className="px-4 py-2 italic text-right">
-                  Showing{" "}
-                  {
-                    libraryItems.filter(
-                      (item) =>
-                        item.barcode.toUpperCase().startsWith(query.toUpperCase()) ||
-                        item.alias?.toUpperCase().includes(query.toUpperCase()) ||
-                        item.boardGameGeekThing.itemName.toUpperCase().includes(
-                          query.toUpperCase()
-                        )
-                    ).slice(0,20).length 
-                  }{" "}
-                  of {total}
-                </td>
-              </tr>
-            </tfoot>
           </table>
         )}
       </div>
     </>
-  );
-}
-
-// Table Header
-export function GameTableHeader(): JSX.Element {
-  return (
-    <thead className="border-b">
-      <tr>
-        <th className="py-2 px-12 text-gray-500">Barcode</th>
-        <th className="py-2 px-4 text-gray-500">Name</th>
-        <th className="py-2 px-4 text-gray-500 hidden lg:table-cell">
-          Item Type
-        </th>
-        <th className="py-2 px-4 text-gray-500">Owner</th>
-        <th className="py-2 px-4 text-gray-500 hidden sm:table-cell">
-          Checked Out?
-        </th>
-        <th className="py-2 px-4 text-gray-500 hidden md:table-cell">
-          Is Hidden?
-        </th>
-      </tr>
-    </thead>
   );
 }
 
