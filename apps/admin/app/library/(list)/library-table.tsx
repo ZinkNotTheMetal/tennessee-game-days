@@ -5,8 +5,18 @@ import { Search } from "@/app/components/search/search";
 import { useRouter } from "next/navigation";
 import { ILibraryItem } from "@repo/shared";
 import { FormatBoardGameGeekType } from "@/app/components/bgg-type/format-type";
-import { FaPersonWalkingArrowRight, FaCircleCheck, FaEyeSlash, FaEye } from "react-icons/fa6";
-import { FcAlphabeticalSortingAz, FcAlphabeticalSortingZa, FcNumericalSorting12, FcNumericalSorting21, } from "react-icons/fc";
+import {
+  FaPersonWalkingArrowRight,
+  FaCircleCheck,
+  FaEyeSlash,
+  FaEye,
+} from "react-icons/fa6";
+import {
+  FcAlphabeticalSortingAz,
+  FcAlphabeticalSortingZa,
+  FcNumericalSorting12,
+  FcNumericalSorting21,
+} from "react-icons/fc";
 import {
   createColumnHelper,
   flexRender,
@@ -16,7 +26,8 @@ import {
   getSortedRowModel,
   SortingState,
   Row,
-  FilterFn
+  FilterFn,
+  RowData,
 } from "@tanstack/react-table";
 
 interface LibraryGameTableProps {
@@ -24,9 +35,12 @@ interface LibraryGameTableProps {
   total: number;
 }
 
-interface ColumnMetaType {
-  sortAscIcon: JSX.Element,
-  sortDescIcon: JSX.Element
+declare module "@tanstack/react-table" {
+  interface ColumnMeta<TData extends RowData, TValue> {
+    sortAscIcon: JSX.Element;
+    sortDescIcon: JSX.Element;
+    sortIcon: JSX.Element;
+  }
 }
 
 export function LibraryGameTable({
@@ -34,46 +48,53 @@ export function LibraryGameTable({
   total,
 }: LibraryGameTableProps): JSX.Element {
   const [query, setQuery] = useState<string>("");
-  const [sorting, setSorting] = useState<SortingState>([])
-  const router = useRouter()
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const router = useRouter();
 
   const columnHelper = createColumnHelper<ILibraryItem>();
 
-  const customGlobalFilter: FilterFn<any> = (row: Row<ILibraryItem>, columnId: string, query: string) => {
-    console.log(query)
-    if (columnId === 'boardGameGeekThing_itemName') {
-      const valueToSearch = row.original.alias || row.original.boardGameGeekThing.itemName
-      return valueToSearch.toLowerCase().startsWith(query.toLowerCase())
+  const customGlobalFilter: FilterFn<any> = (
+    row: Row<ILibraryItem>,
+    columnId: string,
+    query: string
+  ) => {
+    console.log(query);
+    if (columnId === "boardGameGeekThing_itemName") {
+      const valueToSearch =
+        row.original.alias || row.original.boardGameGeekThing.itemName;
+      return valueToSearch.toLowerCase().startsWith(query.toLowerCase());
     }
-    const search = query.toLowerCase()
+    const search = query.toLowerCase();
     // Convert to string
-    const value = String(row.getValue<string>(columnId))
-    return value?.toLowerCase().startsWith(search)
+    const value = String(row.getValue<string>(columnId));
+    return value?.toLowerCase().startsWith(search);
   };
 
   const columns = [
     columnHelper.accessor("barcode", {
       header: () => "Barcode",
       meta: {
-        sortAscIcon: <FcNumericalSorting12 />,
-        sortDescIcon: <FcNumericalSorting21 />
-      }
+        sortAscIcon: <FcNumericalSorting12 className="pl-3 h-9 w-9" />,
+        sortDescIcon: <FcNumericalSorting21 className="pl-3 h-9 w-9" />,
+        sortIcon: <></>,
+      },
     }),
     columnHelper.accessor("boardGameGeekThing.itemName", {
       header: () => "Game Name",
       cell: (item) => item.row.original.alias ?? item.getValue(),
-      filterFn: (row, columnId, filterValue) => {
-        console.log('anytime here?')
-        const valueToSearch = row.original.alias || row.original.boardGameGeekThing.itemName
-        return valueToSearch.toLowerCase().includes(filterValue.toLowerCase())
-      },
       meta: {
-        sortAscIcon: <FcAlphabeticalSortingAz />,
-        sortDescIcon: <FcAlphabeticalSortingZa />,
-      }
+        sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
+        sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
+        sortIcon: <></>,
+      },
     }),
     columnHelper.accessor("owner", {
       header: () => "Owner",
+      meta: {
+        sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
+        sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
+        sortIcon: <></>,
+      },
     }),
     columnHelper.accessor("isCheckedOut", {
       header: () => "Checked In?",
@@ -81,10 +102,14 @@ export function LibraryGameTable({
         return (
           <span className="flex justify-center">
             {/* Is Checked out is the property */}
-            { cell.getValue() ? <FaPersonWalkingArrowRight className="text-red-400 h-4 w-4" /> : <FaCircleCheck className="text-green-400 h-4 w-4" /> }
+            {cell.getValue() ? (
+              <FaPersonWalkingArrowRight className="text-red-400 h-4 w-4" />
+            ) : (
+              <FaCircleCheck className="text-green-400 h-4 w-4" />
+            )}
           </span>
-        )
-      }
+        );
+      },
     }),
     columnHelper.accessor("isHidden", {
       header: () => "Hidden?",
@@ -92,11 +117,15 @@ export function LibraryGameTable({
         return (
           <span className="flex justify-center">
             {/* Is Checked out is the property */}
-            { cell.getValue() ? <FaEyeSlash className="text-red-400 h-5 w-5" /> : <FaEye className="text-green-400 h-5 w-5" /> }
+            {cell.getValue() ? (
+              <FaEyeSlash className="text-red-400 h-5 w-5" />
+            ) : (
+              <FaEye className="text-green-400 h-5 w-5" />
+            )}
           </span>
-        )
+        );
       },
-    })
+    }),
   ];
 
   const reactTable = useReactTable({
@@ -105,7 +134,7 @@ export function LibraryGameTable({
     getCoreRowModel: getCoreRowModel(),
     state: {
       globalFilter: query,
-      sorting: sorting
+      sorting: sorting,
     },
     globalFilterFn: customGlobalFilter,
     onSortingChange: setSorting,
@@ -131,21 +160,30 @@ export function LibraryGameTable({
               {reactTable.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <th 
-                      key={header.id} 
-                      className="py-2 px-4 text-gray-500 text-center"
+                    <th
+                      key={header.id}
+                      className="py-2 px-4 text-gray-500 items-center justify-center"
                       colSpan={header.colSpan}
                       onClick={header.column.getToggleSortingHandler()}
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )
-                      }
+                      <span className="inline-block align-middle">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                        )}
+                      </span>
                       {/* Render sort icon based on meta properties */}
-
+                      <span className="inline-block align-middle">
+                        {
+                          { 
+                            asc: header.column.columnDef.meta?.sortAscIcon,
+                            desc: header.column.columnDef.meta?.sortDescIcon
+                          }
+                          [header.column.getIsSorted() as string] ?? null
+                        }
+                      </span>
                     </th>
                   ))}
                 </tr>
@@ -155,11 +193,11 @@ export function LibraryGameTable({
             <tbody>
               {reactTable.getRowModel().rows.map((row) => {
                 return (
-                  <tr 
+                  <tr
                     key={row.id}
                     className="border-b hover:bg-blue-100 hover:cursor-pointer text-center"
                     onClick={() => {
-                      router.push(`/library/edit/${row.original.id}`)
+                      router.push(`/library/edit/${row.original.id}`);
                     }}
                   >
                     {row.getVisibleCells().map((cell) => {
