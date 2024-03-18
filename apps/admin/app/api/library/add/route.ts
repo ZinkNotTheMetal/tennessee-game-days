@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import IAddLibraryItemRequest from "../../requests/library-item-add";
+import ILibraryItemRequest from "../../requests/library-item-request";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
-  const libraryItemToAdd: IAddLibraryItemRequest = await request.json();
+  const libraryItemToAdd: ILibraryItemRequest = await request.json();
   const { boardGameGeekThing, additionalBoxContent } = libraryItemToAdd;
   const { mechanics, id, ...bggRest } = boardGameGeekThing;
 

@@ -476,6 +476,8 @@ async function main() {
   for(const game of gamesToSeed) {
     await AddLibraryItemToDatabase(game.bggIdToAdd, game.barcode, game.alias, game.includedItems)
     gamesAdded++
+
+    if (gamesAdded % 100) console.log(`--- ${gamesAdded} added ---`)
   }
 
   const end = performance.now()

@@ -1,18 +1,23 @@
 "use client"
 
 import { IConvention } from "@repo/shared"
+import { IVenue } from "@repo/shared/src/interfaces/venue"
 import { useRouter } from "next/navigation"
+import { DateTime } from 'ts-luxon'
 
-const ConventionStatus = (isCanceled: boolean, startDateTimeUtc?: string, endDateTimeUtc?: string) : "Canceled" | "Happening" | "Scheduled" | "Upcoming" | "Completed" => {
-  if (isCanceled) return 'Canceled'
+const ConventionStatus = (isCancelled: boolean, startDateTimeUtc?: string, endDateTimeUtc?: string) : string => {
+  if (isCancelled) return 'Canceled'
   if (!startDateTimeUtc) return 'Upcoming'
-  // if (startDateTimeUtc && endDateTimeUtc
-  //   && DateTime.fromISO(startDateTimeUtc) < DateTime.utc()
-  //   && DateTime.fromISO(endDateTimeUtc) > DateTime.utc()
-  //   ) return 'Happening'
-  // if (endDateTimeUtc && DateTime.fromISO(endDateTimeUtc) < DateTime.utc()) return 'Completed'
+
+  const daysUntilStart = DateTime.fromISO(startDateTimeUtc).diff(DateTime.now(), 'days').days
+  const daysUntilEnd = DateTime.fromISO(startDateTimeUtc).diff(DateTime.now(), 'days').days
+
+  if (daysUntilStart >= 0) return `${daysUntilStart.toFixed(0)} days from now`
+  if (daysUntilStart <= 0 && daysUntilEnd >= 0) return "Happening"
+  if (daysUntilEnd < 0) return "Completed"
 
   return 'Scheduled'
+
 }
 
 interface ConventionTableProps {
@@ -23,14 +28,16 @@ interface ConventionTableProps {
 export function ConventionTable({conventions, total}: ConventionTableProps): JSX.Element {
 
   return(
-    <div className="shadow-lg rounded-lg overflow-x-auto">
-      <table className="min-w-full bg-white rounded-lg">
-        <ConventionHeader />
+    <div className="">
+      <table className="min-w-full divide-y-0 divide-gray-300 bg-white rounded-t-xl rounded-b-xl">
+        <thead>
+          <ConventionHeader />
+        </thead>
 
         <tbody>
 
           {conventions.map(convention => (
-            <ConventionRow {...convention} />
+            <ConventionRow key={convention.id} {...convention} />
           ))}
 
         </tbody>
@@ -41,17 +48,15 @@ export function ConventionTable({conventions, total}: ConventionTableProps): JSX
 
 function ConventionHeader() : JSX.Element {
   return (
-    <thead>
+    <>
       <tr>
-        <th className='py-4 px-6 border-b text-left'>Name</th>
-        <th className='py-4 px-6 border-b text-left'>Start Date</th>
-        <th className='py-4 px-6 border-b text-left'>End Date</th>
-        <th className='py-4 px-6 border-b text-left'>Venue</th>
-        <th className='py-4 px-6 border-b text-left'>Status</th>
-        <th className='py-4 px-6 border-b text-left'>Days Remaining</th>
-        <th className='py-4 px-6 border-b text-left'>&nbsp;</th>
+        <th className='py-4 px-6 border-b text-gray-500'>Name</th>
+        <th className='py-4 px-6 border-b text-gray-500'>Venue Name</th>
+        <th className='py-4 px-6 border-b text-gray-500'>Start Date</th>
+        <th className='py-4 px-6 border-b text-gray-500'>End Date</th>
+        <th className='py-4 px-6 border-b text-gray-500'>Status</th>
       </tr>
-    </thead>
+    </>
   )
 }
 
@@ -60,66 +65,28 @@ interface ConventionRowProps {
   name: string,
   startDateTimeUtc?: string,
   endDateTimeUtc?: string,
-  isCanceled: boolean
+  isCancelled: boolean,
+  venue?: IVenue
 }
 
-function ConventionRow({ id, name, startDateTimeUtc, endDateTimeUtc, isCanceled }: ConventionRowProps) {
+function ConventionRow({ id, name, startDateTimeUtc, endDateTimeUtc, isCancelled, venue }: ConventionRowProps) {
   const router = useRouter()
+
+  const localStartTimeDisplay = (startDateTimeUtc !== undefined && startDateTimeUtc !== null) && DateTime.fromISO(startDateTimeUtc).toLocal() || undefined
+  const localEndDateTimeDisplay = (endDateTimeUtc !== undefined && endDateTimeUtc !== null) && DateTime.fromISO(endDateTimeUtc).toLocal() || undefined
 
   return (
     <tr
-      className="hover:bg-slate-200"
+      className="border-b hover:bg-blue-100 hover:cursor-pointer text-center"
       key={id}
-      onClick={() => router.push(`/conventions/edit/${id}`)}
+      onClick={() => router.push(`/convention/edit/${id}`)}
     >
       <td className="py-4 px-6 border-b">{name}</td>
+      <td className="py-4 px-6 border-b">{venue?.name}</td>
+      <td className="py-4 px-6 border-b">{localStartTimeDisplay?.toLocaleString()}</td>
+      <td className="py-4 px-6 border-b">{localEndDateTimeDisplay?.toLocaleString()}</td>
+      <td className="py-4 px-6 border-b">{ConventionStatus(isCancelled, startDateTimeUtc, endDateTimeUtc)}</td>
     </tr>
   )
 
 }
-
-
-// function ConventionRow({ convention, status}: RowProps): JSX.Element {
-//   const { id, name, startDateTimeUtc, endDateTimeUtc, venue } = convention
-
-//   return (
-//     <tr className='hover:bg-slate-200' key={id}>
-//       <td className="py-4 px-6 border-b">{ name }</td>
-//       <td className="py-4 px-6 border-b">
-//         { startDateTimeUtc !== undefined && startDateTimeUtc.length > 0 && (
-//           <>
-//             { DateTime.fromISO(startDateTimeUtc, { zone: 'America/Chicago' }).toLocaleString() }
-//           </>
-//         ) }
-//       </td>
-//       <td className="py-4 px-6 border-b">
-//       { endDateTimeUtc !== undefined  && endDateTimeUtc.length > 0 && (
-//           <>
-//             { DateTime.fromISO(endDateTimeUtc, { zone: 'America/Chicago' }).toLocaleString() }
-//           </>
-//         ) }
-//       </td>
-//       <td className="py-4 px-6 border-b">{ venue }</td>
-//       <td className="py-4 px-6 border-b">{ status }</td>
-//       <td className="py-4 px-6 border-b">
-//         { startDateTimeUtc !== undefined && (
-//           <>
-//           { DateTime.fromISO(startDateTimeUtc, { zone: 'America/Chicago' }).diff(DateTime.now(), 'days').days >= 0 && (
-//             DateTime.fromISO(startDateTimeUtc, { zone: 'America/Chicago' }).diff(DateTime.now(), 'days').days.toFixed(0)
-//           )}
-//           { DateTime.fromISO(startDateTimeUtc, { zone: 'America/Chicago' }).diff(DateTime.now(), 'days').days < 0 && (
-//             <span>Past</span>
-//           )}
-//           </>
-//         )}
-//       </td>
-//       <td className="py-4 px-6 border-b">
-//         <Link href={`/convention/edit/${id}`}>
-//           <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-//             <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" strokeLinecap="round" strokeLinejoin="round" />
-//           </svg>
-//         </Link>
-//       </td>
-//     </tr>
-//   )
-// }

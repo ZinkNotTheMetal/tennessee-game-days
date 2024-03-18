@@ -7,19 +7,12 @@ export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 export async function GET() {
-  const conventionCount = await prisma.convention.count();
+  const venueCount = await prisma.venue.count();
 
-  const conventions = await prisma.convention.findMany({
-    include: {
-      venue: true,
-    },
-    orderBy: {
-      startDateTimeUtc: 'desc'
-    }
-  });
+  const venues = await prisma.venue.findMany();
 
   return NextResponse.json({
-    total: conventionCount,
-    list: conventions,
+    total: venueCount,
+    list: venues,
   });
 }

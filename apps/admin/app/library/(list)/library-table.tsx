@@ -161,7 +161,7 @@ export function LibraryGameTable({
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className="py-2 px-4 text-gray-500 items-center justify-center"
+                      className="py-2 px-4 text-gray-500"
                       colSpan={header.colSpan}
                       onClick={header.column.getToggleSortingHandler()}
                     >

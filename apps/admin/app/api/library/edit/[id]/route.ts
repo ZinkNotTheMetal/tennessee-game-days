@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import IEditLibraryItemRequest from "../../../requests/library-item-edit";
+import ILibraryItemRequest from "../../../requests/library-item-request";
 
 export const dynamic = "force-dynamic";
 
-export async function PUT(request: NextRequest) {
-  const libraryItemToEdit: IEditLibraryItemRequest = await request.json();
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const libraryItemToEdit: ILibraryItemRequest = await request.json();
 
   const { boardGameGeekThing, additionalBoxContent } = libraryItemToEdit;
   const { mechanics, id, ...bggRest } = boardGameGeekThing;
@@ -20,7 +20,7 @@ export async function PUT(request: NextRequest) {
   });
 
   const updatedLibraryItem = await prisma.libraryItem.update({
-    where: { id: libraryItemToEdit.id },
+    where: { id: Number(params.id) },
     data: {
       alias:
         libraryItemToEdit?.alias?.trim() === ""

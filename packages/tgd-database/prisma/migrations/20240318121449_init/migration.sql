@@ -15,8 +15,8 @@ CREATE TABLE "centralized_barcodes" (
 CREATE TABLE "conventions" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "start_date_utc" TIMESTAMP(3),
-    "end_date_utc" TIMESTAMP(3),
+    "start_date_time_iso_utc" TIMESTAMP(3),
+    "end_date_time_iso_utc" TIMESTAMP(3),
     "date_updated_utc" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "is_cancelled" BOOLEAN NOT NULL DEFAULT false,
     "venue_id" INTEGER,

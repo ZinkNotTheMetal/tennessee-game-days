@@ -1,34 +1,29 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma"
-import { IAddConventionItemRequest } from "../../requests/convention-add";
+import type { IConventionRequest } from "@/app/api/requests/convention-request";
+import { DateTime } from 'ts-luxon'
 
 export async function POST(request: NextRequest) {
-  const conventionToAdd: IAddConventionItemRequest = await request.json()
+  const conventionToAdd: IConventionRequest = await request.json()
+  const { venue, ...convention } = conventionToAdd
+  let venueAddedId = venue?.id || -1
 
-  const { venue, ...rest } = conventionToAdd
-
-  let venueAddedId = -1
-
-  if (venue !== undefined) {
-
-    const newVenue = await prisma.venue.upsert({
-      where: { id: venue.id },
-      update: venue,
-      create: venue
+  if (!(venue?.id) && venue?.name !== undefined) {
+    const createdVenue = await prisma.venue.create({
+      data: venue
     })
-
-    venueAddedId = newVenue.id
+    venueAddedId = createdVenue.id
   }
 
   const createdConvention = await prisma.convention.create({
     data: {
-      name: rest.name,
-      isCancelled: rest.isCanceled,
-      //additionalTimeStartDateTimeUtc?: string
-      startDateUtc: rest.startDateTimeUtc,
-      endDateUtc: rest.endDateTimeUtc,
-      updatedAtUtc: new Date(),
-      venueId: (venueAddedId === -1 ? undefined : venueAddedId)
+      name: convention.name,
+      startDateTimeUtc: (convention.startDateTimeUtc?.trim() ? convention.startDateTimeUtc : undefined),
+      endDateTimeUtc: (convention.endDateTimeUtc?.trim() ? convention.endDateTimeUtc : undefined),
+      extraHoursStartDateTimeUtc: (convention.extraHoursStartDateTimeUtc?.trim() ? convention.extraHoursStartDateTimeUtc : undefined),
+      isCancelled: false,
+      updatedAtUtc: DateTime.utc().toISO(),
+      venueId: (venueAddedId === -1 ? undefined : Number(venueAddedId))
     }
   })
 

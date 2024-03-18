@@ -1,13 +1,13 @@
-interface IAddConventionItemRequest {
+interface IConventionRequest {
   name: string
-  additionalTimeStartDateTimeUtc?: string
+  extraHoursStartDateTimeUtc?: string
   startDateTimeUtc?: string
   endDateTimeUtc?: string
-  isCanceled: boolean
-  venue?: IAddVenueRequest
+  isCancelled: boolean
+  venue?: IVenueRequest
 }
 
-interface IAddVenueRequest {
+interface IVenueRequest {
   /** @format int32 */
   id?: number
   name: string
@@ -22,4 +22,4 @@ interface IAddVenueRequest {
   longitude?: number
 }
 
-export type { IAddConventionItemRequest, IAddVenueRequest }
+export type { IConventionRequest, IVenueRequest }
