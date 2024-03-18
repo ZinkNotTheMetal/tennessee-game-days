@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  // output = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -38,16 +39,17 @@ enum EntityType {
 }
 
 model Convention {
-  id               Int          @id @default(autoincrement()) @map(name: "id")
-  name             String       @unique @map(name: "name")
-  startDateUtc     DateTime?    @map(name: "start_date_utc")
-  endDateUtc       DateTime?    @map(name: "end_date_utc")
-  updatedAtUtc     DateTime     @default(now()) @map(name: "date_updated_utc")
-  isCancelled      Boolean      @default(false) @map(name: "is_cancelled")
-  venueId          Int?         @map(name: "venue_id")
-  venue            Venue?       @relation(fields: [venueId], references: [id])
+  id                          Int          @id @default(autoincrement()) @map(name: "id")
+  name                        String       @unique @map(name: "name")
+  extraHoursStartDateTimeUtc  DateTime?    @map(name: "extra_hours_start_date_time_iso_utc")
+  startDateTimeUtc            DateTime?    @map(name: "start_date_time_iso_utc")
+  endDateTimeUtc              DateTime?    @map(name: "end_date_time_iso_utc")
+  updatedAtUtc                DateTime     @default(now()) @map(name: "date_updated_utc")
+  isCancelled                 Boolean      @default(false) @map(name: "is_cancelled")
+  venueId                     Int?         @map(name: "venue_id")
+  venue                       Venue?       @relation(fields: [venueId], references: [id])
 
-  PlayToWinGames   PlayToWinItem[]
+  PlayToWinGames         PlayToWinItem[]
 
   @@map("conventions")
 }

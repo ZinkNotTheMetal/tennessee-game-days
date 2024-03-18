@@ -38,7 +38,7 @@ export default async function Page() {
   const libraryItems = await getLibraryItems();
 
   return (
-    <div className="pt-6">
+    <main className="pt-6">
       {libraryItems.total <= 0 && (
         <div>
           No games have been loaded in the library, ensure that you have games
@@ -63,6 +63,6 @@ export default async function Page() {
           </div>
         </>
       )}
-    </div>
+    </main>
   );
 }

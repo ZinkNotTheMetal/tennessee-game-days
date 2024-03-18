@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 interface LibraryItemEditButtonsProps {
   id: number;
@@ -20,18 +21,29 @@ export function LibraryItemEditButtons({
       })
         .then((success) => {
           if (success.ok) {
-            // Toast a success message
+            toast(
+              `Successfully deleted ${gameName} from the Library`,
+              { type: "success" }
+            )
           } else {
-            // Toast a failure message
-            console.log(success);
+            toast(
+              `Failed to delete ${gameName} from the library (API error)`,
+              { type: "error" }
+            )
           }
         })
         .catch((e) => {
-          console.log(e);
+          console.log(e)
+          toast(
+            `Failed to delete ${gameName} from the library (check the logs)`,
+            { type: "error" }
+          )
         });
     }
 
-    router.replace("/library");
+    router.refresh()
+    router.replace("/library")
+    router.refresh()
   };
 
   return (

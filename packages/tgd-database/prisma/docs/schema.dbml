@@ -16,8 +16,9 @@ Table centralized_barcodes {
 Table conventions {
   id Int [pk, increment]
   name String [unique, not null]
-  startDateUtc DateTime
-  endDateUtc DateTime
+  extraHoursStartDateTimeUtc DateTime
+  startDateTimeUtc DateTime
+  endDateTimeUtc DateTime
   updatedAtUtc DateTime [default: `now()`, not null]
   isCancelled Boolean [not null, default: false]
   venueId Int

@@ -59,6 +59,9 @@ importers:
       tailwindcss:
         specifier: 3.4.1
         version: 3.4.1
+      ts-luxon:
+        specifier: ^4.5.2
+        version: 4.5.2
       use-debounce:
         specifier: ^10.0.0
         version: 10.0.0(react@18.2.0)
@@ -5925,6 +5928,11 @@ packages:
 
   /ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
+    dev: false
+
+  /ts-luxon@4.5.2:
+    resolution: {integrity: sha512-PqVfo1yiwAa1nYeyK/k4rOgHPGIqJQpGbOMA/+nLcpS2aXEO2mTSvBKUjPyo1PWCTD2/K2iH4OuRo3md344IoA==}
+    engines: {node: '>=13'}
     dev: false
 
   /ts-node@10.9.2(@types/node@20.11.27)(typescript@5.3.3):

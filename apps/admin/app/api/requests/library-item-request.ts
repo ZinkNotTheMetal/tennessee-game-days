@@ -1,6 +1,6 @@
 import { IBoardGameGeekEntity } from "@repo/board-game-geek-shared"
 
-interface IAddLibraryItemRequest {
+interface ILibraryItemRequest {
   barcode: string
   alias: string | null
   owner: string
@@ -10,4 +10,4 @@ interface IAddLibraryItemRequest {
   boardGameGeekThing: IBoardGameGeekEntity
 }
 
-export default IAddLibraryItemRequest
+export default ILibraryItemRequest

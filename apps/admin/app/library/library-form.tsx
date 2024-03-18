@@ -37,8 +37,8 @@ export function LibraryForm({
   const onSubmit: SubmitHandler<ILibraryItem> = async (data) => {
     setOnSubmitting(true);
     // Updating
-    if (libraryItem.id && libraryItem.id > 0) {
-      fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/edit/${libraryItem.id}`,
+    if (data.id && data.id > 0) {
+      fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/edit/${data.id}`,
       {
         method: "PUT",
         body: JSON.stringify(data)
@@ -46,12 +46,12 @@ export function LibraryForm({
         .then((response) => {
           if (response.ok) {
             toast(
-              `Successfully edited ${libraryItem.boardGameGeekThing.itemName}`,
+              `Successfully edited ${data.boardGameGeekThing.itemName}`,
               { type: "success" }
             );
           } else {
             toast(
-              `Failed to edit ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`,
+              `Failed to edit ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
               { type: "error" }
             );
           }
@@ -59,7 +59,7 @@ export function LibraryForm({
         .catch((error) => {
           console.log(error)
           toast(
-            `Failed to edit ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`,
+            `Failed to edit ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
             { type: "error" }
           );
         });
@@ -73,12 +73,12 @@ export function LibraryForm({
         .then((response) => {
           if (response.ok) {
             toast(
-              `Successfully added ${libraryItem.boardGameGeekThing.itemName} to the library`,
+              `Successfully added ${data.boardGameGeekThing.itemName} to the library`,
               { type: "success" }
             );
           } else {
             toast(
-              `Failed to add ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`,
+              `Failed to add ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
               { type: "error" }
             );
           }
@@ -86,7 +86,7 @@ export function LibraryForm({
         .catch((error) => {
           console.log(error)
           toast(
-            `Failed to add ${libraryItem.boardGameGeekThing.itemName} to the library (check the logs)`,
+            `Failed to add ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
             { type: "error" }
           );
         });
