@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Search } from "@/app/components/search/search";
 import { useRouter } from "next/navigation";
 import { ILibraryItem } from "@repo/shared";
-import { FormatBoardGameGeekType } from "@/app/components/bgg-type/format-type";
 import {
   FaPersonWalkingArrowRight,
   FaCircleCheck,
@@ -218,43 +217,5 @@ export function LibraryGameTable({
         )}
       </div>
     </>
-  );
-}
-
-interface GameTableRowProps {
-  Id: number;
-  libraryItem: ILibraryItem;
-}
-
-// Table Row
-export function GameTableRow({
-  Id,
-  libraryItem,
-}: GameTableRowProps): JSX.Element {
-  const router = useRouter();
-
-  return (
-    <tr
-      className="border-b hover:bg-gray-300 hover:cursor-pointer"
-      key={Id}
-      onClick={() => {
-        router.push(`/library/edit/${libraryItem.id}`);
-      }}
-    >
-      <td className="py-3 px-3">{libraryItem.barcode}</td>
-      <td className="py-3 px-3">
-        {libraryItem.alias ?? libraryItem.boardGameGeekThing.itemName}
-      </td>
-      <td className="py-3 px-3 hidden lg:table-cell">
-        {FormatBoardGameGeekType(libraryItem.boardGameGeekThing.type)}
-      </td>
-      <td className="py-3 px-3">{libraryItem.owner}</td>
-      <td className="py-3 px-3 hidden sm:table-cell">
-        {libraryItem.isCheckedOut ? "Y" : "N"}
-      </td>
-      <td className="py-3 px-3 hidden md:table-cell">
-        {libraryItem.isHidden ? "Y" : "N"}
-      </td>
-    </tr>
   );
 }
