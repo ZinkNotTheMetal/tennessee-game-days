@@ -68,7 +68,19 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  // Add centeralized id:
+  // Add centralized barcode
+  await prisma.centralizedBarcode.upsert({
+    where: { barcode: libraryItemToAdd.barcode },
+    create: {
+      barcode: libraryItemToAdd.barcode,
+      entityId: createdLibraryItem.id,
+      entityType: 'LibraryItem'
+    },
+    update: {
+      entityId: createdLibraryItem.id,
+      entityType: 'LibraryItem'
+    }
+  })
 
   return NextResponse.json(
     {

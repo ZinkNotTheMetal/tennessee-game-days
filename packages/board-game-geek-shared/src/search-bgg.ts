@@ -1,6 +1,7 @@
 import { BggClient } from "boardgamegeekclient";
 import { BggThingDto } from "boardgamegeekclient/dist/esm/dto";
 import uniqueIdsOnly from "./unique-ids-only";
+import { xml2json } from "xml-js";
 
 export async function SearchBoardGameGeek(
   query: string,
@@ -23,16 +24,16 @@ export async function SearchBoardGameGeek(
     const searchApiUrl = `https://www.boardgamegeek.com/xmlapi2/search?query=${query.replace('"', "")}&type=boardgame,boardgameexpansion${query.includes('"') ? "&exact=1" : ""}`;
     
     try {
-      const response = await fetch(searchApiUrl);
-      const stringResponse = await response.text();
-      const xmlData = new window.DOMParser().parseFromString(stringResponse, "text/xml");
-      const items = xmlData.querySelectorAll("item");
-      let queryResultIds: number[] = [];
+      const response = await fetch(searchApiUrl)
+      const stringResponse = await response.text()
+      const jsonString = xml2json(stringResponse, { compact: true })
+      const result = JSON.parse(jsonString)
+      let queryResultIds: number[] = []
 
-      if (items.length > 0) {
-        items.forEach((i) => {
-          queryResultIds.push(Number(i.getAttribute("id")));
-        });
+      if (result.items && result.items.item && result.items.item.length > 0) {
+        result.items.item.forEach((i: any) => {
+          queryResultIds.push(Number(i._attributes.id))
+        })
       }
 
       const uniqueIds = queryResultIds.filter(uniqueIdsOnly);

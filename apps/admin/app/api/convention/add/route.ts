@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   const { venue, ...convention } = conventionToAdd
   let venueAddedId = venue?.id || -1
 
-  if (!(venue?.id) && venue?.name !== undefined) {
+  if ((!venue?.id) && venue) {
     const createdVenue = await prisma.venue.create({
       data: venue
     })
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(
     {
-      message: "Successfully added new game to library",
+      message: "Successfully added new convention",
       created: `/convention/edit/${createdConvention.id}`,
     },
     { status: 201 }

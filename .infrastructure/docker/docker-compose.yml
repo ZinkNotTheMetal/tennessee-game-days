@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  tgd-admin:
+    image: zinknotthemetal/tgd-admin-nextjs
+    container_name: tgd-admin
+    build:
+      context: ../../.
+      dockerfile: ./apps/admin/Dockerfile
+      tags:
+        - "zinknotthemetal/tgd-admin-nextjs:latest"
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: development
+    env_file:
+      - .env.local
+
+  db:
+    image: postgres:16-alpine
+    container_name: tgd-db
+    restart: unless-stopped
+    env_file:
+      - .env.local
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+      start_period: 5s
+    volumes:
+      - /Users/william/docker/tgd/postgres:/var/lib/postgres
+      # Migration init if needed
+      #- "./<your_sql_file_name_here>.sql:/docker-entrypoint-initdb.d/1.sql"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    env_file:
+      - .env.local
+    ports:
+      - 5400:80
+    volumes:
+      - /Users/william/docker/tgd/pgadmin:/var/lib/pgadmin
+    depends_on:
+      - db

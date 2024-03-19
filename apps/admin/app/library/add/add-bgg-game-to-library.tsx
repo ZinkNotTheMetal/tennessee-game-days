@@ -48,7 +48,7 @@ export default function AddBggGameToLibrary({ gameSelected, clear }: AddBggGameT
     updatedAtUtc: new Date().toISOString(),
     dateAddedUtc: new Date().toISOString(),
     additionalBoxContent: [],
-    boardGameGeekThingId: gameSelected.id,
+    boardGameGeekId: gameSelected.id,
     boardGameGeekThing: gameSelected,
   }
 

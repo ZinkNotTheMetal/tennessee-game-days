@@ -4,7 +4,7 @@ interface ILibraryItem {
   /** @format int32 */
   id: number;
   /** @format int32 */
-  boardGameGeekThingId: number;
+  boardGameGeekId: number;
   barcode: string;
   /* If a user renames a game in the library */
   alias: string | null;

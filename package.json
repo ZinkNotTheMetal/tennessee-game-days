@@ -5,7 +5,15 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "backend:up": "pnpm docker:compose:up:database && pnpm docker:compose:up:pg-admin",
+    "backend:down": "docker:compose:down:database && docker:compose:down:pg-admin",
+    "docker:compose:up:database": "docker compose -f ./.infrastructure/docker/docker-compose.yml --env-file ./.env up db -d",
+    "docker:compose:up:pg-admin": "docker compose -f ./.infrastructure/docker/docker-compose.yml --env-file ./.env up pgadmin -d",
+    "docker:compose:down:database": "docker compose -f ./.infrastructure/docker/docker-compose.yml -down",
+    "docker:compose:down:pg-admin": "docker compose -f ./.infrastructure/docker/docker-compose.yml down",
+    "docker:build:web": "docker compose -f ./.infrastructure/docker/docker-compose.yml build tgd-admin",
+    "docker:push:web": "echo implement!"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
