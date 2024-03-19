@@ -8,11 +8,13 @@ export async function POST(request: NextRequest) {
   const { venue, ...convention } = conventionToAdd
   let venueAddedId = venue?.id || -1
 
-  if ((!venue?.id) && venue) {
-    const createdVenue = await prisma.venue.create({
-      data: venue
-    })
-    venueAddedId = createdVenue.id
+  if (venue) {
+    if (!venue.id) {
+      const createdVenue = await prisma.venue.create({
+        data: venue
+      })
+      venueAddedId = createdVenue.id
+    }
   }
 
   const createdConvention = await prisma.convention.create({
