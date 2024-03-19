@@ -49,11 +49,8 @@ export default async function Page() {
 
       {libraryItems.total > 0 && (
         <>
-          <div className="flex justify-end">
-            <div className="pr-8">
-              <AddGameToLibraryButton />
-            </div>
-            
+          <div className="flex justify-end pr-8 py-2">
+            <AddGameToLibraryButton />
           </div>
           <div className="flex justify-center">
             <LibraryGameTable

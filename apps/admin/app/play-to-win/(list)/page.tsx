@@ -21,11 +21,11 @@ async function getPlayToWinItemsItems() {
 export default async function Page() {
   const playToWinItems = await getPlayToWinItemsItems()
   return(
-    <main className="container mx-auto">
-      <div className="text-right py-2">
+    <main className="pt-6">
+      <div className="flex justify-end pr-8 py-2">
         <PlayToWinItemUploadButton />
       </div>
-      <div className="flex justify-center py-8">
+      <div className="flex justify-center">
         <PlayToWinItemsTable
           items={playToWinItems.list}
           total={playToWinItems.total}
