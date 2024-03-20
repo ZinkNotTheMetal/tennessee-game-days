@@ -1,5 +1,6 @@
 import { IPlayToWinItem } from "@repo/shared";
 import { Metadata } from "next";
+import { PlayToWinItemForm } from "../../play-to-win-form";
 
 export const metadata: Metadata = {
   title: "Edit Play to Win Item",
@@ -41,7 +42,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           </div>
         )}
         {Boolean(playToWinItem) && (
-          JSON.stringify(playToWinItem)
+          <PlayToWinItemForm id={playToWinItemId} playToWinItem={playToWinItem} />
         )}
       </div>
     </main>
