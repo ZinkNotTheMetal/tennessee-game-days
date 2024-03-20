@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { parse as csvParse } from 'csv-parse'
 import { Readable } from 'stream'
 import prisma from "@/app/lib/prisma";
-import { PlayToWinCsvRow } from "../../requests/ptw-request"
+import { PlayToWinCsvRow } from "../../requests/ptw-csv-request"
 import { MapToBoardGameEntity, SearchBoardGameGeek } from "@repo/board-game-geek-shared";
 
 

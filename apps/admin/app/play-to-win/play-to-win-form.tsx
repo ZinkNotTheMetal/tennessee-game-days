@@ -2,11 +2,14 @@
 
 import { IPlayToWinItem } from "@repo/shared";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import Image from "next/image";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { FormatBoardGameGeekType } from "../components/bgg-type/format-type";
+import useBoardGameGeekSearch from "../hooks/useBggSearch";
+import { IBoardGameGeekEntity, MapToBoardGameEntity } from "@repo/board-game-geek-shared";
+import { FaTimesCircle } from "react-icons/fa";
 
 interface PlayToWinItemFormProps {
   // As of now this will always be set (no adding functionality through UI yet)
@@ -20,6 +23,10 @@ export function PlayToWinItemForm({
   playToWinItem,
 }: PlayToWinItemFormProps) : JSX.Element {
   const [searchBggQuery, setSearchBggQuery] = useState<string>('')
+  const [isLoading, debounced, resultsCount, results, error] = useBoardGameGeekSearch(
+    searchBggQuery,
+    false
+  );
   const [onSubmitting, setOnSubmitting] = useState<boolean>(false);
   const router = useRouter();
   const { boardGameGeekThing, ...rest } = playToWinItem;
@@ -29,12 +36,35 @@ export function PlayToWinItemForm({
     control,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<IPlayToWinItem>({
     values: {
       ...rest,
       boardGameGeekThing,
     },
   })
+
+  const handleSearchInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    debounced(value)
+    setSearchBggQuery(value)
+  }
+
+  const fixBoardGameGeekId = (bggEntity?: IBoardGameGeekEntity) => {
+    // If one is passed in the user is selecting it
+    if (bggEntity) {
+      playToWinItem.boardGameGeekId = bggEntity.id
+      playToWinItem.boardGameGeekThing = bggEntity
+    } else {
+      // the user is trying to deselect it
+      playToWinItem.boardGameGeekId = undefined
+      playToWinItem.boardGameGeekThing = undefined
+    }
+    setSearchBggQuery('')
+
+    reset(playToWinItem)
+
+  }
   
   const onSubmit: SubmitHandler<IPlayToWinItem> = async (data) => {
     setOnSubmitting(true);
@@ -54,7 +84,7 @@ export function PlayToWinItemForm({
           );
         } else {
           toast(
-            `Failed to edit ${data.gameName} to the library (check the logs)`,
+            `Failed to edit ${data.gameName} play-to-win game (check the logs)`,
             { type: "error" }
           );
         }
@@ -62,7 +92,7 @@ export function PlayToWinItemForm({
       .catch((error) => {
         console.log(error)
         toast(
-          `Failed to edit ${data.gameName} to the library (check the logs)`,
+          `Failed to edit ${data.gameName} play-to-win game (check the logs)`,
           { type: "error" }
         );
       });
@@ -97,7 +127,14 @@ export function PlayToWinItemForm({
             >
               Board Game Geek Id
             </label>
-            <label>{boardGameGeekThing.id}</label>
+            <label className="pl-1 flex items-center">
+              <span>{boardGameGeekThing.id}</span>
+              <FaTimesCircle
+                className="text-red-500 ml-2 cursor-pointer"
+                size={20} // Adjust the size of the icon
+                onClick={() => fixBoardGameGeekId()}
+              />
+            </label>
           </div>
 
           <div className="pb-3">
@@ -107,7 +144,7 @@ export function PlayToWinItemForm({
             >
               Year Published
             </label>
-            <label>{boardGameGeekThing.yearPublished}</label>
+            <label className="pl-1">{boardGameGeekThing.yearPublished}</label>
           </div>
 
           <div className="pb-3">
@@ -117,7 +154,7 @@ export function PlayToWinItemForm({
             >
               Type
             </label>
-            <label>{FormatBoardGameGeekType(boardGameGeekThing.type)}</label>
+            <label className="pl-1">{FormatBoardGameGeekType(boardGameGeekThing.type)}</label>
           </div>
 
           </div>
@@ -161,6 +198,35 @@ export function PlayToWinItemForm({
             )}
           </div>
         </div>
+
+        {!Boolean(playToWinItem.boardGameGeekId) && (
+          <div className="relative p-2">
+            <input
+              type="text"
+              className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="Search Board Game Geek..."
+              onChange={handleSearchInputChange}
+            />
+            {searchBggQuery && !isLoading && (
+              <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto bg-white rounded-md shadow-lg">
+                { results.map((result) => (
+                  <button
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-500 hover:text-white w-full text-left"
+                    role="option"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      fixBoardGameGeekId(result)
+                    }}
+                    key={result.id}
+                  >
+                    {result.itemName}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+        )}
 
         {Boolean(playToWinItem.boardGameGeekId) && boardGameGeekThing && (
           <div className="px-2 py-2">
