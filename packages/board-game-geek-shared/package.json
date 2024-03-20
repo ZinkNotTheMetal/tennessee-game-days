@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "boardgamegeekclient": "^1.9.1",
-    "he": "^1.2.0"
+    "he": "^1.2.0",
+    "xml-js": "^1.6.11"
   }
 }

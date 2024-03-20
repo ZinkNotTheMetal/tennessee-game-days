@@ -117,12 +117,15 @@ Table people {
 
 Table play_to_win_items {
   id Int [pk, increment]
-  boardGameGeekId Int [not null]
-  boardGameGeekThing board_game_geek_items [not null]
+  barcode String [unique, not null]
+  boardGameGeekId Int
+  boardGameGeekThing board_game_geek_items
   gameName String
   conventionId Int [not null]
   convention conventions [not null]
   isHidden Boolean [not null]
+  totalTimesPlayed Int [not null, default: 0]
+  dateAddedUtc DateTime [default: `now()`, not null]
 }
 
 Table library_checkout_events {

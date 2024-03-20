@@ -10,15 +10,18 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
   // If Venue is filled out it's new
   // If not then it's just an ID
-  if (venue !== undefined && (!venue?.id)) {
-    const newVenue = await prisma.venue.create({
-      data: {
-        ...venue,
-        id: undefined,
-      }
-    })
+  if (venue !== undefined) {
 
-    venueAddedId = newVenue.id
+    if (!(venue.id)) {
+      const newVenue = await prisma.venue.create({
+        data: {
+          ...venue,
+          id: undefined
+        }
+      })
+      venueAddedId = newVenue.id
+    }
+    
   }
 
   const updatedConvention = await prisma.convention.update({

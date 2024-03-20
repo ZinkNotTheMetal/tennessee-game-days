@@ -23,7 +23,7 @@ export function ConventionForm({
   const router = useRouter();
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/venue/list/`,
+    fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/venue/list`,
     {
       method: "GET"
     })
@@ -46,13 +46,20 @@ export function ConventionForm({
       id: id || 0,
       name: convention?.name || '',
       isCancelled: convention?.isCancelled || false,
+      venue: {
+        id: convention?.venue?.id ?? -1,
+        name: convention?.venue?.name ?? '',
+        streetNumber: convention?.venue?.streetNumber ?? '',
+        streetName: convention?.venue?.streetName ?? '',
+        city: convention?.venue?.city ?? '',
+        stateProvince: convention?.venue?.stateProvince ?? '',
+        postalCode: convention?.venue?.postalCode ?? ''
+      }
     },
   });
 
   const onSubmit: SubmitHandler<IConvention> = async (data) => {
     setOnSubmitting(true);
-
-    console.log(data)
 
     // Updating
     if (data.id && data.id > 0) {
@@ -261,8 +268,7 @@ export function ConventionForm({
           <div className="relative w-full py-4 inline-block">
             <select
               className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              {...register("venue.id")}
-              defaultValue={convention?.venue?.id || "-1"}
+              {...register("venue.id", { setValueAs: (value) => Number(value) })}
             >
               <option value="-1" disabled className="text-gray-500">Select a venue</option>
                 {venueList.map(v => (

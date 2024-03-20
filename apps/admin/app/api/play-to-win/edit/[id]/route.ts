@@ -1,13 +1,11 @@
+import { IPlayToWinRequest } from "@/app/api/requests/play-to-win-request";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import ILibraryItemRequest from "../../../requests/library-item-request";
-
-export const dynamic = "force-dynamic";
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-  const libraryItemToEdit: ILibraryItemRequest = await request.json();
+  const playToWinItem: IPlayToWinRequest = await request.json();
 
-  const { boardGameGeekThing, additionalBoxContent } = libraryItemToEdit;
+  const { boardGameGeekThing, ...rest } = playToWinItem;
   const { mechanics, id, ...bggRest } = boardGameGeekThing;
 
   const upsertBggLibraryGame = await prisma.boardGameGeekThing.upsert({
@@ -19,35 +17,27 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     },
   });
 
-  const updatedLibraryItem = await prisma.libraryItem.update({
+  const updatePlayToWinItem = await prisma.playToWinItem.update({
     where: { id: Number(params.id) },
     data: {
-      alias:
-        libraryItemToEdit?.alias?.trim() === ""
-          ? null
-          : libraryItemToEdit.alias,
-      barcode: libraryItemToEdit.barcode,
-      isHidden: libraryItemToEdit.isHidden,
-      owner: libraryItemToEdit.owner,
-      boardGameGeekId: upsertBggLibraryGame.id,
-      updatedAtUtc: new Date(),
+      ...rest
     },
-  });
+  })
 
   await prisma.centralizedBarcode.upsert({
     where: {
       entityType_entityId: {
-        entityId: Number(updatedLibraryItem.id),
-        entityType: "LibraryItem",
+        entityId: Number(updatePlayToWinItem.id),
+        entityType: "PlayToWinItem",
       },
     },
     create: {
-      entityId: Number(updatedLibraryItem.id),
-      entityType: "LibraryItem",
-      barcode: updatedLibraryItem.barcode,
+      entityId: Number(updatePlayToWinItem.id),
+      entityType: "PlayToWinItem",
+      barcode: updatePlayToWinItem.barcode,
     },
     update: {
-      barcode: updatedLibraryItem.barcode,
+      barcode: updatePlayToWinItem.barcode,
     },
   })
 
@@ -81,7 +71,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
   return NextResponse.json(
     {
-      message: `Successfully edited ${upsertBggLibraryGame.itemName} in library`,
+      message: `Successfully edited ${upsertBggLibraryGame.itemName} play-to-win item`,
     },
     { status: 200 }
   );

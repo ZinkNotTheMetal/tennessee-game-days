@@ -477,7 +477,7 @@ async function main() {
     await AddLibraryItemToDatabase(game.bggIdToAdd, game.barcode, game.alias, game.includedItems)
     gamesAdded++
 
-    if (gamesAdded % 100) console.log(`--- ${gamesAdded} added ---`)
+    if (gamesAdded % 100 == 0) console.log(`--- ${gamesAdded} added ---`)
   }
 
   const end = performance.now()
