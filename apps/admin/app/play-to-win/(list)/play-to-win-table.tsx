@@ -164,7 +164,7 @@ export function PlayToWinItemsTable({
                     key={row.id}
                     className="border-b hover:bg-blue-100 hover:cursor-pointer text-center"
                     onClick={() => {
-                      router.push(`/library/edit/${row.original.id}`);
+                      router.push(`/play-to-win/edit/${row.original.id}`);
                     }}
                   >
                     {row.getVisibleCells().map((cell) => {
