@@ -7,6 +7,9 @@ Table centralized_barcodes {
   barcode String [unique, not null]
   entityType EntityType [not null]
   entityId Int [not null]
+  libraryItems library_items [not null]
+  attendees attendees [not null]
+  playToWinItems play_to_win_items [not null]
 
   indexes {
     (entityType, entityId) [unique]
@@ -24,6 +27,7 @@ Table conventions {
   venueId Int
   venue venues
   PlayToWinGames play_to_win_items [not null]
+  Attendees attendees [not null]
 }
 
 Table venues {
@@ -92,6 +96,7 @@ Table library_items {
   updatedAtUtc DateTime [default: `now()`, not null]
   checkOutEvents library_checkout_events [not null]
   additionalBoxContent library_item_contents [not null]
+  centralizedBarcode centralized_barcodes [not null]
 }
 
 Table library_item_contents {
@@ -126,6 +131,7 @@ Table play_to_win_items {
   isHidden Boolean [not null]
   totalTimesPlayed Int [not null, default: 0]
   dateAddedUtc DateTime [default: `now()`, not null]
+  centralizedBarcode centralized_barcodes [not null]
 }
 
 Table library_checkout_events {
@@ -142,10 +148,18 @@ Table library_checkout_events {
 Table attendees {
   id Int [pk, increment]
   personId Int [not null]
+  barcode String [not null]
   person people [not null]
   isCheckedIn Boolean [not null, default: false]
+  conventionId Int [not null]
+  convention conventions [not null]
   checkedInUtc DateTime
+  centralizedBarcode centralized_barcodes [not null]
   checkOutEvents library_checkout_events [not null]
+
+  indexes {
+    (personId, conventionId) [unique]
+  }
 }
 
 Enum EntityType {
@@ -162,6 +176,8 @@ Ref: game_mechanics.mechanicId > bgg_mechanics.id
 
 Ref: library_items.boardGameGeekId > board_game_geek_items.id
 
+Ref: library_items.barcode > centralized_barcodes.barcode
+
 Ref: library_item_contents.libraryItemId > library_items.id
 
 Ref: library_item_contents.boardGameGeekId > board_game_geek_items.id
@@ -170,8 +186,14 @@ Ref: play_to_win_items.boardGameGeekId > board_game_geek_items.id
 
 Ref: play_to_win_items.conventionId > conventions.id
 
+Ref: play_to_win_items.barcode > centralized_barcodes.barcode
+
 Ref: library_checkout_events.libraryCopyId > library_items.id
 
 Ref: library_checkout_events.attendeeId > attendees.id
 
 Ref: attendees.personId > people.id
+
+Ref: attendees.conventionId > conventions.id
+
+Ref: attendees.barcode > centralized_barcodes.barcode
