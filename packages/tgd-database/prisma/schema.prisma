@@ -6,7 +6,8 @@
 
 generator client {
   provider = "prisma-client-js"
-  // output = "../node_modules/.prisma/client"
+  //output = "../node_modules/.prisma/client"
+  //output = "../node_modules/@prisma/client"
 }
 
 datasource db {
@@ -44,10 +45,10 @@ enum EntityType {
 model Convention {
   id                         Int       @id @default(autoincrement()) @map(name: "id")
   name                       String    @unique @map(name: "name")
-  extraHoursStartDateTimeUtc DateTime? @map(name: "extra_hours_start_date_time_iso_utc")
-  startDateTimeUtc           DateTime? @map(name: "start_date_time_iso_utc")
-  endDateTimeUtc             DateTime? @map(name: "end_date_time_iso_utc")
-  updatedAtUtc               DateTime  @default(now()) @map(name: "date_updated_utc")
+  extraHoursStartDateTimeUtc String?   @map(name: "extra_hours_start_date_time_iso_utc")
+  startDateTimeUtc           String?   @map(name: "start_date_time_iso_utc")
+  endDateTimeUtc             String?   @map(name: "end_date_time_iso_utc")
+  updatedAtUtc               String    @map(name: "date_updated_utc")
   isCancelled                Boolean   @default(false) @map(name: "is_cancelled")
   venueId                    Int?      @map(name: "venue_id")
   venue                      Venue?    @relation(fields: [venueId], references: [id])
@@ -131,8 +132,8 @@ model LibraryItem {
   isHidden               Boolean                        @map(name: "is_hidden")
   isCheckedOut           Boolean                        @map(name: "is_checked_out")
   totalCheckedOutMinutes Int                            @default(0) @map(name: "minutes_checked_out")
-  dateAddedUtc           DateTime                       @default(now()) @map(name: "date_added_utc")
-  updatedAtUtc           DateTime                       @default(now()) @map(name: "date_updated_utc")
+  dateAddedUtc           String                         @map(name: "date_added_utc")
+  updatedAtUtc           String                         @map(name: "date_updated_utc")
   checkOutEvents         LibraryCheckoutEvent[]
   additionalBoxContent   AdditionalLibraryItemContent[]
   centralizedBarcode     CentralizedBarcode             @relation(fields: [barcode], references: [barcode])
@@ -158,7 +159,7 @@ model AdditionalLibraryItemContent {
 
 model Person {
   id            Int        @id @default(autoincrement()) @map(name: "id")
-  firstName     String     @map(name: "first_name")
+  firstName      String     @map(name: "first_name")
   preferredName String?    @map(name: "preferred_name")
   lastName      String     @map(name: "last_name")
   email         String?    @map(name: "email")
@@ -178,7 +179,7 @@ model PlayToWinItem {
   convention         Convention          @relation(fields: [conventionId], references: [id])
   isHidden           Boolean             @map(name: "is_hidden")
   totalTimesPlayed   Int                 @default(0) @map(name: "total_played")
-  dateAddedUtc       DateTime            @default(now()) @map(name: "date_added_utc")
+  dateAddedUtc       String              @map(name: "date_added_utc")
   centralizedBarcode CentralizedBarcode  @relation(fields: [barcode], references: [barcode])
 
   // is_checked_out?
@@ -188,13 +189,12 @@ model PlayToWinItem {
 
 model LibraryCheckoutEvent {
   id                        String      @id @default(cuid()) @map(name: "id")
-  libraryGameBarCodeScanned Int         @map(name: "libary_game_barcode_scanned")
   libraryCopyId             Int         @map(name: "library_item_id")
   library                   LibraryItem @relation(fields: [libraryCopyId], references: [id])
   attendeeId                Int         @map(name: "checkout_attendee_id")
   attendee                  Attendee    @relation(fields: [attendeeId], references: [id])
-  checkedOutTime            DateTime    @default(now()) @map("checked_out_time_utc")
-  checkedInTime             DateTime?   @map("checked_in_time_utc")
+  checkedOutTimeUtcIso      String      @map("checked_out_time_utc")
+  checkedInTimeUtcIso       String?     @map("checked_in_time_utc")
 
   @@map("library_checkout_events")
 }
@@ -207,7 +207,7 @@ model Attendee {
   isCheckedIn  Boolean    @default(false) @map(name: "is_checked_in")
   conventionId Int        @map(name: "convention_id")
   convention   Convention @relation(fields: [conventionId], references: [id])
-  checkedInUtc DateTime?  @map(name: "checked_in_utc")
+  checkedInUtc String?    @map(name: "checked_in_utc")
 
   centralizedBarcode CentralizedBarcode    @relation(fields: [barcode], references: [barcode])
   checkOutEvents     LibraryCheckoutEvent[]

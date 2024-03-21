@@ -11,7 +11,11 @@ export async function GET(
     where: { id: Number(params.id) },
     include: {
       additionalBoxContent: true,
-      checkOutEvents: true,
+      checkOutEvents: {
+        orderBy: {
+          checkedInTimeUtcIso: 'desc'
+        }
+      },
       boardGameGeekThing: true,
     },
   });

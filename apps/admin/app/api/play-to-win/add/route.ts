@@ -4,6 +4,7 @@ import { Readable } from 'stream'
 import prisma from "@/app/lib/prisma";
 import { PlayToWinCsvRow } from "../../requests/ptw-csv-request"
 import { MapToBoardGameEntity, SearchBoardGameGeek } from "@repo/board-game-geek-shared";
+import { DateTime } from "ts-luxon";
 
 
 export async function POST(request: NextRequest) {
@@ -74,7 +75,8 @@ export async function POST(request: NextRequest) {
                 isHidden: false,
                 conventionId: conventionId,
                 gameName: ptwItem.gameName,
-                boardGameGeekId: upsertBggGame.id
+                boardGameGeekId: upsertBggGame.id,
+                dateAddedUtc: DateTime.utc().toISO()
               }
             })
             ptwAddedId = ptwAdded.id
@@ -84,7 +86,8 @@ export async function POST(request: NextRequest) {
                 barcode: ptwItem.barcode,
                 isHidden: false,
                 gameName: ptwItem.gameName,
-                conventionId: conventionId
+                conventionId: conventionId,
+                dateAddedUtc: DateTime.utc().toISO()
               }
             })
             ptwAddedId = ptwAdded.id
@@ -96,7 +99,8 @@ export async function POST(request: NextRequest) {
               barcode: ptwItem.barcode,
               isHidden: false,
               gameName: ptwItem.gameName,
-              conventionId: conventionId
+              conventionId: conventionId,
+              dateAddedUtc: DateTime.utc().toISO()
             }
           })
           ptwAddedId = ptwAdded.id

@@ -14,5 +14,16 @@ export async function GET(
     return NextResponse.json({ message: "Barcode not in system!" }, { status: 404 });
   }
 
+  if (barcodeScanned.entityType === 'LibraryItem') {
+    const libraryItem = await prisma.libraryItem.findFirst({
+      where: { id: barcodeScanned.entityId}
+    })
+
+    return NextResponse.json({
+      barcodeScanned,
+      isCheckedOut: libraryItem?.isCheckedOut
+    })
+  }
+
   return NextResponse.json(barcodeScanned);
 }
