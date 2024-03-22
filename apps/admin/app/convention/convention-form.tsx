@@ -268,11 +268,11 @@ export function ConventionForm({
           <div className="relative w-full py-4 inline-block">
             <select
               className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              {...register("venue.id", { setValueAs: (value) => Number(value) })}
+              {...register("venue.id")}
             >
               <option value="-1" disabled className="text-gray-500">Select a venue</option>
                 {venueList.map(v => (
-                  <option selected={v.id == convention?.venue?.id} key={v.id} value={v.id}>{v.name}</option>
+                  <option key={v.id} value={v.id}>{v.name}</option>
                 ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">

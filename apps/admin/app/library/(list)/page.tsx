@@ -17,39 +17,9 @@ async function getLibraryItems() {
     cache: 'no-store',
   })
 
-  const libraryItems: ApiListResponse<ILibraryItem> = await libraryItemsApi.json();
+  const libraryItems: ApiListResponse<ILibraryItem> = await libraryItemsApi.json()
 
-  libraryItems.list.sort((a: ILibraryItem, b: ILibraryItem) => {
-    // If Alias is null, use ItemName for sorting
-    const aliasA = a.alias?.toLowerCase() ?? a.boardGameGeekThing.itemName.toLowerCase();
-    const aliasB = b.alias?.toLowerCase() ?? b.boardGameGeekThing.itemName.toLowerCase();
-
-      // // Function to check if a string starts with a number
-      // const startsWithNumber = (str: string) => /^\d/.test(str);
-
-      // // Check if aliasA starts with a number
-      // const startsWithNumberA = startsWithNumber(aliasA);
-      // const startsWithNumberB = startsWithNumber(aliasB);
-  
-      // // If both start with a number or neither start with a number, use regular comparison
-      // if (startsWithNumberA === startsWithNumberB) {
-      //     return aliasA.localeCompare(aliasB);
-      // } else if (startsWithNumberA) {
-      //     // If aliasA starts with a number, it should be sorted to the bottom
-      //     return 1;
-      // } else {
-      //     // If aliasB starts with a number, it should be sorted to the bottom
-      //     return -1;
-      // }
-
-    // Compare Alias values
-    if (aliasA < aliasB) return -1;
-    if (aliasA > aliasB) return 1;
-
-    return 0;
-  });
-
-  return libraryItems;
+  return libraryItems
 }
 
 export default async function Page() {
