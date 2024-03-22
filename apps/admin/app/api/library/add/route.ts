@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import ILibraryItemRequest from "../../requests/library-item-request";
+import { DateTime } from "ts-luxon";
 
 export const dynamic = "force-dynamic";
 
@@ -27,8 +28,8 @@ export async function POST(request: NextRequest) {
       owner: libraryItemToAdd.owner,
       boardGameGeekId: upsertBggLibraryGame.id,
       isCheckedOut: false,
-      updatedAtUtc: new Date(),
-      dateAddedUtc: new Date(),
+      updatedAtUtc: DateTime.utc().toISO(),
+      dateAddedUtc: DateTime.utc().toISO(),
     },
   });
 
