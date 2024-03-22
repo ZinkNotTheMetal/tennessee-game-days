@@ -44,7 +44,7 @@ export function LibraryForm({
       ...rest,
       boardGameGeekThing,
     },
-  });
+  })
 
   const onSubmit: SubmitHandler<ILibraryItem> = async (data) => {
     setOnSubmitting(true);

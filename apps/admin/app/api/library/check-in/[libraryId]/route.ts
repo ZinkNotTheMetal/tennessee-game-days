@@ -5,7 +5,7 @@ import { DateTime } from "ts-luxon"
 export async function PUT(request: NextRequest, { params }: { params: { libraryId: string } }) {
   const checkedInTime = DateTime.utc()
 
-  const libraryItem = prisma.libraryItem.count({
+  const libraryItem = await prisma.libraryItem.count({
     where: { id: Number(params.libraryId) }
   })
 
@@ -14,17 +14,21 @@ export async function PUT(request: NextRequest, { params }: { params: { libraryI
   await prisma.$transaction(async t => {
 
     const result = await t.libraryCheckoutEvent.findFirst({
-      where: { libraryCopyId: Number(params.libraryId) }
+      where: { libraryCopyId: Number(params.libraryId), checkedInTimeUtcIso: null }
     })
 
+    // If there are no current check out events then it will just return the 200
+    // If we need a force function I can build that quickly just to do lines 33 without incrementing minutes
     if (result === null) return
 
-    await t.libraryCheckoutEvent.update({
-      where: { id: result.id, checkedInTimeUtcIso: undefined },
+    const event = await t.libraryCheckoutEvent.update({
+      where: { id: result.id, checkedInTimeUtcIso: null },
       data: { 
         checkedInTimeUtcIso: checkedInTime.toUTC().toISO()
       }
     })
+
+    if (event === null) return
 
     await t.libraryItem.update({
       where: 

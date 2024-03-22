@@ -1,6 +1,7 @@
 interface BarcodeResponse {
   barcode: string
-  entityType: 'Attendee' | 'PlayToWinItem' | 'LibraryItem'
+  entityType: 'Attendee' | 'PlayToWinItem' | 'LibraryItem',
+  entityId: number
   isLibraryItemCheckedOut: boolean
 }
 
@@ -18,19 +19,44 @@ async function CheckBarcode(barcode: string) : Promise<BarcodeResponse> {
 
   const data = await response.json()
 
-  console.log(data)
+  console.log("scanned barcode data:", data)
 
   return {
-    barcode: data.barcodeScanned.barcode,
-    entityType: data.barcodeScanned?.entityType,
-    isLibraryItemCheckedOut: data?.isCheckedOut
+    barcode: barcode,
+    entityType: data.entityType,
+    entityId: data.entityId,
+    isLibraryItemCheckedOut: data.isCheckedOut
   }
 }
 
 // Check in LibraryItem
-async function CheckInLibraryItem(barcode: string) {
-  // End event
-  // Add minutes to
+async function CheckInLibraryItem(libraryItemId: number) : Promise<number> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/check-in/${libraryItemId}`,
+    {
+      method: "PUT",
+    }
+  )
+  if (!response.ok) {
+    return response.status
+  }
+  return response.status
 }
 
-export { CheckBarcode }
+async function CheckOutLibraryItem(libraryItemId: number, attendeeId: number): Promise<number> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/check-out`,
+    {
+      method: "POST",
+      body: JSON.stringify({ libraryId: libraryItemId, attendeeId: attendeeId })
+    }
+  )
+  if (!response.ok) {
+    return response.status
+  }
+  return response.status
+
+}
+
+export { CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem }
+export type { BarcodeResponse }

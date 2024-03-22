@@ -10,7 +10,6 @@ const gamesToSeed = [
   { bggIdToAdd: 284083, barcode: "521004-TGD-23-1", alias: null, includedItems: [] }, // 7
   { bggIdToAdd: 316554, barcode: "522001-TGD-3-1", alias: null, includedItems: [] }, // 8
   { bggIdToAdd: 117959, barcode: "620079-RR-07-2", alias: null, includedItems: [] }, // 9
-  { bggIdToAdd: 117959, barcode: "620079-RR-07-2", alias: null, includedItems: [] }, // 10
   { bggIdToAdd: 283355, barcode: "519021-TGD-02-01", alias: null, includedItems: [], }, // 11
   { bggIdToAdd: 823, barcode: "620040-RR-04-01", alias: null, includedItems: [] }, // 12
   { bggIdToAdd: 349490, barcode: "623004-RR-01-1", alias: null, includedItems: [] }, //13
@@ -31,7 +30,6 @@ const gamesToSeed = [
   { bggIdToAdd: 150376, barcode: "516011-TGD-14-1", alias: null, includedItems: [] }, // 28
   { bggIdToAdd: 169, barcode: "510003-TGD-04-1", alias: null, includedItems: [] }, // 29
   { bggIdToAdd: 45, barcode: "720043-RK-04-1", alias: "Liar's Dice",includedItems: [] }, // 30
-  { bggIdToAdd: 13, barcode: "620067-RR-10-1", alias: null, includedItems: [] }, // 31
   { bggIdToAdd: 255618, barcode: "620074-RR-07-1", alias: "dude (with more dude)",includedItems: [256397],}, // 32
   { bggIdToAdd: 2655, barcode: "514010-TGD-05-1", alias: "Hive (with Ladybug and Mosquito)",includedItems: [70704, 30323],}, //33
   { bggIdToAdd: 27162, barcode: "514011-TGD-06-1", alias: "Kingsburg (with Expansion)",includedItems: [] }, // 34

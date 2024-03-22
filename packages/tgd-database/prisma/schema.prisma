@@ -6,7 +6,8 @@
 
 generator client {
   provider = "prisma-client-js"
-  //output = "../node_modules/.prisma/client"
+  output = "../node_modules/.prisma/client"
+  //output = "../../node_modules/.prisma/client"
   //output = "../node_modules/@prisma/client"
 }
 
@@ -182,6 +183,8 @@ model PlayToWinItem {
   dateAddedUtc       String              @map(name: "date_added_utc")
   centralizedBarcode CentralizedBarcode  @relation(fields: [barcode], references: [barcode])
 
+  playToWinEvents    PlayToWinEvent[]
+
   // is_checked_out?
   @@unique([barcode])
   @@map("play_to_win_items")
@@ -199,18 +202,32 @@ model LibraryCheckoutEvent {
   @@map("library_checkout_events")
 }
 
+model PlayToWinEvent {
+  id                        String        @id @default(cuid()) @map(name: "id")
+  playToWinItemId           Int           @map(name: "play_to_win_item_id")
+  playToWinItem             PlayToWinItem @relation(fields: [playToWinItemId], references: [id])
+  attendeeId                Int           @map(name: "attendee_id")
+  attendee                  Attendee      @relation(fields: [attendeeId], references: [id])
+  checkedInTimeUtcIso       String        @map("checked_in_time_utc")
+
+  @@map("play_to_win_events")  
+}
+
 model Attendee {
-  id           Int        @id @default(autoincrement()) @map(name: "id")
-  personId     Int        @map(name: "person_id")
-  barcode      String     @map(name: "barcode")
-  person       Person     @relation(fields: [personId], references: [id])
-  isCheckedIn  Boolean    @default(false) @map(name: "is_checked_in")
-  conventionId Int        @map(name: "convention_id")
-  convention   Convention @relation(fields: [conventionId], references: [id])
-  checkedInUtc String?    @map(name: "checked_in_utc")
+  id             Int        @id @default(autoincrement()) @map(name: "id")
+  personId       Int        @map(name: "person_id")
+  barcode        String     @map(name: "barcode")
+  person         Person     @relation(fields: [personId], references: [id])
+  isCheckedIn    Boolean    @default(false) @map(name: "is_checked_in")
+  conventionId   Int        @map(name: "convention_id")
+  convention     Convention @relation(fields: [conventionId], references: [id])
+  checkedInUtc   String?    @map(name: "checked_in_utc")
+  isVolunteer    Boolean    @default(false) @map(name: "is_volunteer")
+  idTgdOrganizer Boolean    @default(false) @map(name: "is_organizer")
 
   centralizedBarcode CentralizedBarcode    @relation(fields: [barcode], references: [barcode])
   checkOutEvents     LibraryCheckoutEvent[]
+  playToWinEvents    PlayToWinEvent[]
 
   @@unique([personId, conventionId])
   @@map("attendees")

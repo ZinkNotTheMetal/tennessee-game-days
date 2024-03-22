@@ -20,7 +20,7 @@ export async function GET(
     })
 
     return NextResponse.json({
-      barcodeScanned,
+      ...barcodeScanned,
       isCheckedOut: libraryItem?.isCheckedOut
     })
   }

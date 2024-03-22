@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import ScanningTerminalClient from "./scanning-terminal";
+import ScanningTerminalClient from "./scanning-form";
 
 export const metadata: Metadata = {
   title: "Scanning Terminal",
