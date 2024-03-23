@@ -34,7 +34,7 @@ export default function PlayToWinDropZone() : JSX.Element {
       formData.append('csvFile', fileUploaded)
     }
 
-    toast(`Play to win games take up to a minute to show up as the file is processing.`, { type: 'info' })
+    toast(`Beginning the process to upload games. Please be patient as this can take a while...`, { type: 'info' })
 
     fetch(`/api/play-to-win/add`, {
       method: "POST",

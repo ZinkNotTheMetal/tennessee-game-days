@@ -6,6 +6,11 @@ import { PlayToWinCsvRow } from "../../requests/ptw-csv-request"
 import { MapToBoardGameEntity, SearchBoardGameGeek } from "@repo/board-game-geek-shared";
 import { DateTime } from "ts-luxon";
 
+function sleep (ms: number) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms)
+  })
+}
 
 export async function POST(request: NextRequest) {
 
@@ -69,7 +74,7 @@ export async function POST(request: NextRequest) {
             }
 
             // Add to centralized barcode
-            await prisma.centralizedBarcode.create({
+            const barcodeForPtwItem = await prisma.centralizedBarcode.create({
               data: {
                 entityId: 0,
                 entityType: "PlayToWinItem",
@@ -85,23 +90,23 @@ export async function POST(request: NextRequest) {
                 conventionId: conventionId,
                 gameName: ptwItem.gameName,
                 boardGameGeekId: upsertBggGame.id,
-                dateAddedUtc: DateTime.utc().toISO()
+                dateAddedUtc: DateTime.utc().toISO(),
               }
             })
             ptwAddedId = ptwAdded.id
 
-
-            await prisma.centralizedBarcode.update({
-              where: { barcode: ptwItem.barcode },
+            await prisma.playToWinItem.update({
+              where: { id: ptwAdded.id },
               data: {
-                entityId: Number(ptwAdded.id),
-              },
+                centralizedBarcode: {
+                  connect: { id: barcodeForPtwItem.id }
+                }
+              }
             })
-
 
           } else {
             // Add to centralized barcode
-            await prisma.centralizedBarcode.create({
+            const barcodeForPtwItem = await prisma.centralizedBarcode.create({
               data: {
                 entityId: 0,
                 entityType: "PlayToWinItem",
@@ -109,28 +114,31 @@ export async function POST(request: NextRequest) {
               },
             })
 
+            // Add to PTW Games
             const ptwAdded = await prisma.playToWinItem.create({
               data: {
                 barcode: ptwItem.barcode,
                 isHidden: false,
-                gameName: ptwItem.gameName,
                 conventionId: conventionId,
-                dateAddedUtc: DateTime.utc().toISO()
+                gameName: ptwItem.gameName,
+                dateAddedUtc: DateTime.utc().toISO(),
               }
             })
             ptwAddedId = ptwAdded.id
 
-            await prisma.centralizedBarcode.update({
-              where: { barcode: ptwItem.barcode },
+            await prisma.playToWinItem.update({
+              where: { id: ptwAdded.id },
               data: {
-                entityId: Number(ptwAdded.id),
-              },
+                centralizedBarcode: {
+                  connect: { id: barcodeForPtwItem.id }
+                }
+              }
             })
           }
 
         } else {
           // Add to centralized barcode
-          await prisma.centralizedBarcode.create({
+          const barcodeForPtwItem = await prisma.centralizedBarcode.create({
             data: {
               entityId: 0,
               entityType: "PlayToWinItem",
@@ -138,16 +146,26 @@ export async function POST(request: NextRequest) {
             },
           })
 
+          // Add to PTW Games
           const ptwAdded = await prisma.playToWinItem.create({
             data: {
               barcode: ptwItem.barcode,
               isHidden: false,
-              gameName: ptwItem.gameName,
               conventionId: conventionId,
-              dateAddedUtc: DateTime.utc().toISO()
+              gameName: ptwItem.gameName,
+              dateAddedUtc: DateTime.utc().toISO(),
             }
           })
           ptwAddedId = ptwAdded.id
+
+          await prisma.playToWinItem.update({
+            where: { id: ptwAdded.id },
+            data: {
+              centralizedBarcode: {
+                connect: { id: barcodeForPtwItem.id }
+              }
+            }
+          })
 
           await prisma.centralizedBarcode.update({
             where: { barcode: ptwItem.barcode },
@@ -156,7 +174,7 @@ export async function POST(request: NextRequest) {
             },
           })
         }
-
+        await sleep(1900)
       }
     } catch (error) {
       console.log('Error parsing CSV fle:', error)
