@@ -71,7 +71,7 @@ export function PlayToWinItemForm({
 
     // At the moment we are only editing play to win games
     // If we change to adding as well we need to follow library items for the if (data.id && data.id > 0) {
-    fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/play-to-win/edit/${data.id}`,
+    fetch(`/api/play-to-win/edit/${data.id}`,
     {
       method: "PUT",
       body: JSON.stringify(data)

@@ -50,7 +50,7 @@ export function LibraryForm({
     setOnSubmitting(true);
     // Updating
     if (data.id && data.id > 0) {
-      fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/edit/${data.id}`,
+      fetch(`/api/library/edit/${data.id}`,
       {
         method: "PUT",
         body: JSON.stringify(data)
@@ -76,7 +76,7 @@ export function LibraryForm({
           );
         });
     } else {
-      fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/add`,
+      fetch(`/api/library/add`,
         {
           method: "POST",
           body: JSON.stringify(data),

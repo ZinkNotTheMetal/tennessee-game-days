@@ -23,7 +23,7 @@ export function ConventionForm({
   const router = useRouter();
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/venue/list`,
+    fetch(`/api/venue/list`,
     {
       method: "GET"
     })
@@ -63,7 +63,7 @@ export function ConventionForm({
 
     // Updating
     if (data.id && data.id > 0) {
-      fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/convention/edit/${data.id}`,
+      fetch(`/api/convention/edit/${data.id}`,
       {
         method: "PUT",
         body: JSON.stringify(data)
@@ -89,7 +89,7 @@ export function ConventionForm({
           );
         });
     } else {
-      fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/convention/add`,
+      fetch(`/api/convention/add`,
         {
           method: "POST",
           body: JSON.stringify(data),
