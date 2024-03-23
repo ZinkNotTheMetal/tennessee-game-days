@@ -68,6 +68,15 @@ export async function POST(request: NextRequest) {
               });
             }
 
+            // Add to centralized barcode
+            await prisma.centralizedBarcode.create({
+              data: {
+                entityId: 0,
+                entityType: "PlayToWinItem",
+                barcode: ptwItem.barcode,
+              },
+            })
+
             // Add to PTW Games
             const ptwAdded = await prisma.playToWinItem.create({
               data: {
@@ -80,7 +89,26 @@ export async function POST(request: NextRequest) {
               }
             })
             ptwAddedId = ptwAdded.id
+
+
+            await prisma.centralizedBarcode.update({
+              where: { barcode: ptwItem.barcode },
+              data: {
+                entityId: Number(ptwAdded.id),
+              },
+            })
+
+
           } else {
+            // Add to centralized barcode
+            await prisma.centralizedBarcode.create({
+              data: {
+                entityId: 0,
+                entityType: "PlayToWinItem",
+                barcode: ptwItem.barcode,
+              },
+            })
+
             const ptwAdded = await prisma.playToWinItem.create({
               data: {
                 barcode: ptwItem.barcode,
@@ -91,9 +119,25 @@ export async function POST(request: NextRequest) {
               }
             })
             ptwAddedId = ptwAdded.id
+
+            await prisma.centralizedBarcode.update({
+              where: { barcode: ptwItem.barcode },
+              data: {
+                entityId: Number(ptwAdded.id),
+              },
+            })
           }
 
         } else {
+          // Add to centralized barcode
+          await prisma.centralizedBarcode.create({
+            data: {
+              entityId: 0,
+              entityType: "PlayToWinItem",
+              barcode: ptwItem.barcode,
+            },
+          })
+
           const ptwAdded = await prisma.playToWinItem.create({
             data: {
               barcode: ptwItem.barcode,
@@ -104,21 +148,14 @@ export async function POST(request: NextRequest) {
             }
           })
           ptwAddedId = ptwAdded.id
-        }
 
-        // Add centralized barcode
-        await prisma.centralizedBarcode.upsert({
-          where: { barcode: ptwItem.barcode },
-          create: {
-            barcode: ptwItem.barcode,
-            entityId: ptwAddedId,
-            entityType: 'PlayToWinItem'
-          },
-          update: {
-            entityId: ptwAddedId,
-            entityType: 'PlayToWinItem'
-          }
-        })
+          await prisma.centralizedBarcode.update({
+            where: { barcode: ptwItem.barcode },
+            data: {
+              entityId: Number(ptwAdded.id),
+            },
+          })
+        }
 
       }
     } catch (error) {

@@ -19,6 +19,14 @@ export async function POST(request: NextRequest) {
     },
   });
 
+  await prisma.centralizedBarcode.create({
+    data: {
+      entityId: 0,
+      entityType: "LibraryItem",
+      barcode: libraryItemToAdd.barcode,
+    },
+  });
+
   const createdLibraryItem = await prisma.libraryItem.create({
     data: {
       alias:
@@ -33,11 +41,10 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  await prisma.centralizedBarcode.create({
+  await prisma.centralizedBarcode.update({
+    where: { barcode: libraryItemToAdd.barcode },
     data: {
       entityId: Number(createdLibraryItem.id),
-      entityType: "LibraryItem",
-      barcode: libraryItemToAdd.barcode,
     },
   });
 

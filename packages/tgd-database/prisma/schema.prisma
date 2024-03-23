@@ -7,7 +7,7 @@
 generator client {
   provider = "prisma-client-js"
   //output = "../node_modules/.prisma/client"
-  //output = "../../node_modules/.prisma/client"
+  output = "../../node_modules/.prisma/client"
   //output = "../node_modules/@prisma/client"
 }
 
@@ -183,7 +183,7 @@ model PlayToWinItem {
   dateAddedUtc       String              @map(name: "date_added_utc")
   centralizedBarcode CentralizedBarcode  @relation(fields: [barcode], references: [barcode])
 
-  playToWinEvents    PlayToWinEvent[]
+  playToWinPlays     PlayToWinPlay[]
 
   // is_checked_out?
   @@unique([barcode])
@@ -202,15 +202,25 @@ model LibraryCheckoutEvent {
   @@map("library_checkout_events")
 }
 
-model PlayToWinEvent {
+model PlayToWinPlay {
   id                        String        @id @default(cuid()) @map(name: "id")
   playToWinItemId           Int           @map(name: "play_to_win_item_id")
   playToWinItem             PlayToWinItem @relation(fields: [playToWinItemId], references: [id])
-  attendeeId                Int           @map(name: "attendee_id")
-  attendee                  Attendee      @relation(fields: [attendeeId], references: [id])
   checkedInTimeUtcIso       String        @map("checked_in_time_utc")
 
-  @@map("play_to_win_events")  
+  playToWinPlayAttendees    PlayToWinPlayAttendee[]
+
+  @@map("play_to_win_plays")
+}
+
+model PlayToWinPlayAttendee {
+  id                        String        @id @default(cuid()) @map(name: "id")
+  playToWinItemId           String        @map(name: "play_to_win_play_id")
+  playToWinPlay             PlayToWinPlay @relation(fields: [playToWinItemId], references: [id])
+  attendeeId                Int           @map(name: "attendee_id")
+  attendee                  Attendee      @relation(fields: [attendeeId], references: [id])
+
+  @@map("play_to_win_play_players")
 }
 
 model Attendee {
@@ -227,7 +237,7 @@ model Attendee {
 
   centralizedBarcode CentralizedBarcode    @relation(fields: [barcode], references: [barcode])
   checkOutEvents     LibraryCheckoutEvent[]
-  playToWinEvents    PlayToWinEvent[]
+  playToWinPlays     PlayToWinPlayAttendee[]
 
   @@unique([personId, conventionId])
   @@map("attendees")

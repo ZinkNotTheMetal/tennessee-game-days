@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { BarcodeResponse, CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem } from "./scan-functions";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { FaRegTrashCan } from "react-icons/fa6";
+import { toast } from "react-toastify";
 
 export default function ScanningTerminalClient() {
 
@@ -32,25 +33,40 @@ export default function ScanningTerminalClient() {
   const [barcodeResults, setBarcodeResults] = useState<BarcodeResponse[]>([])
 
   useEffect(() => {
-    const scannedLibraryItem = barcodeResults.find(f => f.entityType === 'LibraryItem')
-    const scannedAttendee = barcodeResults.find(f => f.entityType === 'Attendee')
-    const scannedPlayToWin = barcodeResults.find(f => f.entityType === 'PlayToWinItem')
 
-    if (scannedLibraryItem?.entityType === 'LibraryItem' && scannedLibraryItem?.isLibraryItemCheckedOut) {
-      const status = CheckInLibraryItem(scannedLibraryItem?.entityId)
-        .then(() => {
-          reset()
+    const scannedLibraryItem = barcodeResults.find(f => f.entityType === 'LibraryItem')
+    // Scenarios:
+    // 1. If a library game that is checked out is scanned
+    if (scannedLibraryItem && scannedLibraryItem.isLibraryItemCheckedOut) {
+      CheckInLibraryItem(scannedLibraryItem.entityId)
+        .then((response) => {
+          if (response === 200) {
+            toast(`Successfully checked in ${scannedLibraryItem.barcode}`, { type: "success" })
+          }
         })
+      setBarcodeResults([])
+      reset()
     }
 
-    if (scannedLibraryItem && scannedAttendee) {
-      console.log(" Got here!")
-      CheckOutLibraryItem(scannedLibraryItem.entityId, scannedAttendee.entityId)
+    const scannedAttendees = barcodeResults.filter(f => f.entityType === 'Attendee')
+    
+    // 2. If an attendee and library item (not checked out) are scanned in any order
+    if (scannedLibraryItem && scannedAttendees.length === 1 && scannedAttendees[0]) {
+      CheckOutLibraryItem(scannedLibraryItem.entityId, scannedAttendees[0].entityId)
         .then((response) => {
-          console.log("check out status", response)
-          setBarcodeResults([])
-          reset()
+          if (response === 200) {
+            toast(`Successfully checked out ${scannedLibraryItem.barcode}`, { type: "success" })
+          } else if (response === 420) {
+            toast(`Unable to check out game, as the user already has a game checked out!`, { type: "error" })
+          }
         })
+      setBarcodeResults([])
+      reset()
+    }
+
+    const scannedPlayToWinGame = barcodeResults.find(f => f.entityType === 'PlayToWinItem')
+    if (scannedLibraryItem && scannedAttendees) {
+      
     }
 
   }, [barcodeResults])
@@ -72,33 +88,17 @@ export default function ScanningTerminalClient() {
     name: "barcodes"
   })
 
-  const determineScan = async (barcodeScanned: string) => {
-    console.log(barcodeScanned)
+  const getBarcodeInformation = async (barcodeScanned: string, barcodeFieldIndex: number) => {
+    const trimmedBarcode = barcodeScanned.trim()
 
-    const barcodeScannedResponse = await CheckBarcode(barcodeScanned)
-    setBarcodeResults((previous) => [...previous, barcodeScannedResponse])
-
-    // // If it's a checked out game, just check it back in and reset
-    // if (barcodeScannedResponse.entityType === 'LibraryItem' && barcodeScannedResponse.isLibraryItemCheckedOut) {
-    //   const status = await CheckInLibraryItem(barcodeScannedResponse.entityId)
-    //   reset()
-    // }
-
-    // const scannedLibraryItem = barcodeResults.find(f => f.entityType === 'LibraryItem')
-    // const scannedAttendee = barcodeResults.find(f => f.entityType === 'Attendee')
-    // const scannedPlayToWin = barcodeResults.find(f => f.entityType === 'PlayToWinItem')
-
-    // console.log("scannedLibraryItem", scannedLibraryItem)
-
-    // if (scannedLibraryItem && scannedAttendee) {
-    //   console.log(" Got here!")
-    //   const status = await CheckOutLibraryItem(scannedLibraryItem.entityId, scannedAttendee.entityId)
-
-    //   setBarcodeResults([])
-    //   reset()
-    // }
-
-    append({ barcode: '' })
+    if (!(barcodeResults.find(f => f.barcode === trimmedBarcode))) {
+      const barcodeScannedResponse = await CheckBarcode(trimmedBarcode)
+      setBarcodeResults((previous) => [...previous, barcodeScannedResponse])
+      append({ barcode: '' })
+    } else {
+      remove(barcodeFieldIndex)
+      append({ barcode: '' })
+    }
 
   }
 
@@ -110,21 +110,28 @@ export default function ScanningTerminalClient() {
     <form onSubmit={handleSubmit(onSubmit)}>
 
       { fields.map(({ id }, index) => (
-        <div className="py-2 flex items-center">
+        <div key={id} className="py-2 flex items-center">
           <input
             className="w-full p-2 mr-2 border border-gray-300 rounded"
             placeholder="Enter or scan a barcode"
             {...register(`barcodes.${index}.barcode`)}
             key={id} // important to include key with field's id
             onChange={(e) => {
-              determineScan(e.target.value)
+              getBarcodeInformation(e.target.value, index)
             }}
           />
           <button type="button" 
             key={`${id}-btn`}
             onClick={(e) => {
-              e.preventDefault()
-              remove(index)
+              e.preventDefault();
+              // Remove the barcode from barcodeResults
+              setBarcodeResults(previous => {
+                const updatedResults = [...previous];
+                updatedResults.splice(index, 1); // Remove the barcode at the specified index
+                return updatedResults;
+              });
+              // Remove the field using useFieldArray's remove function
+              remove(index);
             }}
             className="w-4 h-4"
           >
@@ -132,14 +139,6 @@ export default function ScanningTerminalClient() {
           </button>
         </div>
       ))}
-
-      <button onClick={(e) => {
-        e.preventDefault()
-        append({ barcode: '' })
-      }}>Add field</button>
-
-
-      { JSON.stringify(barcodeResults)}
 
     </form>
   )
