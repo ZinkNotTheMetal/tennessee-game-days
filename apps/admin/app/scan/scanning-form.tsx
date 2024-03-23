@@ -98,6 +98,7 @@ export default function ScanningTerminalClient() {
       }
     } else {
       remove(barcodeFieldIndex)
+      append({ barcode: '' })
     }
 
   }
@@ -131,7 +132,8 @@ export default function ScanningTerminalClient() {
                 return updatedResults;
               });
               // Remove the field using useFieldArray's remove function
-              remove(index);
+              remove(index)
+              append({ barcode: '' })
             }}
             className="w-4 h-4"
           >
