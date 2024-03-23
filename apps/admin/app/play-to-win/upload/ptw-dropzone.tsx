@@ -13,7 +13,7 @@ export default function PlayToWinDropZone() : JSX.Element {
   const router = useRouter()
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/convention/list/`,
+    fetch(`/api/convention/list/`,
     {
       method: "GET"
     })
@@ -36,7 +36,7 @@ export default function PlayToWinDropZone() : JSX.Element {
 
     toast(`Play to win games take up to a minute to show up as the file is processing.`, { type: 'info' })
 
-    fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/play-to-win/add`, {
+    fetch(`/api/play-to-win/add`, {
       method: "POST",
       body: formData
     })
@@ -44,6 +44,7 @@ export default function PlayToWinDropZone() : JSX.Element {
         if (response.ok) {
           toast(`Successfully uploaded ${file.name} for play-to-win games`, { type: 'success' })
         } else {
+          console.log(response)
           toast(`Failed to upload ${file.name}`, { type: 'error' })
         }
       })

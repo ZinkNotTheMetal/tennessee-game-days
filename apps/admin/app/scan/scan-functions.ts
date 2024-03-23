@@ -8,7 +8,7 @@ interface BarcodeResponse {
 // Check scanned barcode
 async function CheckBarcode(barcode: string) : Promise<BarcodeResponse | undefined> {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/barcode/scan/${barcode}`,
+    `/api/barcode/scan/${barcode}`,
     {
       method: "GET",
     }
@@ -34,7 +34,7 @@ async function CheckBarcode(barcode: string) : Promise<BarcodeResponse | undefin
 // Check in LibraryItem
 async function CheckInLibraryItem(libraryItemId: number) : Promise<number> {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/check-in/${libraryItemId}`,
+    `/api/library/check-in/${libraryItemId}`,
     {
       method: "PUT",
     }
@@ -49,7 +49,7 @@ async function CheckInLibraryItem(libraryItemId: number) : Promise<number> {
 
 async function CheckOutLibraryItem(libraryItemId: number, attendeeId: number): Promise<number> {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/check-out`,
+    `/api/library/check-out`,
     {
       method: "POST",
       body: JSON.stringify({ libraryId: libraryItemId, attendeeId: attendeeId })
@@ -65,7 +65,7 @@ async function CheckOutLibraryItem(libraryItemId: number, attendeeId: number): P
 
 async function LogPlayToWinPlay(playToWinItemId: number, attendeeIds: number[]): Promise<number> {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/play-to-win/log`,
+    `/api/play-to-win/log`,
     {
       method: "POST",
       body: JSON.stringify({ playToWinItemId: playToWinItemId, attendeeIds: attendeeIds })
