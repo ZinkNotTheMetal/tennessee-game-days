@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 async function getCheckedOutGames() {
-  const checkedOutGamesApi = await fetch(`/api/library/check-out`, {
+  const checkedOutGamesApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/check-out`, {
     cache: 'no-store',
   })
 
