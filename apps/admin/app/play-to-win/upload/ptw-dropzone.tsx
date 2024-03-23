@@ -1,16 +1,23 @@
 'use client'
 
-import Dropzone from "@/app/components/drop-zone/drop-zone"
 import { ApiListResponse, IConvention } from "@repo/shared"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { toast } from "react-toastify"
+import { useDropzone } from 'react-dropzone'
+import { FaUpload } from "react-icons/fa6"
 
 export default function PlayToWinDropZone() : JSX.Element {
-  const [fileUploaded, setFileUploaded] = useState<File | undefined>()
   const [conventions, setConventions] = useState<IConvention[] | undefined>(undefined)
   const [conventionSelected, setConventionSelected] = useState<number>(-1)
   const router = useRouter()
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0]
+    console.log(file)
+  }, [])
+
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
   useEffect(() => {
     fetch(`/api/convention/list/`,
@@ -26,12 +33,15 @@ export default function PlayToWinDropZone() : JSX.Element {
 
   }, [])
 
-  const uploadCsvToPtwApi = (file: File) => {
+  const uploadCsvToPtwApi = () => {
+    const playToWinFile = acceptedFiles[0]
+
+    if (playToWinFile === undefined) return
 
     const formData = new FormData()
     formData.append('conventionId', conventionSelected.toString())
-    if (fileUploaded) {
-      formData.append('csvFile', fileUploaded)
+    if (playToWinFile) {
+      formData.append('csvFile', playToWinFile)
     }
 
     toast(`Beginning the process to upload games. Please be patient as this can take a while...`, { type: 'info' })
@@ -42,29 +52,45 @@ export default function PlayToWinDropZone() : JSX.Element {
     })
       .then((response) => {
         if (response.ok) {
-          toast(`Successfully uploaded ${file.name} for play-to-win games`, { type: 'success' })
+          toast(`Successfully uploaded ${playToWinFile.name} for play-to-win games`, { type: 'success' })
         } else {
           console.log(response)
-          toast(`Failed to upload ${file.name}`, { type: 'error' })
+          toast(`Failed to upload ${playToWinFile.name}`, { type: 'error' })
         }
       })
       .catch((error) => {
         console.log(error)
-        toast(`Failed to upload ${file.name}`, { type: 'error' })
+        toast(`Failed to upload ${playToWinFile.name}`, { type: 'error' })
       })
 
     router.push('/play-to-win')
   }
 
+
+
   return (
-    <div>
-      <Dropzone
-        allowedFileTypes=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-        setSelectedFile={setFileUploaded}
-      />
-      {fileUploaded && (
-        <div className="flex justify-center items-center pt-6">
-          <div className="w-1/3">
+    <section className="grid columns-1">
+      <div className="flex items-center justify-center">
+        <div {...getRootProps({className: 'dropzone'})} className="flex flex-col w-1/2 items-center justify-center bg-gray-200 hover:bg-gray-300 cursor-pointer border-2 border-dashed border-gray-500 p-4 rounded-lg">
+          <input {...getInputProps()} />
+          <FaUpload className="h-28 w-14 py-2" />
+          { isDragActive ? (
+            <p>Drop the file here...</p>
+          ) : 
+          (
+            <p>Drag 'n' drop a file here, or click here and select a file to upload.</p>
+          )}
+        </div>
+
+      </div>
+
+      <div className="w-1/2 mx-auto">
+        <div className="text-center py-2">
+        { acceptedFiles.map((file, index) => (
+          <span key={`${file.name}-${index}`}><span>{file.name}</span>- {file.size} bytes</span>
+        )) }
+        </div>
+        <div className="flex justify-center items-center">
           <div className="relative w-full py-4 inline-block">
             <select
               className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -82,15 +108,18 @@ export default function PlayToWinDropZone() : JSX.Element {
               </svg>
             </div>
           </div>
-          </div>
           <button
             className={`${conventionSelected === -1 ? 'disabled bg-gray-300 pointer-events-none' : 'bg-blue-500 hover:bg-blue-700'} text-white font-bold py-2 px-4 rounded ml-4`}
-            onClick={() => uploadCsvToPtwApi(fileUploaded)}
+            onClick={(e) => uploadCsvToPtwApi()}
           >
             Upload
           </button>
+
         </div>
-      )}
-    </div>
+      </div>
+
+      
+    </section>
+
   )
 }

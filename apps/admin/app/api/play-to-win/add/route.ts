@@ -95,18 +95,16 @@ export async function POST(request: NextRequest) {
             })
             ptwAddedId = ptwAdded.id
 
-            await prisma.playToWinItem.update({
-              where: { id: ptwAdded.id },
+            await prisma.centralizedBarcode.update({
+              where: { barcode: ptwItem.barcode },
               data: {
-                centralizedBarcode: {
-                  connect: { id: barcodeForPtwItem.id }
-                }
-              }
+                entityId: Number(ptwAdded.id),
+              },
             })
 
           } else {
             // Add to centralized barcode
-            const barcodeForPtwItem = await prisma.centralizedBarcode.create({
+            await prisma.centralizedBarcode.create({
               data: {
                 entityId: 0,
                 entityType: "PlayToWinItem",
@@ -126,19 +124,17 @@ export async function POST(request: NextRequest) {
             })
             ptwAddedId = ptwAdded.id
 
-            await prisma.playToWinItem.update({
-              where: { id: ptwAdded.id },
+            await prisma.centralizedBarcode.update({
+              where: { barcode: ptwItem.barcode },
               data: {
-                centralizedBarcode: {
-                  connect: { id: barcodeForPtwItem.id }
-                }
-              }
+                entityId: Number(ptwAdded.id),
+              },
             })
           }
 
         } else {
           // Add to centralized barcode
-          const barcodeForPtwItem = await prisma.centralizedBarcode.create({
+          await prisma.centralizedBarcode.create({
             data: {
               entityId: 0,
               entityType: "PlayToWinItem",
@@ -157,15 +153,6 @@ export async function POST(request: NextRequest) {
             }
           })
           ptwAddedId = ptwAdded.id
-
-          await prisma.playToWinItem.update({
-            where: { id: ptwAdded.id },
-            data: {
-              centralizedBarcode: {
-                connect: { id: barcodeForPtwItem.id }
-              }
-            }
-          })
 
           await prisma.centralizedBarcode.update({
             where: { barcode: ptwItem.barcode },
@@ -204,8 +191,10 @@ async function parseCsvFile<T>(file: File): Promise<T[]> {
   return new Promise((resolve, reject) => {
     stream
       .pipe(csvParse({
-        skip_empty_lines: true,
         columns: true,
+        skipRecordsWithError: true,
+        skipRecordsWithEmptyValues: true,
+        skipEmptyLines: true,
       }))
       .on('data', (data) => results.push(data))
       .on('end', () => {
