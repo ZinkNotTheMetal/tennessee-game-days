@@ -64,7 +64,10 @@ export async function GET(request: NextRequest) {
   })
   
   const checkedOutGames = await prisma.libraryItem.findMany({
-    where: { isCheckedOut: true }
+    where: { isCheckedOut: true },
+    include: {
+      boardGameGeekThing: true
+    }
   })
 
   return NextResponse.json({

@@ -6,7 +6,7 @@ interface BarcodeResponse {
 }
 
 // Check scanned barcode
-async function CheckBarcode(barcode: string) : Promise<BarcodeResponse> {
+async function CheckBarcode(barcode: string) : Promise<BarcodeResponse | undefined> {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/barcode/scan/${barcode}`,
     {
@@ -14,7 +14,9 @@ async function CheckBarcode(barcode: string) : Promise<BarcodeResponse> {
     }
   );
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    console.log("Check barcode response", response)
+    console.log("Barcode response status", response.status)
+    return undefined
   }
 
   const data = await response.json()
@@ -38,8 +40,10 @@ async function CheckInLibraryItem(libraryItemId: number) : Promise<number> {
     }
   )
   if (!response.ok) {
+    console.log(response.status)
     return response.status
   }
+
   return response.status
 }
 
@@ -52,11 +56,28 @@ async function CheckOutLibraryItem(libraryItemId: number, attendeeId: number): P
     }
   )
   if (!response.ok) {
+    console.log(response.status)
     return response.status
   }
   return response.status
 
 }
 
-export { CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem }
+async function LogPlayToWinPlay(playToWinItemId: number, attendeeIds: number[]): Promise<number> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/play-to-win/log`,
+    {
+      method: "POST",
+      body: JSON.stringify({ playToWinItemId: playToWinItemId, attendeeIds: attendeeIds })
+    }
+  )
+  if (!response.ok) {
+    console.log(response.status)
+    return response.status
+  }
+  return response.status
+
+}
+
+export { CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem, LogPlayToWinPlay }
 export type { BarcodeResponse }

@@ -30,6 +30,14 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     message: 'Successfully logged Play to Win Play'
-  }, { status: 200})
+  }, { status: 200 })
 
+}
+
+export async function GET(request: NextRequest) {
+  const playToWinPlays = await prisma.playToWinPlay.count()
+
+  return NextResponse.json({
+    count: playToWinPlays
+  }, { status: 200 })
 }

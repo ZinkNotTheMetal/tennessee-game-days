@@ -5,16 +5,10 @@ import { BarcodeResponse, CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem 
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function ScanningTerminalClient() {
 
-  // Can we submit via a function rather than button on submit
-  //  - Submitting after 1 textbox if library item checked out
-  //  - Submitting after 2 textboxes if library item is not checked out and attendee scanned
-  //  - We can call handleSubmit programatically to 
-  // Can we dynamically add fields to the form and give it focus
-  //  - Add new textbox to be scanned if scenario 2
-  //  - Add N amount of textboxes everytime scanned until submitted
   // How to have the website make a noise on status code 420
   //  - https://www.joshwcomeau.com/react/announcing-use-sound-react-hook/
   //  - https://www.youtube.com/watch?v=8sDto47tLfE
@@ -31,6 +25,7 @@ export default function ScanningTerminalClient() {
   // Next is to pick from above and get them to mp3
 
   const [barcodeResults, setBarcodeResults] = useState<BarcodeResponse[]>([])
+  const router = useRouter()
 
   useEffect(() => {
 
@@ -46,6 +41,7 @@ export default function ScanningTerminalClient() {
         })
       setBarcodeResults([])
       reset()
+      router.refresh()
     }
 
     const scannedAttendees = barcodeResults.filter(f => f.entityType === 'Attendee')
@@ -62,6 +58,7 @@ export default function ScanningTerminalClient() {
         })
       setBarcodeResults([])
       reset()
+      router.refresh()
     }
 
     const scannedPlayToWinGame = barcodeResults.find(f => f.entityType === 'PlayToWinItem')
@@ -93,11 +90,14 @@ export default function ScanningTerminalClient() {
 
     if (!(barcodeResults.find(f => f.barcode === trimmedBarcode))) {
       const barcodeScannedResponse = await CheckBarcode(trimmedBarcode)
-      setBarcodeResults((previous) => [...previous, barcodeScannedResponse])
-      append({ barcode: '' })
+      if (barcodeScannedResponse?.barcode) {
+
+        setBarcodeResults((previous) => [...previous, barcodeScannedResponse])
+        append({ barcode: '' })
+
+      }
     } else {
       remove(barcodeFieldIndex)
-      append({ barcode: '' })
     }
 
   }
