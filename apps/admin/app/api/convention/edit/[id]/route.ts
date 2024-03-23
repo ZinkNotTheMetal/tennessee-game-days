@@ -6,22 +6,18 @@ import { DateTime } from 'ts-luxon'
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   const conventionToEditRequest: IConventionRequest = await request.json();
   const { venue, ...convention } = conventionToEditRequest
-  let venueAddedId = venue?.id || -1
+  let venueAddedId: number = venue?.id || -1
 
-  // If Venue is filled out it's new
-  // If not then it's just an ID
+  console.log(venue)
+
   if (venue !== undefined) {
-
-    if (!(venue.id)) {
-      const newVenue = await prisma.venue.create({
-        data: {
-          ...venue,
-          id: undefined
-        }
+    const { id, ...rest } = venue
+    if ((venue?.id || -1) < 0) {
+      const addedVenue = await prisma.venue.create({
+        data: rest
       })
-      venueAddedId = newVenue.id
+      venueAddedId = addedVenue.id
     }
-    
   }
 
   const updatedConvention = await prisma.convention.update({

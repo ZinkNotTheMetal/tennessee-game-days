@@ -47,7 +47,9 @@ export function LibraryGameTable({
   total,
 }: LibraryGameTableProps): JSX.Element {
   const [query, setQuery] = useState<string>("");
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "boardGameGeekThing_itemName", desc: false }
+  ]);
   const router = useRouter();
 
   const columnHelper = createColumnHelper<ILibraryItem>();

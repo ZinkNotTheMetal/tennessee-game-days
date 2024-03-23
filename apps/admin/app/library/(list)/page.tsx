@@ -17,21 +17,9 @@ async function getLibraryItems() {
     cache: 'no-store',
   })
 
-  const libraryItems: ApiListResponse<ILibraryItem> = await libraryItemsApi.json();
+  const libraryItems: ApiListResponse<ILibraryItem> = await libraryItemsApi.json()
 
-  libraryItems.list.sort((a: ILibraryItem, b: ILibraryItem) => {
-    // If Alias is null, use ItemName for sorting
-    const aliasA = a.alias ?? a.boardGameGeekThing.itemName;
-    const aliasB = b.alias ?? b.boardGameGeekThing.itemName;
-
-    // Compare Alias values
-    if (aliasA < aliasB) return -1;
-    if (aliasA > aliasB) return 1;
-
-    return 0;
-  });
-
-  return libraryItems;
+  return libraryItems
 }
 
 export default async function Page() {

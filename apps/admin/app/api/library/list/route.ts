@@ -12,7 +12,7 @@ export async function GET() {
   const libraryItems = await prisma.libraryItem.findMany({
     include: {
       boardGameGeekThing: true,
-    },
+    }
   });
 
   return NextResponse.json({

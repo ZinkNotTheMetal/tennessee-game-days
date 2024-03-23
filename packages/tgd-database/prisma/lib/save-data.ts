@@ -4,6 +4,7 @@ import {
 } from "@repo/board-game-geek-shared";
 import { IBoardGameGeekEntity } from "@repo/board-game-geek-shared/src/entities/IBoardGameGeekEntity";
 import { PrismaClient } from "@prisma/client";
+import { DateTime } from 'ts-luxon'
 
 export const prisma = new PrismaClient();
 
@@ -65,7 +66,7 @@ export default async function AddLibraryItemToDatabase(
     await UpsertBggGame(id, contentProperties);
   }
 
-  await AddMechanicsToDatabase(bggAddedId, mechanics);
+  await AddMechanicsToDatabase(bggAddedId, mechanics)
 
   const libraryIdAdded = await AddBggGameToLibrary(
     barcode,
@@ -75,8 +76,7 @@ export default async function AddLibraryItemToDatabase(
   );
 
   // Add to centralized barcode
-  console.log("Successfully Added:", bggAddedId);
-  await UpsertLibraryItemBarcode(barcode, libraryIdAdded);
+  console.log("Successfully Added:", barcode, bggAddedId);
 }
 
 async function AddBggGameToLibrary(
@@ -85,6 +85,20 @@ async function AddBggGameToLibrary(
   alias: string | null,
   owner: string
 ): Promise<number> {
+  let centralizedBarcodeId: number = -1
+  try {
+    const centralizedBarcode = await prisma.centralizedBarcode.create({
+      data: {
+        barcode: barcode,
+        entityId: 0,
+        entityType: 'LibraryItem',
+      }
+    })
+    centralizedBarcodeId = centralizedBarcode.id
+  } catch (error) {
+    console.log('Barcode unique constraint failed', barcode)
+    throw error;
+  }
   
   const libraryItem = await prisma.libraryItem.upsert({
     where: { barcode: barcode },
@@ -96,7 +110,7 @@ async function AddBggGameToLibrary(
       owner: owner,
       isHidden: false,
       isCheckedOut: false,
-      updatedAtUtc: new Date(),
+      updatedAtUtc: DateTime.utc().toISO(),
     },
     create: {
       boardGameGeekThing: {
@@ -104,33 +118,24 @@ async function AddBggGameToLibrary(
       },
       owner: owner,
       alias: alias,
-      barcode: barcode,
+      centralizedBarcode: {
+        connect: { id: centralizedBarcodeId }
+      },
       isHidden: false,
       isCheckedOut: false,
-      dateAddedUtc: new Date(),
-      updatedAtUtc: new Date(),
+      dateAddedUtc: DateTime.utc().toISO(),
+      updatedAtUtc: DateTime.utc().toISO(),
     },
-  });
+  })
+
+  await prisma.centralizedBarcode.update({
+    where: { barcode: barcode },
+    data: {
+      entityId: libraryItem.id
+    }
+  })
 
   return libraryItem.id;
-}
-
-async function UpsertLibraryItemBarcode(
-  barcode: string,
-  libraryItemAddedId: number
-) {
-  await prisma.centralizedBarcode.upsert({
-    where: { barcode: barcode },
-    update: {
-      entityType: "LibraryItem",
-      entityId: libraryItemAddedId,
-    },
-    create: {
-      barcode: barcode,
-      entityType: "LibraryItem",
-      entityId: libraryItemAddedId,
-    },
-  });
 }
 
 async function AddMechanicsToDatabase(

@@ -6,12 +6,24 @@ import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { ILibraryItem } from "@repo/shared";
+import { ICheckoutEvent, ILibraryItem } from "@repo/shared";
 import { FormatBoardGameGeekType } from "../components/bgg-type/format-type";
+import { DateTime } from "ts-luxon";
 
 interface LibraryFormProps {
   id?: number;
   libraryItem: ILibraryItem;
+}
+
+function DisplayLastCheckedInTime(checkoutEvents: ICheckoutEvent[]) {
+  
+  if (checkoutEvents.length === 0) return 'No one has checked out this game'
+
+  const lastCheckedIn = checkoutEvents.find(f => f.checkedInTimeUtcIso !== null)?.checkedInTimeUtcIso
+
+  if (lastCheckedIn === undefined) return 'Checked out - but not checked back in yet'
+
+  return DateTime.fromISO(lastCheckedIn).toLocal().toFormat('MM/dd/yyyy t')
 }
 
 export function LibraryForm({
@@ -32,7 +44,7 @@ export function LibraryForm({
       ...rest,
       boardGameGeekThing,
     },
-  });
+  })
 
   const onSubmit: SubmitHandler<ILibraryItem> = async (data) => {
     setOnSubmitting(true);
@@ -397,8 +409,7 @@ export function LibraryForm({
                 Last Time Checked In
               </label>
               <span className="">
-                {/* TODO: @WZ - Change this to the last time checked in (date time) */}
-                {libraryItem.checkOutEvents.length}
+                { DisplayLastCheckedInTime(libraryItem.checkOutEvents) }
               </span>
             </div>
           </div>

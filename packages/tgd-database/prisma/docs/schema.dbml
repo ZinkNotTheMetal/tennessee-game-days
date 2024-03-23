@@ -7,6 +7,9 @@ Table centralized_barcodes {
   barcode String [unique, not null]
   entityType EntityType [not null]
   entityId Int [not null]
+  libraryItems library_items [not null]
+  attendees attendees [not null]
+  playToWinItems play_to_win_items [not null]
 
   indexes {
     (entityType, entityId) [unique]
@@ -16,14 +19,15 @@ Table centralized_barcodes {
 Table conventions {
   id Int [pk, increment]
   name String [unique, not null]
-  extraHoursStartDateTimeUtc DateTime
-  startDateTimeUtc DateTime
-  endDateTimeUtc DateTime
-  updatedAtUtc DateTime [default: `now()`, not null]
+  extraHoursStartDateTimeUtc String
+  startDateTimeUtc String
+  endDateTimeUtc String
+  updatedAtUtc String [not null]
   isCancelled Boolean [not null, default: false]
   venueId Int
   venue venues
   PlayToWinGames play_to_win_items [not null]
+  Attendees attendees [not null]
 }
 
 Table venues {
@@ -88,10 +92,11 @@ Table library_items {
   isHidden Boolean [not null]
   isCheckedOut Boolean [not null]
   totalCheckedOutMinutes Int [not null, default: 0]
-  dateAddedUtc DateTime [default: `now()`, not null]
-  updatedAtUtc DateTime [default: `now()`, not null]
+  dateAddedUtc String [not null]
+  updatedAtUtc String [not null]
   checkOutEvents library_checkout_events [not null]
   additionalBoxContent library_item_contents [not null]
+  centralizedBarcode centralized_barcodes [not null]
 }
 
 Table library_item_contents {
@@ -125,27 +130,55 @@ Table play_to_win_items {
   convention conventions [not null]
   isHidden Boolean [not null]
   totalTimesPlayed Int [not null, default: 0]
-  dateAddedUtc DateTime [default: `now()`, not null]
+  dateAddedUtc String [not null]
+  centralizedBarcode centralized_barcodes [not null]
+  playToWinPlays play_to_win_plays [not null]
 }
 
 Table library_checkout_events {
   id String [pk]
-  libraryGameBarCodeScanned Int [not null]
   libraryCopyId Int [not null]
   library library_items [not null]
   attendeeId Int [not null]
   attendee attendees [not null]
-  checkedOutTime DateTime [default: `now()`, not null]
-  checkedInTime DateTime
+  checkedOutTimeUtcIso String [not null]
+  checkedInTimeUtcIso String
+}
+
+Table play_to_win_plays {
+  id String [pk]
+  playToWinItemId Int [not null]
+  playToWinItem play_to_win_items [not null]
+  checkedInTimeUtcIso String [not null]
+  playToWinPlayAttendees play_to_win_play_players [not null]
+}
+
+Table play_to_win_play_players {
+  id String [pk]
+  playToWinItemId String [not null]
+  playToWinPlay play_to_win_plays [not null]
+  attendeeId Int [not null]
+  attendee attendees [not null]
 }
 
 Table attendees {
   id Int [pk, increment]
   personId Int [not null]
+  barcode String [not null]
   person people [not null]
   isCheckedIn Boolean [not null, default: false]
-  checkedInUtc DateTime
+  conventionId Int [not null]
+  convention conventions [not null]
+  checkedInUtc String
+  isVolunteer Boolean [not null, default: false]
+  idTgdOrganizer Boolean [not null, default: false]
+  centralizedBarcode centralized_barcodes [not null]
   checkOutEvents library_checkout_events [not null]
+  playToWinPlays play_to_win_play_players [not null]
+
+  indexes {
+    (personId, conventionId) [unique]
+  }
 }
 
 Enum EntityType {
@@ -162,6 +195,8 @@ Ref: game_mechanics.mechanicId > bgg_mechanics.id
 
 Ref: library_items.boardGameGeekId > board_game_geek_items.id
 
+Ref: library_items.barcode > centralized_barcodes.barcode
+
 Ref: library_item_contents.libraryItemId > library_items.id
 
 Ref: library_item_contents.boardGameGeekId > board_game_geek_items.id
@@ -170,8 +205,20 @@ Ref: play_to_win_items.boardGameGeekId > board_game_geek_items.id
 
 Ref: play_to_win_items.conventionId > conventions.id
 
+Ref: play_to_win_items.barcode > centralized_barcodes.barcode
+
 Ref: library_checkout_events.libraryCopyId > library_items.id
 
 Ref: library_checkout_events.attendeeId > attendees.id
 
+Ref: play_to_win_plays.playToWinItemId > play_to_win_items.id
+
+Ref: play_to_win_play_players.playToWinItemId > play_to_win_plays.id
+
+Ref: play_to_win_play_players.attendeeId > attendees.id
+
 Ref: attendees.personId > people.id
+
+Ref: attendees.conventionId > conventions.id
+
+Ref: attendees.barcode > centralized_barcodes.barcode

@@ -4,6 +4,7 @@ import { Readable } from 'stream'
 import prisma from "@/app/lib/prisma";
 import { PlayToWinCsvRow } from "../../requests/ptw-csv-request"
 import { MapToBoardGameEntity, SearchBoardGameGeek } from "@repo/board-game-geek-shared";
+import { DateTime } from "ts-luxon";
 
 
 export async function POST(request: NextRequest) {
@@ -67,6 +68,15 @@ export async function POST(request: NextRequest) {
               });
             }
 
+            // Add to centralized barcode
+            await prisma.centralizedBarcode.create({
+              data: {
+                entityId: 0,
+                entityType: "PlayToWinItem",
+                barcode: ptwItem.barcode,
+              },
+            })
+
             // Add to PTW Games
             const ptwAdded = await prisma.playToWinItem.create({
               data: {
@@ -74,47 +84,78 @@ export async function POST(request: NextRequest) {
                 isHidden: false,
                 conventionId: conventionId,
                 gameName: ptwItem.gameName,
-                boardGameGeekId: upsertBggGame.id
+                boardGameGeekId: upsertBggGame.id,
+                dateAddedUtc: DateTime.utc().toISO()
               }
             })
             ptwAddedId = ptwAdded.id
+
+
+            await prisma.centralizedBarcode.update({
+              where: { barcode: ptwItem.barcode },
+              data: {
+                entityId: Number(ptwAdded.id),
+              },
+            })
+
+
           } else {
+            // Add to centralized barcode
+            await prisma.centralizedBarcode.create({
+              data: {
+                entityId: 0,
+                entityType: "PlayToWinItem",
+                barcode: ptwItem.barcode,
+              },
+            })
+
             const ptwAdded = await prisma.playToWinItem.create({
               data: {
                 barcode: ptwItem.barcode,
                 isHidden: false,
                 gameName: ptwItem.gameName,
-                conventionId: conventionId
+                conventionId: conventionId,
+                dateAddedUtc: DateTime.utc().toISO()
               }
             })
             ptwAddedId = ptwAdded.id
+
+            await prisma.centralizedBarcode.update({
+              where: { barcode: ptwItem.barcode },
+              data: {
+                entityId: Number(ptwAdded.id),
+              },
+            })
           }
 
         } else {
+          // Add to centralized barcode
+          await prisma.centralizedBarcode.create({
+            data: {
+              entityId: 0,
+              entityType: "PlayToWinItem",
+              barcode: ptwItem.barcode,
+            },
+          })
+
           const ptwAdded = await prisma.playToWinItem.create({
             data: {
               barcode: ptwItem.barcode,
               isHidden: false,
               gameName: ptwItem.gameName,
-              conventionId: conventionId
+              conventionId: conventionId,
+              dateAddedUtc: DateTime.utc().toISO()
             }
           })
           ptwAddedId = ptwAdded.id
-        }
 
-        // Add centralized barcode
-        await prisma.centralizedBarcode.upsert({
-          where: { barcode: ptwItem.barcode },
-          create: {
-            barcode: ptwItem.barcode,
-            entityId: ptwAddedId,
-            entityType: 'PlayToWinItem'
-          },
-          update: {
-            entityId: ptwAddedId,
-            entityType: 'PlayToWinItem'
-          }
-        })
+          await prisma.centralizedBarcode.update({
+            where: { barcode: ptwItem.barcode },
+            data: {
+              entityId: Number(ptwAdded.id),
+            },
+          })
+        }
 
       }
     } catch (error) {
