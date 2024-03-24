@@ -5,7 +5,8 @@ import { MapToBoardGameEntity, SearchBoardGameGeek } from "@repo/board-game-geek
 
 // WZ: Cannot run this on Vercel due to the timeout limitations
 // I can run this locally and update the database to production
-export const maxDuration = 300
+// Uncomment below locally if needed
+//export const maxDuration = 300
 
 export async function POST(request: NextRequest) {
 
