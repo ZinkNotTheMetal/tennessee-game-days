@@ -6,6 +6,9 @@ import { PlayToWinCsvRow } from "../../requests/ptw-csv-request"
 import { MapToBoardGameEntity, SearchBoardGameGeek } from "@repo/board-game-geek-shared";
 import { DateTime } from "ts-luxon";
 
+
+export const maxDuration = 300; // 5 minutes
+
 function sleep (ms: number) {
   return new Promise(resolve => {
     setTimeout(resolve, ms)
