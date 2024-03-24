@@ -71,6 +71,9 @@ importers:
       use-debounce:
         specifier: ^10.0.0
         version: 10.0.0(react@18.2.0)
+      use-sound:
+        specifier: ^4.0.1
+        version: 4.0.1(react@18.2.0)
       xml-js:
         specifier: ^1.6.11
         version: 1.6.11
@@ -3603,6 +3606,10 @@ packages:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
     dev: true
 
+  /howler@2.2.4:
+    resolution: {integrity: sha512-iARIBPgcQrwtEr+tALF+rapJ8qSc+Set2GJQl7xT1MQzWaVkFebdJhR3alVlSiUf5U7nAANKuj3aWpwerocD5w==}
+    dev: false
+
   /http-proxy-agent@7.0.0:
     resolution: {integrity: sha512-+ZT+iBxVUQ1asugqnD6oWoRiS25AkjNfG085dKJGtGxkdwLQrMKU5wJr2bOOFAXzKcTuqq+7fZlTMgG3SRfIYQ==}
     engines: {node: '>= 14'}
@@ -6244,6 +6251,15 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
     dependencies:
+      react: 18.2.0
+    dev: false
+
+  /use-sound@4.0.1(react@18.2.0):
+    resolution: {integrity: sha512-hykJ86kNcu6y/FzlSHcQxhjSGMslZx2WlfLpZNoPbvueakv4OF3xPxEtGV2YmculrIaH0tPp9LtG4jgy17xMWg==}
+    peerDependencies:
+      react: '>=16.8'
+    dependencies:
+      howler: 2.2.4
       react: 18.2.0
     dev: false
 

@@ -1,31 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { BarcodeResponse, CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem } from "./scan-functions";
-import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { FaRegTrashCan } from "react-icons/fa6";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react"
+import { BarcodeResponse, CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem } from "./scan-functions"
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form"
+import { FaRegTrashCan } from "react-icons/fa6"
+import { toast } from "react-toastify"
+import { useRouter } from "next/navigation"
+import useSound from "use-sound";
 
 export default function ScanningTerminalClient() {
 
-  // How to have the website make a noise on status code 420
-  //  - https://www.joshwcomeau.com/react/announcing-use-sound-react-hook/
-  //  - https://www.youtube.com/watch?v=8sDto47tLfE
-  //  - Accepted?
-  //    - https://freesound.org/people/tim.kahn/sounds/91926/
-  //    - https://freesound.org/people/zerolagtime/sounds/144418/
-  //    - https://freesound.org/people/Scrampunk/sounds/345299/
-  //    - https://freesound.org/people/FoolBoyMedia/sounds/352661/
-  //  - Error?
-  //    - https://freesound.org/people/MrAngelGames/sounds/674824/
-  //    - https://freesound.org/people/rakkarage/sounds/516905/
-  //    - https://freesound.org/people/Autistic%20Lucario/sounds/142608/
-  //    - https://freesound.org/people/guitarguy1985/sounds/57806/
-  // Next is to pick from above and get them to mp3
-
   const [barcodeResults, setBarcodeResults] = useState<BarcodeResponse[]>([])
   const router = useRouter()
+  const [ playErrorChime ] = useSound("/sounds/checkout-error.mp3")
+  const [ playCompleteChime ] = useSound("/sounds/complete-chime.mp3")
 
   useEffect(() => {
 
@@ -37,11 +25,14 @@ export default function ScanningTerminalClient() {
         .then((response) => {
           if (response === 200) {
             toast(`Successfully checked in ${scannedLibraryItem.barcode}`, { type: "success" })
+            playCompleteChime()
           }
         })
-      setBarcodeResults([])
-      reset()
-      router.refresh()
+        .finally(() => {
+          setBarcodeResults([])
+          reset()
+          router.refresh()
+        })
     }
 
     const scannedAttendees = barcodeResults.filter(f => f.entityType === 'Attendee')
@@ -52,13 +43,17 @@ export default function ScanningTerminalClient() {
         .then((response) => {
           if (response === 200) {
             toast(`Successfully checked out ${scannedLibraryItem.barcode}`, { type: "success" })
+            playCompleteChime()
           } else if (response === 420) {
             toast(`Unable to check out game, as the user already has a game checked out!`, { type: "error" })
+            playErrorChime()
           }
         })
-      setBarcodeResults([])
-      reset()
-      router.refresh()
+        .finally(() => {
+          setBarcodeResults([])
+          reset()
+          router.refresh()
+        })
     }
 
     const scannedPlayToWinGame = barcodeResults.find(f => f.entityType === 'PlayToWinItem')
