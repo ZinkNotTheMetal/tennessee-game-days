@@ -1,6 +1,5 @@
-import { Metadata } from "next";
-import Dropzone from "../../components/drop-zone/drop-zone";
-import PlayToWinDropZone from "./ptw-dropzone";
+import { Metadata } from "next"
+import PlayToWinDropZone from "./ptw-dropzone"
 
 
 export const metadata: Metadata = {
