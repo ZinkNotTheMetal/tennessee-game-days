@@ -3,9 +3,12 @@ import { parse as csvParse } from 'csv-parse'
 import { Readable } from 'stream'
 import prisma from "@/app/lib/prisma";
 import { PlayToWinCsvRow } from "../../requests/ptw-csv-request"
-import { MapToBoardGameEntity, SearchBoardGameGeek } from "@repo/board-game-geek-shared";
 import { DateTime } from "ts-luxon";
 
+
+// https://stackoverflow.com/questions/73839916/how-to-run-functions-that-take-more-than-10s-on-vercel
+// https://vercel.com/docs/functions/runtimes#max-execution-time
+export const maxDuration = 10; // 10 seconds
 
 export async function POST(request: NextRequest) {
 
@@ -21,149 +24,41 @@ export async function POST(request: NextRequest) {
       const results = await parseCsvFile<PlayToWinCsvRow>(file)
 
       for(const ptwItem of results) {
-        let ptwAddedId: number = -1
+        // Add barcode
+        await prisma.centralizedBarcode.create({
+          data: {
+            entityId: 0,
+            entityType: "PlayToWinItem",
+            barcode: ptwItem.barcode,
+          },
+        })
 
-        const bggResult = await SearchBoardGameGeek(ptwItem.gameName, false)
-
-        if (bggResult && bggResult.totalCount > 0) {
-          // Some results were found for ptwItem.gameName
-          const found = bggResult.results.find((result) => result.name === ptwItem.gameName);
-
-          if (found) {
-            // BGG Item is coming back
-            const { mechanics, ...bggEntity } = MapToBoardGameEntity(found)
-            // Save to BGG Thing
-            const upsertBggGame = await prisma.boardGameGeekThing.upsert({
-              where: { id: bggEntity.id },
-              update: bggEntity,
-              create: bggEntity,
-            });
-
-            // Add mechanics
-            for (const gm of mechanics) {
-              await prisma.mechanic.upsert({
-                where: { id: gm.id },
-                update: { name: gm.name },
-                create: {
-                  id: gm.id,
-                  name: gm.name,
-                },
-              });
-          
-              await prisma.gameMechanic.upsert({
-                where: {
-                  boardGameGeekId_mechanicId: {
-                    boardGameGeekId: upsertBggGame.id,
-                    mechanicId: gm.id,
-                  },
-                },
-                create: {
-                  mechanicId: gm.id,
-                  boardGameGeekId: upsertBggGame.id,
-                },
-                update: {
-                  mechanicId: gm.id,
-                  boardGameGeekId: upsertBggGame.id,
-                },
-              });
-            }
-
-            // Add to centralized barcode
-            await prisma.centralizedBarcode.create({
-              data: {
-                entityId: 0,
-                entityType: "PlayToWinItem",
-                barcode: ptwItem.barcode,
-              },
-            })
-
-            // Add to PTW Games
-            const ptwAdded = await prisma.playToWinItem.create({
-              data: {
-                barcode: ptwItem.barcode,
-                isHidden: false,
-                conventionId: conventionId,
-                gameName: ptwItem.gameName,
-                boardGameGeekId: upsertBggGame.id,
-                dateAddedUtc: DateTime.utc().toISO()
-              }
-            })
-            ptwAddedId = ptwAdded.id
-
-
-            await prisma.centralizedBarcode.update({
-              where: { barcode: ptwItem.barcode },
-              data: {
-                entityId: Number(ptwAdded.id),
-              },
-            })
-
-
-          } else {
-            // Add to centralized barcode
-            await prisma.centralizedBarcode.create({
-              data: {
-                entityId: 0,
-                entityType: "PlayToWinItem",
-                barcode: ptwItem.barcode,
-              },
-            })
-
-            const ptwAdded = await prisma.playToWinItem.create({
-              data: {
-                barcode: ptwItem.barcode,
-                isHidden: false,
-                gameName: ptwItem.gameName,
-                conventionId: conventionId,
-                dateAddedUtc: DateTime.utc().toISO()
-              }
-            })
-            ptwAddedId = ptwAdded.id
-
-            await prisma.centralizedBarcode.update({
-              where: { barcode: ptwItem.barcode },
-              data: {
-                entityId: Number(ptwAdded.id),
-              },
-            })
+        // Add to PTW Games
+        const ptwAdded = await prisma.playToWinItem.create({
+          data: {
+            barcode: ptwItem.barcode,
+            isHidden: false,
+            conventionId: conventionId,
+            gameName: ptwItem.gameName,
+            dateAddedUtc: DateTime.utc().toISO(),
           }
-
-        } else {
-          // Add to centralized barcode
-          await prisma.centralizedBarcode.create({
-            data: {
-              entityId: 0,
-              entityType: "PlayToWinItem",
-              barcode: ptwItem.barcode,
-            },
-          })
-
-          const ptwAdded = await prisma.playToWinItem.create({
-            data: {
-              barcode: ptwItem.barcode,
-              isHidden: false,
-              gameName: ptwItem.gameName,
-              conventionId: conventionId,
-              dateAddedUtc: DateTime.utc().toISO()
-            }
-          })
-          ptwAddedId = ptwAdded.id
-
-          await prisma.centralizedBarcode.update({
-            where: { barcode: ptwItem.barcode },
-            data: {
-              entityId: Number(ptwAdded.id),
-            },
-          })
-        }
-
+        })
+        
+        // Update barcode
+        await prisma.centralizedBarcode.update({
+          where: { barcode: ptwItem.barcode },
+          data: {
+            entityId: Number(ptwAdded.id),
+          },
+        })
       }
+
     } catch (error) {
       console.log('Error parsing CSV fle:', error)
       return NextResponse.json({
         error: 'Error parsing CSV file',
-      },
-      { status: 500 }
+        },
+        { status: 500 }
       )
     }
   }
@@ -186,8 +81,10 @@ async function parseCsvFile<T>(file: File): Promise<T[]> {
   return new Promise((resolve, reject) => {
     stream
       .pipe(csvParse({
-        skip_empty_lines: true,
         columns: true,
+        skipRecordsWithError: true,
+        skipRecordsWithEmptyValues: true,
+        skipEmptyLines: true,
       }))
       .on('data', (data) => results.push(data))
       .on('end', () => {
