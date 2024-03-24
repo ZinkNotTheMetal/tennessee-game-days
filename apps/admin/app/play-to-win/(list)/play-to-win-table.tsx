@@ -5,8 +5,6 @@ import { Search } from "@/app/components/search/search";
 import { useRouter } from "next/navigation";
 import { IPlayToWinItem } from "@repo/shared";
 import {
-  FaPersonWalkingArrowRight,
-  FaCircleCheck,
   FaEyeSlash,
   FaEye,
 } from "react-icons/fa6";
@@ -47,7 +45,9 @@ export function PlayToWinItemsTable({
   total,
 }: IPlayToWinTableProps): JSX.Element {
   const [query, setQuery] = useState<string>("");
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: 'gameName', desc: false }
+  ]);
   const router = useRouter();
 
   const columnHelper = createColumnHelper<IPlayToWinItem>();

@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
         mechanicId: gm.id,
         boardGameGeekId: upsertBggLibraryGame.id,
       },
-    });
+    })
   }
 
   // Add centralized barcode
