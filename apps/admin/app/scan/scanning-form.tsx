@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react"
-import { BarcodeResponse, CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem } from "./scan-functions"
+import { BarcodeResponse, CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem, LogPlayToWinPlay } from "./scan-functions"
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form"
 import { FaRegTrashCan } from "react-icons/fa6"
 import { toast } from "react-toastify"
@@ -56,11 +56,6 @@ export default function ScanningTerminalClient() {
         })
     }
 
-    const scannedPlayToWinGame = barcodeResults.find(f => f.entityType === 'PlayToWinItem')
-    if (scannedLibraryItem && scannedAttendees) {
-      
-    }
-
   }, [barcodeResults])
 
   const {
@@ -81,8 +76,10 @@ export default function ScanningTerminalClient() {
   })
 
   const getBarcodeInformation = async (barcodeScanned: string, barcodeFieldIndex: number) => {
+    // Ensure that no spaces are in front or at the end of the barcode
     const trimmedBarcode = barcodeScanned.trim()
 
+    // See if the barcode has already been scanned or not
     if (!(barcodeResults.find(f => f.barcode === trimmedBarcode))) {
       const barcodeScannedResponse = await CheckBarcode(trimmedBarcode)
       if (barcodeScannedResponse?.barcode) {
@@ -92,14 +89,26 @@ export default function ScanningTerminalClient() {
 
       }
     } else {
+      // If it has, remove the barcode - submit it
       remove(barcodeFieldIndex)
       append({ barcode: '' })
+      handleSubmit(onSubmit)()
     }
 
   }
 
   const onSubmit: SubmitHandler<{ barcodes: { barcode: string; }[]; }> = async (data) => {
+    // 3. If an attendee and a play to win game are scanned in any order
+    const scannedPlayToWinGame = barcodeResults.find(f => f.entityType === 'PlayToWinItem')
+    const scannedAttendees = barcodeResults.filter(f => f.entityType === 'Attendee')
 
+    if (scannedPlayToWinGame === undefined) return
+
+    await LogPlayToWinPlay(scannedPlayToWinGame.entityId, scannedAttendees.map(m => m.entityId))
+
+    setBarcodeResults([])
+    reset()
+    router.refresh()
   }
 
   return (
@@ -115,20 +124,27 @@ export default function ScanningTerminalClient() {
             onChange={(e) => {
               getBarcodeInformation(e.target.value, index)
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                console.log('hi')
+                handleSubmit(onSubmit)()
+              }
+            }}
           />
           <button type="button" 
             key={`${id}-btn`}
             onClick={(e) => {
-              e.preventDefault();
+              e.preventDefault()
+              remove(index)
+              if (fields.length === 1) {
+                append({ barcode: ''})
+              }
               // Remove the barcode from barcodeResults
               setBarcodeResults(previous => {
                 const updatedResults = [...previous];
                 updatedResults.splice(index, 1); // Remove the barcode at the specified index
                 return updatedResults;
-              });
-              // Remove the field using useFieldArray's remove function
-              remove(index)
-              append({ barcode: '' })
+              })
             }}
             className="w-4 h-4"
           >
