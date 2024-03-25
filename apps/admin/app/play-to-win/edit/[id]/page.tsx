@@ -1,10 +1,9 @@
 import { IPlayToWinItem } from "@repo/shared";
-import { Metadata } from "next";
 import { PlayToWinItemForm } from "../../play-to-win-form";
 
-export const metadata: Metadata = {
-  title: "Edit Play to Win Item",
-};
+interface Props {
+  params: { id: string }
+}
 
 async function getPlayToWinItem(id: number) {
   const playToWinItemById = await fetch(
@@ -19,8 +18,18 @@ async function getPlayToWinItem(id: number) {
   return item;
 }
 
+export async function generateMetadata(
+  { params }: Props
+) {
+  const playToWinItem = await getPlayToWinItem(Number(params.id))
 
-export default async function Page({ params }: { params: { id: string } }) {
+  return {
+    title: `Edit - ${playToWinItem.barcode} - ${playToWinItem.gameName}`
+  }
+}
+
+
+export default async function Page({ params }: Props) {
   const playToWinItemId = Number(params.id)
   const playToWinItem = await getPlayToWinItem(playToWinItemId)
 

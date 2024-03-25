@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ConventionForm } from "../convention-form";
 
 export const metadata: Metadata = {
-  title: "Add upcoming Convention",
+  title: "Add new Convention",
 };
 
 export default function Page(): JSX.Element {

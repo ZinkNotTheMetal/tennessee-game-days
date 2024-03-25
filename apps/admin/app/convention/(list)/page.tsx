@@ -5,8 +5,7 @@ import { ApiListResponse } from '@repo/shared'
 import type { IConvention } from '@repo/shared'
 
 export const metadata: Metadata = {
-  title: 'Conventions',
-  description: 'Manage conventions that are stored',
+  title: 'TGD - Conventions'
 }
 
 async function getConventionsFromApi() {
