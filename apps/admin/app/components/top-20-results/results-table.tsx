@@ -1,37 +1,14 @@
 'use client'
 
 import { IBoardGameGeekEntity } from "@repo/board-game-geek-shared"
+import { TopCheckedOutGame } from "@repo/shared"
 import { useEffect, useState } from "react"
 
-interface TopCheckedOutGame {
-  alias: string
-  barcode: string
-  boardGameGeekThing: IBoardGameGeekEntity,
-  totalCheckedOutMinutes: number
-  _count: {
-    checkOutEvents: number;
-    // Add any other properties you expect in _count
-  };
+interface TopCheckedOutGameProps {
+  topCheckedOutGames: TopCheckedOutGame[]
 }
 
-export default function TopCheckedOutGames(): JSX.Element {
-  const [topCheckedOutGames, setTopCheckedOutGames] = useState<TopCheckedOutGame[]>([])
-
-  useEffect(() => {
-    fetch(`/api/library/stats/all-time-top-20`, {
-      method: "GET"
-    })
-      .then((results) => {
-        return results.json()
-      })
-      .then((json) => {
-        return json.list
-      })
-      .then((list: TopCheckedOutGame[]) => {
-        setTopCheckedOutGames(list)
-      })
-
-  }, [])
+export default function TopCheckedOutGames({ topCheckedOutGames }: TopCheckedOutGameProps): JSX.Element {
 
   return (
     <>
@@ -106,13 +83,15 @@ interface ResultsRowProps {
   boardGameGeekThing: IBoardGameGeekEntity,
   totalCheckedOutMinutes: number
   checkOutCount: number
+  isCheckedOut: boolean
 }
 
-function ResultsTableRow({ alias, barcode, boardGameGeekThing, totalCheckedOutMinutes, checkOutCount }: ResultsRowProps) : JSX.Element {
+function ResultsTableRow({ alias, barcode, boardGameGeekThing, isCheckedOut, totalCheckedOutMinutes, checkOutCount }: ResultsRowProps) : JSX.Element {
 
   return (
     <tr
       key={barcode}
+      className={`${isCheckedOut ? 'italic text-red-400' : ''}`}
     >
       <td className="p-3">{ alias || boardGameGeekThing.itemName }</td>
       <td className="p-3">{ checkOutCount }</td>

@@ -56,6 +56,8 @@ export default function ScanningTerminalClient() {
         })
     }
 
+    router.refresh()
+
   }, [barcodeResults])
 
   const {

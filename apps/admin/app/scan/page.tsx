@@ -1,7 +1,8 @@
 import { Metadata } from "next"
 import ScanningTerminalClient from "./scanning-form"
-import { ApiListResponse, ILibraryItem } from "@repo/shared"
+import { ApiListResponse, ILibraryItem, TopCheckedOutGame } from "@repo/shared"
 import TopCheckedOutGames from "../components/top-20-results/results-table"
+import GameCheckoutItemOverview from "../components/checked-out-overview/overview";
 
 export const metadata: Metadata = {
   title: "Scanning Terminal",
@@ -27,41 +28,67 @@ async function getPlayToWinPlays() {
   return playToWinPlays.count
 }
 
+async function getTop20CheckedOutGames() {
+
+  const allTimeTop20Api = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/stats/all-time-top-20`, {
+    method: 'GET'
+  })
+
+  const allTimeTop20LibraryGames: { list: TopCheckedOutGame[] } = await allTimeTop20Api.json()
+
+  return allTimeTop20LibraryGames.list
+}
+
 export default async function Page() {
   const checkedOutGames = await getCheckedOutGames()
   const playToWinPlays = await getPlayToWinPlays()
+  const top20CheckedOutGames = await getTop20CheckedOutGames()
 
   return (
     <main className="container mx-auto mt-8 bg-white rounded-lg shadow-lg p-6">
       <h1 className="text-4xl font-bold mb-8 text-center text-blue-600">Terminal</h1>
 
-      <div className="pb-8">
+      <div className="py-2">
         <ScanningTerminalClient />
       </div>
 
-      <div className="grid grid-cols-3 gap-6 pt-8">
+      <div className="pt-6 grid grid-cols-4">
         <div className="bg-gray-200 p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-blue-600">Checked Out Games</h2>
-          <ul>
-            {checkedOutGames.list.map(game => (
-              <li key={game.id} className="mb-2">{ game.alias || game.boardGameGeekThing.itemName }</li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="bg-gray-200 p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-blue-600">Games Checked Out</h2>
-          <p className="text-3xl font-bold">{checkedOutGames.total}</p>
-        </div>
-
-        <div className="bg-gray-200 p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-blue-600">Play-to-Win Plays</h2>
+          <h2 className="text-xl font-semibold mb-4 text-blue-600">Total Play-to-Win Plays</h2>
           <p className="text-3xl font-bold">{playToWinPlays}</p>
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-6 pt-4">
+        <div className="bg-gray-200 p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4 text-blue-600">Checked Out Games</h2>
+          { checkedOutGames.list.map((game) => (
+            <>
+              { game.checkOutEvents[0]?.checkedInTimeUtcIso !== undefined && (
+                <div className="flex justify-between">
+                  <GameCheckoutItemOverview
+                    key={game.barcode}
+                    gameName={game.alias || game.boardGameGeekThing.itemName} 
+                    checkOutTimeUtcIso={game.checkOutEvents[0]?.checkedOutTimeUtcIso || ''}
+                    attendeePreferredName={game.checkOutEvents[0]?.attendee.person.preferredName || game.checkOutEvents[0]?.attendee.person.firstName || ''}
+                    attendeeLastName={game.checkOutEvents[0]?.attendee.person.lastName || ''}
+                  />
+                </div>
+              )}
+            </>
+
+          ))}
+        </div>
+
+        <div className="bg-gray-200 p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4 text-blue-600">Games Checked Out Now</h2>
+          <p className="text-3xl font-bold">{checkedOutGames.total}</p>
+        </div>
+
+      </div>
+
       <div>
-        <TopCheckedOutGames />
+        <TopCheckedOutGames topCheckedOutGames={top20CheckedOutGames} />
       </div>
     </main>
   );

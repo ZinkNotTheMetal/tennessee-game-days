@@ -19,6 +19,7 @@ export async function GET() {
       barcode: true,
       totalCheckedOutMinutes: true,
       boardGameGeekId: true,
+      isCheckedOut: true,
       boardGameGeekThing: true,
       _count: { 
         select: { 
