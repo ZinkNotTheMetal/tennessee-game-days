@@ -7,10 +7,6 @@ import NavBar from "./components/navbar/navbar";
 
 const roboto = Roboto({ weight: "300", subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "Tennessee Game Days (TGD) - Admin",
-};
-
 export default function RootLayout({
   children,
 }: {

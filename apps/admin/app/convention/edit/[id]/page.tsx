@@ -1,11 +1,10 @@
-import type { Metadata } from "next";
 import { ConventionForm } from "../../convention-form";
 import type { IConvention, ILibraryItem } from "@repo/shared";
 import DeleteConventionButton from "./delete-convention-button";
 
-export const metadata: Metadata = {
-  title: "Edit Game in Library",
-};
+interface Props {
+  params: { id: string }
+}
 
 async function getConvention(id: number) {
   const conventionByIdApi = await fetch(
@@ -19,6 +18,17 @@ async function getConvention(id: number) {
   const item: IConvention = await conventionByIdApi.json();
   return item;
 }
+
+export async function generateMetadata(
+  { params }: Props
+) {
+  const convention = await getConvention(Number(params.id))
+
+  return {
+    title: `Edit - ${convention.name}`
+  }
+}
+
 
 export default async function Page({ params }: { params: { id: string } }) {
   const conventionId = Number(params.id)

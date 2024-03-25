@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import UserSearchBggGame from "./search-bgg-game"
 
 export const metadata: Metadata = {
-  title: 'Add new Game to Library'
+  title: 'Add new item to library'
 }
 
 export default function AddGameToLibrary(): JSX.Element {

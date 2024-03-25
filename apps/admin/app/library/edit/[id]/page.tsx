@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
+import Head from "next/head";
 import { LibraryForm } from "../../library-form";
 import type { ILibraryItem } from "@repo/shared";
 import { LibraryItemEditButtons } from "./library-edit-buttons";
 
-export const metadata: Metadata = {
-  title: "Edit Game in Library",
-};
+interface Props {
+  params: { id: string }
+}
 
 async function getLibraryItem(id: number) {
   const libraryItemByIdApi = await fetch(
@@ -18,6 +18,16 @@ async function getLibraryItem(id: number) {
 
   const item: ILibraryItem = await libraryItemByIdApi.json();
   return item;
+}
+
+export async function generateMetadata(
+  { params }: Props
+) {
+  const libraryItem = await getLibraryItem(Number(params.id))
+
+  return {
+    title: `Edit - ${libraryItem.barcode} - ${libraryItem.alias || libraryItem.boardGameGeekThing?.itemName}`
+  }
 }
 
 export default async function Page({ params }: { params: { id: string } }) {
