@@ -56,6 +56,8 @@ export default function ScanningTerminalClient() {
         })
     }
 
+    router.refresh()
+
   }, [barcodeResults])
 
   const {
@@ -136,9 +138,7 @@ export default function ScanningTerminalClient() {
             onClick={(e) => {
               e.preventDefault()
               remove(index)
-              if (fields.length === 1) {
-                append({ barcode: ''})
-              }
+              append({ barcode: ''})
               // Remove the barcode from barcodeResults
               setBarcodeResults(previous => {
                 const updatedResults = [...previous];

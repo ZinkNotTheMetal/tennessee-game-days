@@ -23,6 +23,23 @@ interface ICheckoutEvent {
   id: string,
   checkedInTimeUtcIso?: string
   checkedOutTimeUtcIso: string
+  attendeeId: number
+  attendee: IAttendee
 }
 
-export type { ILibraryItem, ICheckoutEvent };
+interface IAttendee {
+  id: number
+  personId: number
+  barcode: string
+  person: IPerson
+}
+
+interface IPerson {
+  firstName: string
+  preferredName: string
+  lastName: string
+  email: string
+  phoneNumber: string
+}
+
+export type { ILibraryItem, ICheckoutEvent, IAttendee, IPerson };

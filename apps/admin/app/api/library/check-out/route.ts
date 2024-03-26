@@ -66,8 +66,20 @@ export async function GET(request: NextRequest) {
   const checkedOutGames = await prisma.libraryItem.findMany({
     where: { isCheckedOut: true },
     include: {
-      boardGameGeekThing: true
-    }
+      boardGameGeekThing: true,
+      checkOutEvents: {
+        orderBy: { 
+          checkedOutTimeUtcIso: 'desc'
+        },
+        include: {
+          attendee: {
+            include: {
+              person: true
+            }
+          }
+        }
+      }
+    },
   })
 
   return NextResponse.json({
