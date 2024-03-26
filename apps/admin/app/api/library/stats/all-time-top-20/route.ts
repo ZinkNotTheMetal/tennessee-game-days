@@ -20,10 +20,16 @@ export async function GET() {
       totalCheckedOutMinutes: true,
       boardGameGeekId: true,
       boardGameGeekThing: true,
-      _count: { select: { checkOutEvents: true }}
+      _count: { 
+        select: { 
+          checkOutEvents: true
+        }
+      }
     },
     orderBy: {
-      totalCheckedOutMinutes: 'desc' // descending order
+      checkOutEvents: {
+        _count: 'desc'
+      }
     },
     take: 20 // limit to the top 20 results
   });

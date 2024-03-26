@@ -1,6 +1,7 @@
-import { Metadata } from "next";
-import ScanningTerminalClient from "./scanning-form";
-import { ApiListResponse, ILibraryItem } from "@repo/shared";
+import { Metadata } from "next"
+import ScanningTerminalClient from "./scanning-form"
+import { ApiListResponse, ILibraryItem } from "@repo/shared"
+import TopCheckedOutGames from "../components/top-20-results/results-table"
 
 export const metadata: Metadata = {
   title: "Scanning Terminal",
@@ -57,6 +58,10 @@ export default async function Page() {
           <h2 className="text-xl font-semibold mb-4 text-blue-600">Play-to-Win Plays</h2>
           <p className="text-3xl font-bold">{playToWinPlays}</p>
         </div>
+      </div>
+
+      <div>
+        <TopCheckedOutGames />
       </div>
     </main>
   );
