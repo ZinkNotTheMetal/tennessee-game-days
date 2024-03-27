@@ -1,6 +1,7 @@
 interface PlayToWinCsvRow {
-  barcode: string,
+  barcode: string
   gameName: string
+  publisher?: string
 }
 
 export type { PlayToWinCsvRow }

@@ -130,6 +130,7 @@ Table play_to_win_items {
   convention conventions [not null]
   isHidden Boolean [not null]
   totalTimesPlayed Int [not null, default: 0]
+  publisherName String
   dateAddedUtc String [not null]
   centralizedBarcode centralized_barcodes [not null]
   playToWinPlays play_to_win_plays [not null]

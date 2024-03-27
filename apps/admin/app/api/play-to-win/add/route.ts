@@ -10,6 +10,19 @@ import { DateTime } from "ts-luxon";
 // https://vercel.com/docs/functions/runtimes#max-execution-time
 export const maxDuration = 10; // 10 seconds
 
+function standardizeGameName(gameName: string): string {
+  let result = gameName.trim()
+  // Remove quotes from .csv name
+  result.replace('"', '')
+
+  // Articles can be at the end (i.e. Deadlines, The)
+  if (gameName.toLowerCase().endsWith(", the")) {
+    result = "The " + gameName.substring(0, gameName.length - 5)
+  }
+
+  return result
+}
+
 export async function POST(request: NextRequest) {
 
   const formData = await request.formData()
@@ -33,13 +46,16 @@ export async function POST(request: NextRequest) {
           },
         })
 
+        const gameName = standardizeGameName(ptwItem.gameName)
+
         // Add to PTW Games
         const ptwAdded = await prisma.playToWinItem.create({
           data: {
             barcode: ptwItem.barcode,
             isHidden: false,
             conventionId: conventionId,
-            gameName: ptwItem.gameName,
+            gameName: gameName,
+            publisherName: ptwItem.publisher || null,
             dateAddedUtc: DateTime.utc().toISO(),
           }
         })
