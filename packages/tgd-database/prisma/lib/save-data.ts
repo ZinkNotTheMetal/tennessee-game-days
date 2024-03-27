@@ -179,7 +179,7 @@ function DetermineGameOwner(barcode: string) {
   if (barcode.toUpperCase().includes("RR")) {
     return "Russ Rupe";
   } else if (barcode.toUpperCase().includes("RK")) {
-    return "Richard Keuler";
+    return "Rick Keuler";
   } else if (barcode.toUpperCase().includes("GP")) {
     return "Game Point";
   } else {
