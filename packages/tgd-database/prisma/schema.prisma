@@ -167,6 +167,7 @@ model Person {
   phoneNumber   String?    @map(name: "phone_number")
   attendee      Attendee[]
 
+  @@unique([firstName, lastName])
   @@map("people")
 }
 
@@ -225,16 +226,19 @@ model PlayToWinPlayAttendee {
 }
 
 model Attendee {
-  id             Int        @id @default(autoincrement()) @map(name: "id")
-  personId       Int        @map(name: "person_id")
-  barcode        String     @map(name: "barcode")
-  person         Person     @relation(fields: [personId], references: [id])
-  isCheckedIn    Boolean    @default(false) @map(name: "is_checked_in")
-  conventionId   Int        @map(name: "convention_id")
-  convention     Convention @relation(fields: [conventionId], references: [id])
-  checkedInUtc   String?    @map(name: "checked_in_utc")
-  isVolunteer    Boolean    @default(false) @map(name: "is_volunteer")
-  idTgdOrganizer Boolean    @default(false) @map(name: "is_organizer")
+  id              Int        @id @default(autoincrement()) @map(name: "id")
+  personId        Int        @map(name: "person_id")
+  barcode         String     @map(name: "barcode")
+  person          Person     @relation(fields: [personId], references: [id])
+  isCheckedIn     Boolean    @default(false) @map(name: "is_checked_in")
+  hasCancelled    Boolean    @default(false) @map(name: "has_cancelled")
+  isStayingOnSite Boolean    @default(false) @map(name: "staying_at_convention")
+  conventionId    Int        @map(name: "convention_id")
+  convention      Convention @relation(fields: [conventionId], references: [id])
+  checkedInUtc    String?    @map(name: "checked_in_utc")
+  dateRegistered  String     @map(name: "registered_date_utc")
+  isVolunteer     Boolean    @default(false) @map(name: "is_volunteer")
+  idTgdOrganizer  Boolean    @default(false) @map(name: "is_organizer")
 
   centralizedBarcode CentralizedBarcode    @relation(fields: [barcode], references: [barcode])
   checkOutEvents     LibraryCheckoutEvent[]
