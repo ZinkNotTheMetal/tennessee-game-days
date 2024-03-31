@@ -38,28 +38,32 @@ export async function POST(request: NextRequest, { params }: { params: { convent
     }
   })
 
-  // 3. Upsert a new person into the system
-  const person = await prisma.person.upsert({
-    where: {
-      id: isPersonInSystem ? isPersonInSystem.id : undefined, // Use existing id if available
-    },
-    update: {
-      // Merge existing data with provided data
-      firstName: attendeeToAdd.firstName || isPersonInSystem?.firstName,
-      preferredName: attendeeToAdd.preferredName || isPersonInSystem?.preferredName,
-      lastName: attendeeToAdd.lastName || isPersonInSystem?.lastName,
-      email: attendeeToAdd.email || isPersonInSystem?.email,
-      phoneNumber: attendeeToAdd.phoneNumber || isPersonInSystem?.phoneNumber,
-    },
-    create: {
-      // Use only the provided data if no existing record found
-      firstName: attendeeToAdd.firstName,
-      preferredName: attendeeToAdd.preferredName,
-      lastName: attendeeToAdd.lastName,
-      email: attendeeToAdd.email || null,
-      phoneNumber: attendeeToAdd.phoneNumber || null,
-    },
-  })
+  if (!isPersonInSystem) {
+    const personToAdd = await prisma.person.create({
+      data: {
+        // Merge existing data with provided data
+        firstName: attendeeToAdd.firstName,
+        preferredName: attendeeToAdd.preferredName,
+        lastName: attendeeToAdd.lastName,
+        email: attendeeToAdd.email,
+        phoneNumber: attendeeToAdd.phoneNumber,
+      }
+    })
+    personId = personToAdd.id
+  } else {
+    const personToUpdate = await prisma.person.update({
+      where: { id: isPersonInSystem.id },
+      data: {
+        // Merge existing data with provided data
+        firstName: attendeeToAdd.firstName || isPersonInSystem?.firstName,
+        preferredName: attendeeToAdd.preferredName || isPersonInSystem?.preferredName,
+        lastName: attendeeToAdd.lastName || isPersonInSystem?.lastName,
+        email: attendeeToAdd.email || isPersonInSystem?.email,
+        phoneNumber: attendeeToAdd.phoneNumber || isPersonInSystem?.phoneNumber,
+      }
+    })
+    personId = personToUpdate.id
+  }
 
   // 4. Add a new barcode for the attendee
   try {
@@ -77,7 +81,7 @@ export async function POST(request: NextRequest, { params }: { params: { convent
       data: {
         barcode: attendeeToAdd.barcode,
         conventionId: Number(params.conventionId),
-        personId: person.id,
+        personId: personId,
         dateRegistered: DateTime.utc().toISO()
       }
     })
