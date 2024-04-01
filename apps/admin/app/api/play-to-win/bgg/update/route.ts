@@ -7,7 +7,7 @@ import { DateTime } from "ts-luxon";
 // WZ: Cannot run this on Vercel due to the timeout limitations
 // I can run this locally and update the database to production
 // Uncomment below locally if needed
-export const maxDuration = 300
+//export const maxDuration = 300
 
 export async function POST(request: NextRequest) {
 
