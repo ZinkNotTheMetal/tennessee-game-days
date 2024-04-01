@@ -49,6 +49,20 @@ async function CheckInLibraryItem(libraryItemId: number) : Promise<number> {
   return response.status
 }
 
+async function CheckInAttendee(attendeeId: number): Promise<number> {
+  const response = await fetch(
+    `/api/attendee/check-in/${attendeeId}`,
+    {
+      method: "PATCH",
+    }
+  )
+  if (!response.ok) {
+    console.log(response.status)
+    return response.status
+  }
+  return response.status
+}
+
 async function CheckOutLibraryItem(libraryItemId: number, attendeeId: number): Promise<number> {
   const response = await fetch(
     `/api/library/check-out`,
@@ -81,5 +95,5 @@ async function LogPlayToWinPlay(playToWinItemId: number, attendeeIds: number[]):
 
 }
 
-export { CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem, LogPlayToWinPlay }
+export { CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem, LogPlayToWinPlay, CheckInAttendee }
 export type { BarcodeResponse }
