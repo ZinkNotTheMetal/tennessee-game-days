@@ -54,7 +54,27 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const playToWinPlays = await prisma.playToWinPlay.count()
+  const nextUpcomingConvention = await prisma.convention.findFirst({
+    where: {
+      endDateTimeUtc: {
+        gt: DateTime.utc().toISO()
+      }
+    },
+    include: {
+      venue: true
+    },
+    orderBy: {
+      startDateTimeUtc: 'asc'
+    }
+  })
+
+  if (nextUpcomingConvention === null) {
+    return NextResponse.json({ error: "Cannot log play to win as there are no conventions to log this play against" }, { status: 516 })
+  }
+
+  const playToWinPlays = await prisma.playToWinPlay.count({
+    where: { conventionId: nextUpcomingConvention.id}
+  })
 
   return NextResponse.json({
     count: playToWinPlays

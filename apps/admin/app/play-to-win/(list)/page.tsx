@@ -14,5 +14,16 @@ async function getUpcomingConvention(): Promise<IConvention> {
 export default async function Page() {
   const upcomingConvention = await getUpcomingConvention()
 
+  if (!upcomingConvention) {
+    return(
+      <section>
+        <span className='py-8 text-red-400'>
+          No conventions have been added, ensure that you add a convention and that the connection to the database is ok. If you are receiving this error unexpectedly please Contact your administrator.
+        </span>
+      </section>
+    )
+  }
+
+
   redirect(`/play-to-win/${upcomingConvention.id}`)
 }
