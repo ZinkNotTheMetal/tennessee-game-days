@@ -28,6 +28,7 @@ Table conventions {
   venue venues
   PlayToWinGames play_to_win_items [not null]
   Attendees attendees [not null]
+  PlayToWinPlays play_to_win_plays [not null]
 }
 
 Table venues {
@@ -155,6 +156,8 @@ Table play_to_win_plays {
   playToWinItemId Int [not null]
   playToWinItem play_to_win_items [not null]
   checkedInTimeUtcIso String [not null]
+  conventionId Int [not null]
+  convention conventions [not null]
   playToWinPlayAttendees play_to_win_play_players [not null]
 }
 
@@ -220,6 +223,8 @@ Ref: library_checkout_events.libraryCopyId > library_items.id
 Ref: library_checkout_events.attendeeId > attendees.id
 
 Ref: play_to_win_plays.playToWinItemId > play_to_win_items.id
+
+Ref: play_to_win_plays.conventionId > conventions.id
 
 Ref: play_to_win_play_players.playToWinItemId > play_to_win_plays.id
 
