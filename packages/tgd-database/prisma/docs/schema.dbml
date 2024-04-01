@@ -118,6 +118,10 @@ Table people {
   email String
   phoneNumber String
   attendee attendees [not null]
+
+  indexes {
+    (firstName, lastName) [unique]
+  }
 }
 
 Table play_to_win_items {
@@ -168,9 +172,12 @@ Table attendees {
   barcode String [not null]
   person people [not null]
   isCheckedIn Boolean [not null, default: false]
+  hasCancelled Boolean [not null, default: false]
+  isStayingOnSite Boolean [not null, default: false]
   conventionId Int [not null]
   convention conventions [not null]
   checkedInUtc String
+  dateRegistered String [not null]
   isVolunteer Boolean [not null, default: false]
   idTgdOrganizer Boolean [not null, default: false]
   centralizedBarcode centralized_barcodes [not null]
