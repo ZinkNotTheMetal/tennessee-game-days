@@ -3,6 +3,7 @@ interface BarcodeResponse {
   entityType: 'Attendee' | 'PlayToWinItem' | 'LibraryItem',
   entityId: number
   isLibraryItemCheckedOut: boolean
+  isUserCheckedIn: boolean
 }
 
 // Check scanned barcode
@@ -27,7 +28,8 @@ async function CheckBarcode(barcode: string) : Promise<BarcodeResponse | undefin
     barcode: barcode,
     entityType: data.entityType,
     entityId: data.entityId,
-    isLibraryItemCheckedOut: data.isCheckedOut
+    isLibraryItemCheckedOut: data.isCheckedOut,
+    isUserCheckedIn: data.isUserCheckedIn
   }
 }
 

@@ -16,10 +16,18 @@ export default function ScanningTerminalClient() {
   const [ playCompleteChime ] = useSound("/sounds/complete-chime.mp3")
 
   useEffect(() => {
-
-    const scannedLibraryItem = barcodeResults.find(f => f.entityType === 'LibraryItem')
     // Scenarios:
-    // 1. If a library game that is checked out is scanned
+    const scannedAttendees = barcodeResults.filter(f => f.entityType === 'Attendee')
+    const scannedLibraryItem = barcodeResults.find(f => f.entityType === 'LibraryItem')
+
+    // 1. Check in a user who isn't checked in
+    if (scannedAttendees[0] && !scannedAttendees[0].isUserCheckedIn && !scannedLibraryItem) {
+      // Check in the user with date time...
+      toast(`Successfully checked in user ${scannedAttendees[0].barcode}`, { type: "success" })
+      playCompleteChime()
+    }
+    
+    // 2. If a library game that is checked out is scanned
     if (scannedLibraryItem && scannedLibraryItem.isLibraryItemCheckedOut) {
       CheckInLibraryItem(scannedLibraryItem.entityId)
         .then((response) => {
@@ -34,8 +42,6 @@ export default function ScanningTerminalClient() {
           router.refresh()
         })
     }
-
-    const scannedAttendees = barcodeResults.filter(f => f.entityType === 'Attendee')
     
     // 2. If an attendee and library item (not checked out) are scanned in any order
     if (scannedLibraryItem && scannedAttendees.length === 1 && scannedAttendees[0]) {
@@ -104,9 +110,22 @@ export default function ScanningTerminalClient() {
     const scannedPlayToWinGame = barcodeResults.find(f => f.entityType === 'PlayToWinItem')
     const scannedAttendees = barcodeResults.filter(f => f.entityType === 'Attendee')
 
-    if (scannedPlayToWinGame === undefined) return
+    if (scannedPlayToWinGame === undefined) {
+      toast('Scanned Play to Win Game is null', { type: 'error' })
+      return
+    }
 
-    await LogPlayToWinPlay(scannedPlayToWinGame.entityId, scannedAttendees.map(m => m.entityId))
+    const status = await LogPlayToWinPlay(scannedPlayToWinGame.entityId, scannedAttendees.map(m => m.entityId))
+
+    console.log("PTW Status", status)
+
+    if (status === 200) {
+      toast(`Successfully logged Play to Win play ${scannedPlayToWinGame.barcode}`, { type: "success" })
+      playCompleteChime()
+    } else {
+      toast(`Error - logging Play to Win play ${scannedPlayToWinGame.barcode}`, { type: "success" })
+      playErrorChime()
+    }
 
     setBarcodeResults([])
     reset()
@@ -128,7 +147,6 @@ export default function ScanningTerminalClient() {
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                console.log('hi')
                 handleSubmit(onSubmit)()
               }
             }}
