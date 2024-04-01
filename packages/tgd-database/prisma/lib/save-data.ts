@@ -96,8 +96,8 @@ async function AddBggGameToLibrary(
     })
     centralizedBarcodeId = centralizedBarcode.id
   } catch (error) {
-    console.log('Barcode unique constraint failed', barcode)
-    throw error;
+    console.log('  Barcode already found in the system...', barcode)
+    return 0 // Barcode is already in the system
   }
   
   const libraryItem = await prisma.libraryItem.upsert({

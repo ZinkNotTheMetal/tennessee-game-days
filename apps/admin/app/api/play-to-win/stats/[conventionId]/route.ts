@@ -6,16 +6,16 @@ export async function GET(
   { params }: { params: { conventionId: string } }
 ) {
 
-  const result = await prisma.playToWinPlay.aggregate({
-    _count: {
-      _all: true,
-    },
-    groupBy: { gameName: { playToWinItem: { name: true } } },
-  });
+  // const result = await prisma.playToWinPlay.aggregate({
+  //   _count: {
+  //     _all: true,
+  //   },
+  //   groupBy: { gameName: { playToWinItem: { name: true } } },
+  // });
 
-  return NextResponse.json({
-    result
-  })
+  // return NextResponse.json({
+  //   result
+  // })
 }
 
 
