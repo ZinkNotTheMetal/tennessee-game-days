@@ -16,13 +16,13 @@ export default function ConventionSelectDropdown({ currentConvention, convention
       <div className="relative w-full py-4 inline-block">
         <select
           className="block appearance-none bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-          value={currentConvention}
+          defaultValue={currentConvention}
           onChange={(e) => {
             router.push(`/play-to-win/${e.target.value}`)
           }}
         >
           {conventionList.map((convention) => (
-            <option value={convention.id} selected={convention.id === currentConvention}>{convention.name}</option>
+            <option key={convention.id} value={convention.id}>{convention.name}</option>
           ))}
         </select>
         <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">

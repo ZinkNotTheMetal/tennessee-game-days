@@ -25,5 +25,16 @@ export async function GET(
     })
   }
 
+  if (barcodeScanned.entityType === 'Attendee') {
+    const attendee = await prisma.attendee.findFirst({
+      where: { id: barcodeScanned.entityId }
+    })
+
+    return NextResponse.json({
+      ...barcodeScanned,
+      isUserCheckedIn: attendee?.isCheckedIn
+    })
+  }
+
   return NextResponse.json(barcodeScanned);
 }

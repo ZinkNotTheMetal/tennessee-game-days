@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react"
-import { BarcodeResponse, CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem, LogPlayToWinPlay } from "./scan-functions"
+import { BarcodeResponse, CheckBarcode, CheckInAttendee, CheckInLibraryItem, CheckOutLibraryItem, LogPlayToWinPlay } from "./scan-functions"
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form"
 import { FaRegTrashCan } from "react-icons/fa6"
 import { toast } from "react-toastify"
@@ -21,10 +21,23 @@ export default function ScanningTerminalClient() {
     const scannedLibraryItem = barcodeResults.find(f => f.entityType === 'LibraryItem')
 
     // 1. Check in a user who isn't checked in
-    if (scannedAttendees[0] && !scannedAttendees[0].isUserCheckedIn && !scannedLibraryItem) {
-      // Check in the user with date time...
-      toast(`Successfully checked in user ${scannedAttendees[0].barcode}`, { type: "success" })
-      playCompleteChime()
+    if (scannedAttendees[0] && !(scannedAttendees[0].isUserCheckedIn) && !scannedLibraryItem) {
+      const scannedAttendee = scannedAttendees[0]
+      CheckInAttendee(scannedAttendee.entityId)
+        .then((response) => {
+          if (response === 200) {
+            toast(`Successfully checked in user ${scannedAttendee.barcode}`, { type: "success" })
+            playCompleteChime()
+          } else {
+            toast(`Failed to check in user ${scannedAttendee.barcode}`, { type: "success" })
+            playCompleteChime()
+          }
+        })
+        .finally(() => {
+          setBarcodeResults([])
+          reset()
+          router.refresh()
+        })
     }
     
     // 2. If a library game that is checked out is scanned
