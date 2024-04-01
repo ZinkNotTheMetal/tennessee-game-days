@@ -34,7 +34,7 @@ export default async function Page() {
         {conventionsResponse.total <= 0 && (
           <div className='py-8 text-red-400'>
             <span>
-            No conventions have been added, ensure that you add a convention and that the connection to the database is ok. If you are receiving this error unexpectedly please Contact your administrator.
+              No conventions have been added, ensure that you add a convention and that the connection to the database is ok. If you are receiving this error unexpectedly please Contact your administrator.
             </span>
           </div>
         )}

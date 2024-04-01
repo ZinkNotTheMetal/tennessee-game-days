@@ -8,8 +8,9 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { FormatBoardGameGeekType } from "../components/bgg-type/format-type";
 import useBoardGameGeekSearch from "../hooks/useBggSearch";
-import { IBoardGameGeekEntity, MapToBoardGameEntity } from "@repo/board-game-geek-shared";
+import { IBoardGameGeekEntity } from "@repo/board-game-geek-shared";
 import { FaTimesCircle } from "react-icons/fa";
+import { ImSpinner3 } from "react-icons/im";
 
 interface PlayToWinItemFormProps {
   // As of now this will always be set (no adding functionality through UI yet)
@@ -46,8 +47,8 @@ export function PlayToWinItemForm({
 
   const handleSearchInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    debounced(value)
     setSearchBggQuery(value)
+    debounced(value)
   }
 
   const fixBoardGameGeekId = (bggEntity?: IBoardGameGeekEntity) => {
@@ -207,6 +208,11 @@ export function PlayToWinItemForm({
               placeholder="Search Board Game Geek..."
               onChange={handleSearchInputChange}
             />
+            { isLoading && (
+              <span className="p-1">
+                <ImSpinner3 className="animate-spin" />
+              </span>
+            )}
             {searchBggQuery && !isLoading && (
               <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto bg-white rounded-md shadow-lg">
                 { results.map((result) => (

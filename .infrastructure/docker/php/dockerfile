@@ -1,0 +1,5 @@
+FROM php:apache
+WORKDIR /var/www/html
+
+COPY cart.php index.php
+EXPOSE 80

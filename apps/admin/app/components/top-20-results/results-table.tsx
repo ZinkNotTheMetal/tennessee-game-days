@@ -17,7 +17,7 @@ export default function TopCheckedOutGames({ topCheckedOutGames }: TopCheckedOut
           <span>Not enough checkout events to show top checked out games...</span>
         </div>
       )}
-      { topCheckedOutGames.length >= 0 && (
+      { topCheckedOutGames.length > 0 && (
         <div className="pt-12">
           <div className="flex justify-center">
             <span className="text-xl font-semibold mb-4 text-blue-600">Top Checked out games in the library</span>
