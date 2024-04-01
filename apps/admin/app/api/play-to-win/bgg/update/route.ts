@@ -1,18 +1,39 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma";
 import { MapToBoardGameEntity, SearchBoardGameGeek } from "@repo/board-game-geek-shared";
+import { DateTime } from "ts-luxon";
 
 
 // WZ: Cannot run this on Vercel due to the timeout limitations
 // I can run this locally and update the database to production
 // Uncomment below locally if needed
-//export const maxDuration = 300
+export const maxDuration = 300
 
 export async function POST(request: NextRequest) {
 
   try {
 
-    const playToWinItemsInSystem = await prisma.playToWinItem.findMany()
+    const nextUpcomingConvention = await prisma.convention.findFirst({
+      where: {
+        endDateTimeUtc: {
+          gt: DateTime.utc().toISO()
+        }
+      },
+      include: {
+        venue: true
+      },
+      orderBy: {
+        startDateTimeUtc: 'asc'
+      }
+    })
+  
+    if (nextUpcomingConvention === null) {
+      return NextResponse.json({ error: "Cannot log play to win as there are no conventions to log this play against" }, { status: 516 })
+    }
+
+    const playToWinItemsInSystem = await prisma.playToWinItem.findMany({
+      where: { conventionId: nextUpcomingConvention.id }
+    })
 
     for(const ptwItem of playToWinItemsInSystem) {
       if (!ptwItem.gameName) continue

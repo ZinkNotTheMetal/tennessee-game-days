@@ -31,7 +31,7 @@ export default function useBoardGameGeekSearch(
           setError(e)
         });
     }
-  }, 725)
+  }, 225)
 
   return [isLoading, debounced, totalResults, results, error];
 }
