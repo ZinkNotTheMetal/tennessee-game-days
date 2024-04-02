@@ -23,8 +23,8 @@ export async function POST(request: NextRequest, { params }: { params: { convent
   const isPersonInSystem = await prisma.person.findFirst({
     where: {
       OR: [
-        { email: attendeeToAdd.email },
-        { phoneNumber: attendeeToAdd.phoneNumber },
+        { email: attendeeToAdd.email ? attendeeToAdd.email : undefined },
+        { phoneNumber: attendeeToAdd.phoneNumber ? attendeeToAdd.phoneNumber : undefined },
         { 
           firstName: attendeeToAdd.preferredName || attendeeToAdd.firstName,
           lastName: attendeeToAdd.lastName,
@@ -65,47 +65,56 @@ export async function POST(request: NextRequest, { params }: { params: { convent
     personId = personToUpdate.id
   }
 
-  // 4. Add a new barcode for the attendee
+  const attendeeAlreadyAdded = await prisma.attendee.findFirst({
+    where: { personId: personId }
+  })
+
+  if (attendeeAlreadyAdded) return NextResponse.json({ error: 'Attendee has already been added to this convention'}, { status: 400 }) 
+
+  let successfulAdd = false
   try {
-    // Create new barcode
-    const barcodeAdded = await prisma.centralizedBarcode.create({
-      data: {
-        entityId: 0,
-        entityType: "Attendee",
-        barcode: attendeeToAdd.barcode,
-      },
+
+    // 4. Add a new barcode in a transaction
+    await prisma.$transaction(async (transaction) => {
+      const newBarcode = await transaction.centralizedBarcode.create({
+        data: {
+          entityId: 0,
+          entityType: 'Attendee',
+          barcode: attendeeToAdd.barcode
+        }
+      })
+
+      const newAttendee = await transaction.attendee.create({
+        data: {
+          barcode: attendeeToAdd.barcode,
+          conventionId: Number(params.conventionId),
+          personId: personId,
+          dateRegistered: DateTime.utc().toISO()
+        }
+      })
+
+      await transaction.centralizedBarcode.update({
+        where: { id: newBarcode.id },
+        data: { 
+          entityId: newAttendee.id
+        }
+      })
+
     })
 
-    // 5. Add new attendee after barcode was completed
-    const newAttendee = await prisma.attendee.create({
-      data: {
-        barcode: attendeeToAdd.barcode,
-        conventionId: Number(params.conventionId),
-        personId: personId,
-        dateRegistered: DateTime.utc().toISO()
-      }
-    })
-
-    // 6. Update barcode with correct entity id
-    await prisma.centralizedBarcode.update({
-      where: { id: barcodeAdded.id },
-      data: { 
-        entityId: newAttendee.id
-      }
-    })
-
+    successfulAdd = true
   } catch (error) {
-    return NextResponse.json({
-      message: 'Failed to add attendee as the barcode was already in the system',
-      error: error
-    }, { status: 515 })
+    throw error
+  } finally {
+    if (successfulAdd) {
+      return NextResponse.json({
+        message: "Successfully added attendee to conference",
+      },{ status: 201 })
+    } else {
+      return NextResponse.json({
+        message: 'Failed to add attendee as the barcode was already in the system',
+      }, { status: 515 })
+    }
   }
-
-  return NextResponse.json(
-    {
-      message: "Successfully added attendee to conference",
-    },
-    { status: 201 }
-  );
 
 }
