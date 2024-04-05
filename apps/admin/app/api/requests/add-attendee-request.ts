@@ -1,11 +1,28 @@
 interface IAddAttendeeRequest {
-  barcode: string
+  person: IPurchasingAttendee
+  additionalAttendees: IPerson[] | undefined
+  isStayingOnSite: boolean
+  passPurchased: 'Free' | 'Individual' | 'Couple' | 'Family'
+}
+
+interface IPurchasingAttendee extends IPerson {
+  phoneNumber: string
+  email: string
+  zipCode: string
+  emergencyContact?: IEmergencyContact
+}
+
+interface IPerson {
   firstName: string
-  preferredName?: string
   lastName: string
-  phoneNumber?: string
+  preferredName?: string
   email?: string
-  isStayingAtConvention: Boolean
+}
+
+interface IEmergencyContact {
+  name: string
+  phoneNumber: string
+  relationship: string
 }
 
 export type { IAddAttendeeRequest }

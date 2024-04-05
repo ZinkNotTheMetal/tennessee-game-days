@@ -36,7 +36,6 @@ model CentralizedBarcode {
   @@map("centralized_barcodes")
 }
 
-// Define the Enum type
 enum EntityType {
   Attendee
   LibraryItem
@@ -157,18 +156,31 @@ model AdditionalLibraryItemContent {
   @@map("library_item_contents")
 }
 
-// Add Library Item Expansions
-
 model Person {
-  id            Int        @id @default(autoincrement()) @map(name: "id")
-  firstName      String     @map(name: "first_name")
-  preferredName String?    @map(name: "preferred_name")
-  lastName      String     @map(name: "last_name")
-  email         String?    @map(name: "email")
-  phoneNumber   String?    @map(name: "phone_number")
-  attendee      Attendee[]
+  id                            Int        @id @default(autoincrement()) @map(name: "id")
+  firstName                      String     @map(name: "first_name")
+  preferredName                 String?    @map(name: "preferred_name")
+  lastName                      String     @map(name: "last_name")
+  email                         String?    @map(name: "email")
+  phoneNumber                   String?    @map(name: "phone_number")
+  zipCode                       String?    @map(name: "zip_code")
 
-  @@unique([firstName, lastName])
+  emergencyContactName          String?    @map(name: "emergency_contact_name")
+  emergencyContactPhoneNumber   String?    @map(name: "emergency_contact_phone")
+  emergencyContactRelationship  String?    @map(name: "emergency_contact_relationship")
+
+  attendee          Attendee[]
+
+  // Self-referential relationship
+  relatedTo       Person?    @relation("relatedTo", fields: [relatedPersonId], references: [id])
+  relatedPersonId Int?       @map(name: "related_person_id")
+  
+  // Opposite relation field
+  relatedBy       Person[]   @relation("relatedTo")
+
+  @@unique([firstName, lastName, relatedPersonId])
+  @@unique([phoneNumber])
+  @@unique([email])
   @@map("people")
 }
 
@@ -229,19 +241,20 @@ model PlayToWinPlayAttendee {
 }
 
 model Attendee {
-  id              Int        @id @default(autoincrement()) @map(name: "id")
-  personId        Int        @map(name: "person_id")
-  barcode         String     @map(name: "barcode")
-  person          Person     @relation(fields: [personId], references: [id])
-  isCheckedIn     Boolean    @default(false) @map(name: "is_checked_in")
-  hasCancelled    Boolean    @default(false) @map(name: "has_cancelled")
-  isStayingOnSite Boolean    @default(false) @map(name: "staying_at_convention")
-  conventionId    Int        @map(name: "convention_id")
-  convention      Convention @relation(fields: [conventionId], references: [id])
-  checkedInUtc    String?    @map(name: "checked_in_utc")
-  dateRegistered  String     @map(name: "registered_date_utc")
-  isVolunteer     Boolean    @default(false) @map(name: "is_volunteer")
-  idTgdOrganizer  Boolean    @default(false) @map(name: "is_organizer")
+  id                 Int                @id @default(autoincrement()) @map(name: "id")
+  personId           Int                @map(name: "person_id")
+  barcode            String             @map(name: "barcode")
+  person             Person             @relation(fields: [personId], references: [id])
+  isCheckedIn        Boolean            @default(false) @map(name: "is_checked_in")
+  hasCancelled       Boolean            @default(false) @map(name: "has_cancelled")
+  isStayingOnSite    Boolean            @default(false) @map(name: "staying_at_convention")
+  conventionId       Int                @map(name: "convention_id")
+  convention         Convention         @relation(fields: [conventionId], references: [id])
+  checkedInUtc       String?            @map(name: "checked_in_utc")
+  dateRegistered     String             @map(name: "registered_date_utc")
+  isVolunteer        Boolean            @default(false) @map(name: "is_volunteer")
+  idTgdOrganizer     Boolean            @default(false) @map(name: "is_organizer")
+  passPurchased      PassTypePurchased  @map(name: "pass_purchased")
 
   centralizedBarcode CentralizedBarcode    @relation(fields: [barcode], references: [barcode])
   checkOutEvents     LibraryCheckoutEvent[]
@@ -249,4 +262,11 @@ model Attendee {
 
   @@unique([personId, conventionId])
   @@map("attendees")
+}
+
+enum PassTypePurchased {
+  Free
+  Individual
+  Couple
+  Family
 }
