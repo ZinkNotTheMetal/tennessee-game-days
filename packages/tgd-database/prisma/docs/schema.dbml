@@ -116,12 +116,19 @@ Table people {
   firstName String [not null]
   preferredName String
   lastName String [not null]
-  email String
-  phoneNumber String
+  email String [unique]
+  phoneNumber String [unique]
+  zipCode String
+  emergencyContactName String
+  emergencyContactPhoneNumber String
+  emergencyContactRelationship String
   attendee attendees [not null]
+  relatedTo people
+  relatedPersonId Int
+  relatedBy people [not null]
 
   indexes {
-    (firstName, lastName) [unique]
+    (firstName, lastName, relatedPersonId) [unique]
   }
 }
 
@@ -183,6 +190,7 @@ Table attendees {
   dateRegistered String [not null]
   isVolunteer Boolean [not null, default: false]
   idTgdOrganizer Boolean [not null, default: false]
+  passPurchased PassTypePurchased [not null]
   centralizedBarcode centralized_barcodes [not null]
   checkOutEvents library_checkout_events [not null]
   playToWinPlays play_to_win_play_players [not null]
@@ -198,6 +206,13 @@ Enum EntityType {
   PlayToWinItem
 }
 
+Enum PassTypePurchased {
+  Free
+  Individual
+  Couple
+  Family
+}
+
 Ref: conventions.venueId > venues.id
 
 Ref: game_mechanics.boardGameGeekId > board_game_geek_items.id
@@ -211,6 +226,8 @@ Ref: library_items.barcode > centralized_barcodes.barcode
 Ref: library_item_contents.libraryItemId > library_items.id
 
 Ref: library_item_contents.boardGameGeekId > board_game_geek_items.id
+
+Ref: people.relatedPersonId - people.id
 
 Ref: play_to_win_items.boardGameGeekId > board_game_geek_items.id
 
