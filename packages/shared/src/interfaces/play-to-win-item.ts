@@ -5,9 +5,10 @@ interface IPlayToWinItem {
   id: number
   barcode: string
   gameName: string
+  publisherName: string
   isHidden: boolean
   dateAddedUtc: string
-  totalTimesPlayed: number
+  _count: { playToWinPlays: number }
   /** @format int32 */
   boardGameGeekId?: number
   boardGameGeekThing?: IBoardGameGeekEntity

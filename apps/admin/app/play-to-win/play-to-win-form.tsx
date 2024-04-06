@@ -41,6 +41,7 @@ export function PlayToWinItemForm({
   } = useForm<IPlayToWinItem>({
     values: {
       ...rest,
+      publisherName: rest.publisherName ?? boardGameGeekThing?.publisherName ?? '',
       boardGameGeekThing,
     },
   })
@@ -153,6 +154,19 @@ export function PlayToWinItemForm({
               className="block text-gray-700 text-sm font-bold mb-2 italic"
               htmlFor="name"
             >
+              Publisher
+            </label>
+            <input
+              className={`w-1/2 p-2 border ${errors?.barcode ? "border-red-600" : "border-gray-300"} rounded`}
+              {...register("publisherName")}
+            />
+          </div>
+
+          <div className="pb-3">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2 italic"
+              htmlFor="name"
+            >
               Type
             </label>
             <label className="pl-1">{FormatBoardGameGeekType(boardGameGeekThing.type)}</label>
@@ -198,6 +212,21 @@ export function PlayToWinItemForm({
               </span>
             )}
           </div>
+
+          {!Boolean(playToWinItem.boardGameGeekId) && (
+            <div className="pb-3">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2 italic"
+                htmlFor="name"
+              >
+                Publisher
+              </label>
+              <input
+                className={`w-full p-2 border border-gray-300 rounded`}
+                {...register("publisherName")}
+              />
+            </div>
+          )}
         </div>
 
         {!Boolean(playToWinItem.boardGameGeekId) && (
@@ -225,7 +254,7 @@ export function PlayToWinItemForm({
                     }}
                     key={result.id}
                   >
-                    {result.itemName}
+                    {result.itemName} ({result.yearPublished})
                   </button>
                 ))}
               </div>
@@ -355,7 +384,7 @@ export function PlayToWinItemForm({
         <div className="pl-2 pt-8">
           <div className="flex items-center">
             <label htmlFor="totalTimesPlayed" className="text-gray-700 text-sm font-bold mr-2">Total Times Played:</label>
-            <span id="totalTimesPlayed" className="text-gray-700">{playToWinItem.totalTimesPlayed}</span>
+            <span id="totalTimesPlayed" className="text-gray-700">{playToWinItem._count.playToWinPlays}</span>
           </div>
         </div>
 

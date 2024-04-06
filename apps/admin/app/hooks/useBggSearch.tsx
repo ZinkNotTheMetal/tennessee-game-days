@@ -23,9 +23,9 @@ export default function useBoardGameGeekSearch(
     } else {
       SearchBoardGameGeek(query, searchById)
         .then((results) => {
-          setIsLoading(false);
-          setTotalResults(results.totalCount);
-          setResults(results.results.map((r) => MapToBoardGameEntity(r)));
+          setIsLoading(false)
+          setTotalResults(results.totalCount)
+          setResults(results.results.map((r) => MapToBoardGameEntity(r)))
         })
         .catch((e) => {
           setError(e)

@@ -52,6 +52,7 @@ Table board_game_geek_items {
   thumbnailUrl String
   imageUrl String
   yearPublished Int
+  publisherName String
   playingTimeMinutes Int
   minimumPlayerCount Int
   maximumPlayerCount Int
@@ -141,7 +142,6 @@ Table play_to_win_items {
   conventionId Int [not null]
   convention conventions [not null]
   isHidden Boolean [not null]
-  totalTimesPlayed Int [not null, default: 0]
   publisherName String
   dateAddedUtc String [not null]
   centralizedBarcode centralized_barcodes [not null]
