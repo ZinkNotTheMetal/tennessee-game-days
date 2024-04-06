@@ -5,15 +5,15 @@ import prisma from "@/app/lib/prisma";
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   const playToWinItem: IPlayToWinRequest = await request.json();
 
-  const { boardGameGeekThing, ...rest } = playToWinItem;
-  const { mechanics, id, ...bggRest } = boardGameGeekThing;
+  const { boardGameGeekThing, _count, ...rest } = playToWinItem;
+  const { mechanics, id: bggId, ...bggRest } = boardGameGeekThing;
 
   const upsertBggLibraryGame = await prisma.boardGameGeekThing.upsert({
-    where: { id: id },
+    where: { id: bggId },
     update: bggRest,
     create: {
       ...bggRest,
-      id: id,
+      id: bggId,
     },
   });
 

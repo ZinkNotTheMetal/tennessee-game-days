@@ -163,7 +163,7 @@ export function LibraryForm({
       </div>
 
       <div className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 px-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 px-2">
           <div>
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
@@ -197,6 +197,18 @@ export function LibraryForm({
                 Owner is required to add item to library
               </span>
             )}
+          </div>
+          <div>
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="itemType"
+            >
+              Publisher
+            </label>
+            <input
+              className={`w-full p-2 border border-gray-300 rounded`}
+              {...register("boardGameGeekThing.publisherName")}
+            />
           </div>
         </div>
 

@@ -11,6 +11,7 @@ interface IBoardGameGeekEntity {
   imageUrl: string;
   /** @format int32 */
   yearPublished: number;
+  publisherName: string | null;
   /** @format int32 */
   playingTimeMinutes: number;
   /** @format int32 */

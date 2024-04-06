@@ -44,6 +44,7 @@ export function MapToBoardGameEntity(
     minimumPlayerAge: bggThingDto.minage,
     averageUserRating: bggThingDto.statistics.ratings.average,
     complexityRating: bggThingDto.statistics.ratings.averageweight,
+    publisherName: bggThingDto.links.find((item) => item.type === "boardgamepublisher")?.value ?? null,
     ranking: FindBoardGameGeekRanking(
       bggThingDto.statistics.ratings.ranks?.find(
         (item) => item.name == "boardgame"

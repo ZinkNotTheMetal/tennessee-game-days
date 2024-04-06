@@ -53,6 +53,7 @@ export default function PlayToWinDropZone() : JSX.Element {
       .then((response) => {
         if (response.ok) {
           toast(`Successfully uploaded ${playToWinFile.name} for play-to-win games`, { type: 'success' })
+          router.refresh()
         } else {
           console.log(response)
           toast(`Failed to upload ${playToWinFile.name}`, { type: 'error' })

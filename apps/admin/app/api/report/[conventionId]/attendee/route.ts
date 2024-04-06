@@ -5,6 +5,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { conventionId: string } }
 ) {
+  const conventionForReport = await prisma.convention.count({
+    where: { id: Number(params.conventionId) }
+  })
+
+  if (conventionForReport <= 0) return NextResponse.json({ message: "Convention not found" }, { status: 404 });
 
   const attendeeReport = await prisma.attendee.groupBy({
     where: { conventionId: Number(params.conventionId) },

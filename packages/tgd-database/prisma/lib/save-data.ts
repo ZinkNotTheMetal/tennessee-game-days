@@ -190,19 +190,20 @@ function DetermineGameOwner(barcode: string) {
 async function UpsertBggGame(
   bggItemToAdd: number,
   bggProperties: {
-    itemName: string;
-    description: string;
-    type: string;
-    thumbnailUrl: string;
-    imageUrl: string;
-    yearPublished: number;
-    playingTimeMinutes: number;
-    minimumPlayerCount: number;
-    maximumPlayerCount: number;
-    minimumPlayerAge: number;
-    averageUserRating: number;
-    complexityRating: number;
-    votedBestPlayerCount: number | null;
+    itemName: string
+    description: string
+    type: string
+    thumbnailUrl: string
+    imageUrl: string
+    yearPublished: number
+    publisherName: string | null
+    playingTimeMinutes: number
+    minimumPlayerCount: number
+    maximumPlayerCount: number
+    minimumPlayerAge: number
+    averageUserRating: number
+    complexityRating: number
+    votedBestPlayerCount: number | null
   }
 ): Promise<number> {
 

@@ -9,7 +9,8 @@ export async function GET(
   const playToWinItemById = await prisma.playToWinItem.findFirst({
     where: { id: Number(params.id) },
     include: {
-      boardGameGeekThing: true
+      boardGameGeekThing: true,
+      _count: true,
     }
   })
 
