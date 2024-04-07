@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest, { params }: { params: { libraryI
       data: {
         isCheckedOut: false,
         totalCheckedOutMinutes: {
-          increment: Number(checkedInTime.diff(DateTime.fromISO(result.checkedOutTimeUtcIso), 'minutes').toObject().minutes?.toFixed(0))
+          increment: Number(checkedInTime.diff(DateTime.fromJSDate(result.checkedOutTimeUtcIso), 'minutes').toObject().minutes?.toFixed(0))
         }
       }
     })

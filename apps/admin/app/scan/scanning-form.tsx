@@ -149,7 +149,7 @@ export default function ScanningTerminalClient() {
     <form onSubmit={handleSubmit(onSubmit)}>
 
       { fields.map(({ id }, index) => (
-        <div key={id} className="py-2 flex items-center">
+        <div key={index} className="py-2 flex items-center">
           <input
             className="w-full p-2 mr-2 border border-gray-300 rounded"
             placeholder="Enter or scan a barcode"

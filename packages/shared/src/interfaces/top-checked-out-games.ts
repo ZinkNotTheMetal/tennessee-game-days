@@ -1,15 +1,14 @@
-import { IBoardGameGeekEntity } from "@repo/board-game-geek-shared"
-
 interface TopCheckedOutGame {
-  alias: string
-  barcode: string
-  isCheckedOut: boolean
-  boardGameGeekThing: IBoardGameGeekEntity,
-  totalCheckedOutMinutes: number
-  _count: {
-    checkOutEvents: number;
-    // Add any other properties you expect in _count
-  };
+  bggId: number
+  libraryItemName: string
+  allCopiesCheckedOut: boolean
+  totalCheckedOutMinutes: string // bigint needs to be string
+  totalCheckedOutEvents: string // bigint needs to be string
+  bggAverageRating: number
+  bggAverageComplexity: number
+  minPlayerCount: number
+  maxPlayerCount: number
+  bggPlaytimeMinutes: number
 }
 
 export type { TopCheckedOutGame }

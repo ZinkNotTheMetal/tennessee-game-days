@@ -1,8 +1,6 @@
 'use client'
 
-import { IBoardGameGeekEntity } from "@repo/board-game-geek-shared"
 import { TopCheckedOutGame } from "@repo/shared"
-import { useEffect, useState } from "react"
 
 interface TopCheckedOutGameProps {
   topCheckedOutGames: TopCheckedOutGame[]
@@ -55,6 +53,9 @@ function ResultsTableHeader(): JSX.Element {
         <th className="py-2 px-4 text-gray-500 hidden md:table-cell">
           Max Player count
         </th>
+        <th className="py-2 px-4 text-gray-500 hidden md:table-cell">
+          Playtime (min)
+        </th>
       </tr>
     </thead>
   )
@@ -70,7 +71,7 @@ function ResultsTableBody({ games }: ResultsTableBodyProps): JSX.Element {
     <tbody className="text-center">
 
       { games.map((game) => (
-        <ResultsTableRow key={game.barcode} {...game} checkOutCount={game._count.checkOutEvents} />
+        <ResultsTableRow key={game.bggId} {...game} />
       ))}
 
     </tbody>
@@ -78,28 +79,34 @@ function ResultsTableBody({ games }: ResultsTableBodyProps): JSX.Element {
 }
 
 interface ResultsRowProps {
-  alias: string
-  barcode: string
-  boardGameGeekThing: IBoardGameGeekEntity,
-  totalCheckedOutMinutes: number
-  checkOutCount: number
-  isCheckedOut: boolean
+  bggId: number
+  libraryItemName: string
+  allCopiesCheckedOut: boolean
+  totalCheckedOutMinutes: string // bigint needs to be string
+  totalCheckedOutEvents: string // bigint needs to be string
+  bggAverageRating: number
+  bggAverageComplexity: number
+  minPlayerCount: number
+  maxPlayerCount: number
+  bggPlaytimeMinutes: number
 }
 
-function ResultsTableRow({ alias, barcode, boardGameGeekThing, isCheckedOut, totalCheckedOutMinutes, checkOutCount }: ResultsRowProps) : JSX.Element {
+function ResultsTableRow({ 
+  bggId, libraryItemName, allCopiesCheckedOut, totalCheckedOutMinutes, totalCheckedOutEvents, bggAverageRating, bggAverageComplexity, minPlayerCount, maxPlayerCount, bggPlaytimeMinutes
+}: ResultsRowProps) : JSX.Element {
 
   return (
     <tr
-      key={barcode}
-      className={`${isCheckedOut ? 'italic text-red-400' : ''}`}
+      className={`${allCopiesCheckedOut ? 'italic text-red-400' : ''}`}
     >
-      <td className="p-3">{ alias || boardGameGeekThing.itemName }</td>
-      <td className="p-3">{ checkOutCount }</td>
+      <td className="p-3">{ libraryItemName }</td>
+      <td className="p-3">{ totalCheckedOutEvents }</td>
       <td className="p-3">{ totalCheckedOutMinutes } min</td>
-      <td className="p-3">{ Number(boardGameGeekThing.complexityRating).toFixed(1) }</td>
-      <td className="p-3">{ Number(boardGameGeekThing.averageUserRating).toFixed(1) }</td>
-      <td className="p-3">{ boardGameGeekThing.minimumPlayerCount }</td>
-      <td className="p-3">{ boardGameGeekThing.maximumPlayerCount }</td>
+      <td className="p-3">{ Number(bggAverageComplexity).toFixed(1) }</td>
+      <td className="p-3">{ Number(bggAverageRating).toFixed(1) }</td>
+      <td className="p-3">{ minPlayerCount }</td>
+      <td className="p-3">{ maxPlayerCount }</td>
+      <td className="p-3">{ bggPlaytimeMinutes }</td>
     </tr>
   )
 }
