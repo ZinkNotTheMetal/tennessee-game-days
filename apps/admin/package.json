@@ -29,7 +29,7 @@
     "@tanstack/react-table": "^8.15.0",
     "csv-parse": "^5.5.5",
     "next": "^14.1.4",
-    "postcss": "8.4.35",
+    "postcss": "8.4.38",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
