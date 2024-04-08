@@ -29,7 +29,6 @@ Table conventions {
   playToWinGames play_to_win_items [not null]
   attendees attendees [not null]
   playToWinPlays play_to_win_plays [not null]
-  libraryCheckoutEvents library_checkout_events [not null]
 }
 
 Table venues {
@@ -156,8 +155,6 @@ Table library_checkout_events {
   library library_items [not null]
   attendeeId Int [not null]
   attendee attendees [not null]
-  conventionId Int
-  convention conventions
   checkedOutTimeUtcIso DateTime [not null]
   checkedInTimeUtcIso DateTime
 }
@@ -242,8 +239,6 @@ Ref: play_to_win_items.barcode > centralized_barcodes.barcode
 Ref: library_checkout_events.libraryCopyId > library_items.id
 
 Ref: library_checkout_events.attendeeId > attendees.id
-
-Ref: library_checkout_events.conventionId > conventions.id
 
 Ref: play_to_win_plays.playToWinItemId > play_to_win_items.id
 
