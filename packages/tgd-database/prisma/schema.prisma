@@ -45,17 +45,17 @@ enum EntityType {
 model Convention {
   id                         Int       @id @default(autoincrement()) @map(name: "id")
   name                       String    @unique @map(name: "name")
-  extraHoursStartDateTimeUtc String?   @map(name: "extra_hours_start_date_time_iso_utc")
-  startDateTimeUtc           String?   @map(name: "start_date_time_iso_utc")
-  endDateTimeUtc             String?   @map(name: "end_date_time_iso_utc")
+  extraHoursStartDateTimeUtc DateTime? @map(name: "checked_out_time_utc") @db.Timestamptz()
+  startDateTimeUtc           DateTime? @map(name: "start_date_time_iso_utc") @db.Timestamptz()
+  endDateTimeUtc             DateTime? @map(name: "end_date_time_iso_utc") @db.Timestamptz()
   updatedAtUtc               String    @map(name: "date_updated_utc")
   isCancelled                Boolean   @default(false) @map(name: "is_cancelled")
   venueId                    Int?      @map(name: "venue_id")
   venue                      Venue?    @relation(fields: [venueId], references: [id])
 
-  PlayToWinGames PlayToWinItem[]
-  Attendees      Attendee[]
-  PlayToWinPlays PlayToWinPlay[]  
+  playToWinGames        PlayToWinItem[]
+  attendees             Attendee[]
+  playToWinPlays        PlayToWinPlay[]
 
   @@map("conventions")
 }
@@ -134,8 +134,8 @@ model LibraryItem {
   isHidden               Boolean                        @map(name: "is_hidden")
   isCheckedOut           Boolean                        @map(name: "is_checked_out")
   totalCheckedOutMinutes Int                            @default(0) @map(name: "minutes_checked_out")
-  dateAddedUtc           String                         @map(name: "date_added_utc")
-  updatedAtUtc           String                         @map(name: "date_updated_utc")
+  dateAddedUtc           DateTime                       @map(name: "date_added_utc") @db.Timestamptz()
+  updatedAtUtc           DateTime                       @map(name: "date_updated_utc") @db.Timestamptz()
   checkOutEvents         LibraryCheckoutEvent[]
   additionalBoxContent   AdditionalLibraryItemContent[]
   centralizedBarcode     CentralizedBarcode             @relation(fields: [barcode], references: [barcode])
@@ -165,6 +165,7 @@ model Person {
   email                         String?    @map(name: "email")
   phoneNumber                   String?    @map(name: "phone_number")
   zipCode                       String?    @map(name: "zip_code")
+  dateAdded                     DateTime   @default(now()) @map(name: "date_added_utc") @db.Timestamptz()
 
   emergencyContactName          String?    @map(name: "emergency_contact_name")
   emergencyContactPhoneNumber   String?    @map(name: "emergency_contact_phone")
@@ -195,7 +196,7 @@ model PlayToWinItem {
   convention         Convention          @relation(fields: [conventionId], references: [id])
   isHidden           Boolean             @map(name: "is_hidden")
   publisherName      String?             @map(name: "publisher")
-  dateAddedUtc       String              @map(name: "date_added_utc")
+  dateAddedUtc       DateTime            @map(name: "date_added_utc") @db.Timestamptz()
   centralizedBarcode CentralizedBarcode  @relation(fields: [barcode], references: [barcode])
 
   playToWinPlays     PlayToWinPlay[]
@@ -211,8 +212,8 @@ model LibraryCheckoutEvent {
   library                   LibraryItem @relation(fields: [libraryCopyId], references: [id])
   attendeeId                Int         @map(name: "checkout_attendee_id")
   attendee                  Attendee    @relation(fields: [attendeeId], references: [id])
-  checkedOutTimeUtcIso      String      @map("checked_out_time_utc")
-  checkedInTimeUtcIso       String?     @map("checked_in_time_utc")
+  checkedOutTimeUtcIso      DateTime    @map("checked_out_time_utc") @db.Timestamptz()
+  checkedInTimeUtcIso       DateTime?   @map("checked_in_time_utc") @db.Timestamptz()
 
   @@map("library_checkout_events")
 }
@@ -221,7 +222,7 @@ model PlayToWinPlay {
   id                        String        @id @default(cuid()) @map(name: "id")
   playToWinItemId           Int           @map(name: "play_to_win_item_id")
   playToWinItem             PlayToWinItem @relation(fields: [playToWinItemId], references: [id])
-  checkedInTimeUtcIso       String        @map("checked_in_time_utc")
+  checkedInTimeUtcIso       DateTime      @map("checked_in_time_utc") @db.Timestamptz()
   conventionId              Int           @map("convention_id")
   convention                Convention    @relation(fields: [conventionId], references: [id])
 
@@ -250,8 +251,8 @@ model Attendee {
   isStayingOnSite    Boolean            @default(false) @map(name: "staying_at_convention")
   conventionId       Int                @map(name: "convention_id")
   convention         Convention         @relation(fields: [conventionId], references: [id])
-  checkedInUtc       String?            @map(name: "checked_in_utc")
-  dateRegistered     String             @map(name: "registered_date_utc")
+  checkedInUtc       DateTime?          @map(name: "checked_in_utc") @db.Timestamptz()
+  dateRegistered     DateTime           @map(name: "registered_date_utc") @db.Timestamptz()
   isVolunteer        Boolean            @default(false) @map(name: "is_volunteer")
   idTgdOrganizer     Boolean            @default(false) @map(name: "is_organizer")
   passPurchased      PassTypePurchased  @map(name: "pass_purchased")

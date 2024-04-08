@@ -7,10 +7,13 @@ import { DateTime } from 'ts-luxon'
 
 const ConventionStatus = (isCancelled: boolean, startDateTimeUtc?: string, endDateTimeUtc?: string) : string => {
   if (isCancelled) return 'Canceled'
-  if (!startDateTimeUtc) return 'Upcoming'
+  if (!startDateTimeUtc || !endDateTimeUtc) return 'Upcoming'
 
   const daysUntilStart = DateTime.fromISO(startDateTimeUtc).diff(DateTime.now(), 'days').days
-  const daysUntilEnd = DateTime.fromISO(startDateTimeUtc).diff(DateTime.now(), 'days').days
+  const daysUntilEnd = DateTime.fromISO(endDateTimeUtc).diff(DateTime.now(), 'days').days
+
+  console.log("until", daysUntilStart)
+  console.log("end", daysUntilEnd)
 
   if (daysUntilStart >= 0) return `${daysUntilStart.toFixed(0)} days from now`
   if (daysUntilStart <= 0 && daysUntilEnd >= 0) return "Happening"

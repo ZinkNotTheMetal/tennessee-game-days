@@ -19,16 +19,16 @@ Table centralized_barcodes {
 Table conventions {
   id Int [pk, increment]
   name String [unique, not null]
-  extraHoursStartDateTimeUtc String
-  startDateTimeUtc String
-  endDateTimeUtc String
+  extraHoursStartDateTimeUtc DateTime
+  startDateTimeUtc DateTime
+  endDateTimeUtc DateTime
   updatedAtUtc String [not null]
   isCancelled Boolean [not null, default: false]
   venueId Int
   venue venues
-  PlayToWinGames play_to_win_items [not null]
-  Attendees attendees [not null]
-  PlayToWinPlays play_to_win_plays [not null]
+  playToWinGames play_to_win_items [not null]
+  attendees attendees [not null]
+  playToWinPlays play_to_win_plays [not null]
 }
 
 Table venues {
@@ -94,8 +94,8 @@ Table library_items {
   isHidden Boolean [not null]
   isCheckedOut Boolean [not null]
   totalCheckedOutMinutes Int [not null, default: 0]
-  dateAddedUtc String [not null]
-  updatedAtUtc String [not null]
+  dateAddedUtc DateTime [not null]
+  updatedAtUtc DateTime [not null]
   checkOutEvents library_checkout_events [not null]
   additionalBoxContent library_item_contents [not null]
   centralizedBarcode centralized_barcodes [not null]
@@ -120,6 +120,7 @@ Table people {
   email String [unique]
   phoneNumber String [unique]
   zipCode String
+  dateAdded DateTime [default: `now()`, not null]
   emergencyContactName String
   emergencyContactPhoneNumber String
   emergencyContactRelationship String
@@ -143,7 +144,7 @@ Table play_to_win_items {
   convention conventions [not null]
   isHidden Boolean [not null]
   publisherName String
-  dateAddedUtc String [not null]
+  dateAddedUtc DateTime [not null]
   centralizedBarcode centralized_barcodes [not null]
   playToWinPlays play_to_win_plays [not null]
 }
@@ -154,15 +155,15 @@ Table library_checkout_events {
   library library_items [not null]
   attendeeId Int [not null]
   attendee attendees [not null]
-  checkedOutTimeUtcIso String [not null]
-  checkedInTimeUtcIso String
+  checkedOutTimeUtcIso DateTime [not null]
+  checkedInTimeUtcIso DateTime
 }
 
 Table play_to_win_plays {
   id String [pk]
   playToWinItemId Int [not null]
   playToWinItem play_to_win_items [not null]
-  checkedInTimeUtcIso String [not null]
+  checkedInTimeUtcIso DateTime [not null]
   conventionId Int [not null]
   convention conventions [not null]
   playToWinPlayAttendees play_to_win_play_players [not null]
@@ -186,8 +187,8 @@ Table attendees {
   isStayingOnSite Boolean [not null, default: false]
   conventionId Int [not null]
   convention conventions [not null]
-  checkedInUtc String
-  dateRegistered String [not null]
+  checkedInUtc DateTime
+  dateRegistered DateTime [not null]
   isVolunteer Boolean [not null, default: false]
   idTgdOrganizer Boolean [not null, default: false]
   passPurchased PassTypePurchased [not null]

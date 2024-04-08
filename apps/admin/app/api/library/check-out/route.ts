@@ -30,6 +30,25 @@ export async function POST(request: NextRequest) {
   if (hasGameCheckedOut !== 0) return NextResponse.json({ message: 'User has game already checked out!'}, { status: 420 })  
   if (libraryItem.isCheckedOut) return NextResponse.json({ message: "Game already checked out!" }, { status: 400 })
 
+  const currentConvention = await prisma.convention.findFirst({
+    where: {
+      AND: [
+        {
+          startDateTimeUtc: {
+            gte: DateTime.utc().toISO()
+          }
+        },
+        {
+          endDateTimeUtc: {
+            lte: DateTime.utc().toISO()
+          }
+        }
+      ]
+    }
+  })
+
+  console.log("convention", currentConvention)
+
   await prisma.$transaction(async t => {
 
     await t.libraryItem.update({
