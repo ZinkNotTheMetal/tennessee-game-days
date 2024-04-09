@@ -1,28 +1,16 @@
 import { ConventionForm } from "../../convention-form";
 import type { IConvention, ILibraryItem } from "@repo/shared";
 import DeleteConventionButton from "./delete-convention-button";
+import { getConventionById } from "../../actions";
 
 interface Props {
   params: { id: string }
 }
 
-async function getConvention(id: number) {
-  const conventionByIdApi = await fetch(
-    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/convention/${id}`,
-    {
-      method: "GET",
-      cache: 'no-store',
-    }
-  );
-
-  const item: IConvention = await conventionByIdApi.json();
-  return item;
-}
-
 export async function generateMetadata(
   { params }: Props
 ) {
-  const convention = await getConvention(Number(params.id))
+  const convention = await getConventionById(Number(params.id))
 
   return {
     title: `Edit - ${convention.name}`
@@ -32,7 +20,7 @@ export async function generateMetadata(
 
 export default async function Page({ params }: { params: { id: string } }) {
   const conventionId = Number(params.id)
-  const convention = await getConvention(conventionId)
+  const convention = await getConventionById(conventionId)
 
   return (
     <main className="container mx-auto p-8">

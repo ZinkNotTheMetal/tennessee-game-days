@@ -11,7 +11,7 @@ export async function GET(
     where: {id: Number(params.id)},
     include: {
       venue: true,
-    }
+    },
   })
 
   if (conventionById === null || conventionById === undefined)
