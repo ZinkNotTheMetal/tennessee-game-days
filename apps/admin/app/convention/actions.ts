@@ -64,5 +64,25 @@ export async function getLibraryReport(id: number) {
   )
 
   const item: ILibraryReport = await libraryGamesByConventionApi.json();
-  return item;
+  return item
+}
+
+interface IPlayToWinItemReport {
+  gameName: string
+  publisher: string
+  plays: number
+  totalPlayers: number
+}
+
+export async function getPlayToWinReport(id: number) {
+  const playToWinGameReportApi = await fetch(
+    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/report/${id}/play-to-win`,
+    {
+      method: "GET",
+      cache: 'no-store',
+    }
+  )
+
+  const games: IPlayToWinItemReport[] = await playToWinGameReportApi.json();
+  return games
 }

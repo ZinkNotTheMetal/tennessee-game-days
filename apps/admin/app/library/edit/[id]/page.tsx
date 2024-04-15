@@ -40,9 +40,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         Edit Game in library
       </h1>
 
-      <div className="text-right">
-        <LibraryItemEditButtons id={libraryItemId} gameName={libraryItem?.boardGameGeekThing?.itemName || ''} />
-      </div>
+      <LibraryItemEditButtons id={libraryItemId} gameName={libraryItem?.boardGameGeekThing?.itemName || ''} />
 
       <div className="pt-4">
         {!libraryItem && (

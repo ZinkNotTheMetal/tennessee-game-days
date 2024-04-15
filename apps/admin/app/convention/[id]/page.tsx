@@ -1,5 +1,7 @@
 import { DateTime } from "ts-luxon"
-import { getConventionById, getAttendeeReport, getLibraryReport } from "../actions"
+import { getConventionById, getAttendeeReport, getLibraryReport, getPlayToWinReport } from "../actions"
+import EditConventionButton from "./edit-convention-button"
+import BackButton from "@/app/components/buttons/back-button"
 
 interface Props {
   params: { id: string }
@@ -19,6 +21,7 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
   const convention = await getConventionById(Number(params.id))
   const attendeeCount = await getAttendeeReport(Number(params.id))
   const libraryReport = await getLibraryReport(Number(params.id))
+  const playToWinReport = await getPlayToWinReport(Number(params.id))
 
   return (
     <main className="container mx-auto p-8">
@@ -27,6 +30,10 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
       </h1>
 
       <div className="bg-gray-100 rounded-md p-6 mb-8">
+        <div className="flex justify-end space-x-4">
+          <BackButton />
+          <EditConventionButton id={Number(params.id)} />
+        </div>
         <h2 className="text-xl font-semibold mb-4">Event Details:</h2>
         <div className="flex flex-wrap items-center mb-4">
           <p className="w-full sm:w-1/2 mb-2 sm:mb-0">Extra Hours Start Date:</p>
@@ -70,6 +77,14 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
         <h2 className="text-xl font-semibold mb-4">Library Game Counts:</h2>
         <p>Games not played: {libraryReport.itemsNotPlayed.length}</p>
         <p>Games played: {libraryReport.itemsPlayed.length}</p>
+      </div>
+
+      <div className="bg-gray-100 rounded-md p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Play to Win Counts:</h2>
+        <p>Total Play To Win Games: {playToWinReport.length}</p>
+        <p>Games played at least once: {playToWinReport.reduce((acc, current) => acc + current.plays, 0)}</p>
+        <p>Games not played: {playToWinReport.filter(g => g.plays === 0).length}</p>
+        <p>Total Play to Win players: {playToWinReport.reduce((acc, current) => acc + current.totalPlayers, 0)}</p>
       </div>
     </main>
   )
