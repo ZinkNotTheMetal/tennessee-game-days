@@ -11,7 +11,8 @@
     "@repo/board-game-geek-shared": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@turbo/gen": "^1.13.0",
+    "@repo/board-game-geek-shared": "workspace:*",
+    "@turbo/gen": "^1.13.2",
     "@types/node": "^20.11.30",
     "eslint": "^8.56.0",
     "typescript": "^5.4.2"
