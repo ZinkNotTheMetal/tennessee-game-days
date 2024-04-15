@@ -1,5 +1,4 @@
 import { IVenue } from "./venue"
-import { DateTime } from 'ts-luxon'
 
 interface IConvention {
   /** @format int32 */
