@@ -1,11 +1,9 @@
+import { GET } from '@/app/api/convention/upcoming/route';
 import { IConvention } from '@repo/shared';
 import { redirect } from 'next/navigation';
 
 async function getUpcomingConvention(): Promise<IConvention> {
-  const upcomingConventionApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/convention/upcoming`, {
-    cache: 'no-store',
-  })
-
+  const upcomingConventionApi = await GET() // Call server side GET, as you are on the server you don't have to talk to the API
   const upcomingConvention: IConvention = await upcomingConventionApi.json();
 
   return upcomingConvention;

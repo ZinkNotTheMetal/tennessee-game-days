@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
 }
 
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const count = await prisma.libraryItem.count({
     where: { isCheckedOut: true }
   })

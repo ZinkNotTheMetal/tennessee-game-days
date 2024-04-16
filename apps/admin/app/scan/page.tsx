@@ -1,43 +1,12 @@
 import { Metadata } from "next"
 import ScanningTerminalClient from "./scanning-form"
-import { ApiListResponse, ILibraryItem, TopCheckedOutGame } from "@repo/shared"
 import TopCheckedOutGames from "../components/top-20-results/results-table"
 import GameCheckoutItemOverview from "../components/checked-out-overview/overview";
+import { getCheckedOutGames, getPlayToWinPlays, getTop20CheckedOutGames } from "./actions";
 
 export const metadata: Metadata = {
   title: "Scanning Terminal",
 };
-
-async function getCheckedOutGames() {
-  const checkedOutGamesApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/check-out`, {
-    cache: 'no-store',
-  })
-
-  const checkedOutItems: ApiListResponse<ILibraryItem> = await checkedOutGamesApi.json()
-
-  return checkedOutItems
-}
-
-async function getPlayToWinPlays() {
-  const checkedOutGamesApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/play-to-win/log`, {
-    cache: 'no-store',
-  })
-
-  const playToWinPlays: { count: number } = await checkedOutGamesApi.json()
-
-  return playToWinPlays.count
-}
-
-async function getTop20CheckedOutGames() {
-
-  const allTimeTop20Api = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/stats/all-time-top-20`, {
-    method: 'GET'
-  })
-
-  const allTimeTop20LibraryGames: { list: TopCheckedOutGame[] } = await allTimeTop20Api.json()
-
-  return allTimeTop20LibraryGames.list
-}
 
 export default async function Page() {
   const checkedOutGames = await getCheckedOutGames()
