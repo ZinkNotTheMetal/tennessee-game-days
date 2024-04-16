@@ -3,17 +3,15 @@ import type { Metadata } from 'next'
 import { ConventionTable } from './convention-table'
 import { ApiListResponse } from '@repo/shared'
 import type { IConvention } from '@repo/shared'
+import { GET } from '@/app/api/convention/list/route'
 
 export const metadata: Metadata = {
   title: 'TGD - Conventions'
 }
 
 async function getConventionsFromApi() {
-  const conventionListApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/convention/list`, {
-    cache: 'no-store',
-  })
-
-  const conventions: ApiListResponse<IConvention> = await conventionListApi.json();
+  const conventionListApi = await GET()
+  const conventions: ApiListResponse<IConvention> = await conventionListApi.json()
 
   return conventions;
 }
