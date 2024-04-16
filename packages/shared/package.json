@@ -8,9 +8,9 @@
     "generate:component": "turbo gen react-component"
   },
   "devDependencies": {
+    "@repo/board-game-geek-shared": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@repo/board-game-geek-shared": "workspace:*",
     "@turbo/gen": "^1.13.2",
     "@types/node": "^20.11.30",
     "eslint": "^8.56.0",

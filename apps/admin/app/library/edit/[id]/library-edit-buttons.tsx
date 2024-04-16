@@ -1,5 +1,6 @@
 "use client";
 
+import BackButton from "@/app/components/buttons/back-button";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
@@ -48,22 +49,14 @@ export function LibraryItemEditButtons({
 
   return (
     <>
-      <div className="flex justify-end space-x-12">
+      <div className="flex justify-end space-x-4">
+        <BackButton />
         <button
           className="bg-red-400 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full"
           onClick={() => removeItemFromLibrary(id)}
           type="button"
         >
           Delete '{gameName}' from library!
-        </button>
-        <button
-          className="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full"
-          onClick={() => {
-            router.push("/library");
-          }}
-          type="button"
-        >
-          Back to list
         </button>
       </div>
     </>
