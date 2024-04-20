@@ -93,7 +93,11 @@ export async function GET() {
         include: {
           attendee: {
             include: {
-              person: true
+              person: {
+                include: {
+                  relatedTo: true
+                }
+              }
             }
           }
         }

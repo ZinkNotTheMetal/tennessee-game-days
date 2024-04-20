@@ -1,8 +1,8 @@
 "use client";
 
-import BackButton from "@/app/components/buttons/back-button";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import BackButton from "@/app/components/buttons/back-button"
+import { useRouter } from "next/navigation"
+import { toast } from "react-toastify"
 
 interface LibraryItemEditButtonsProps {
   id: number;

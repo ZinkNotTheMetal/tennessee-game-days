@@ -1,21 +1,13 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Search } from "@/app/components/search/search";
-import { useRouter } from "next/navigation";
-import { ILibraryItem } from "@repo/shared";
-import {
-  FaPersonWalkingArrowRight,
-  FaCircleCheck,
-  FaEyeSlash,
-  FaEye,
-} from "react-icons/fa6";
+import { Prisma } from "@prisma/client"
 import {
   FcAlphabeticalSortingAz,
   FcAlphabeticalSortingZa,
   FcNumericalSorting12,
   FcNumericalSorting21,
-} from "react-icons/fc";
+} from "react-icons/fc"
+import { FaCalendarTimes, FaCalendar, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import {
   createColumnHelper,
   flexRender,
@@ -27,11 +19,13 @@ import {
   Row,
   FilterFn,
   RowData,
-} from "@tanstack/react-table";
-import { Prisma } from "@prisma/client";
+} from "@tanstack/react-table"
+import Search from "@/app/components/search/search";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-interface LibraryGameTableProps {
-  libraryItems: Prisma.LibraryItemGetPayload<{ include: { boardGameGeekThing: true }}>[]
+interface AttendeeTableProps {
+  attendees: Prisma.AttendeeGetPayload<{ include: { person: { include: { relatedTo: true }} } }>[]
   total: number
 }
 
@@ -43,33 +37,16 @@ declare module "@tanstack/react-table" {
   }
 }
 
-export function LibraryGameTable({
-  libraryItems,
-  total,
-}: LibraryGameTableProps): JSX.Element {
+export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.Element {
   const [query, setQuery] = useState<string>("");
   const [sorting, setSorting] = useState<SortingState>([
-    { id: "boardGameGeekThing_itemName", desc: false }
+    { id: "person_lastName", desc: false }
   ]);
-  const router = useRouter()
-  type LibraryItemPrismaRowType = Prisma.LibraryItemGetPayload<{ include: { boardGameGeekThing: true } }>
+  const router = useRouter();
+  type AttendeePrismaRowType = Prisma.AttendeeGetPayload<{ include: { person: { include: { relatedTo: true }} } }>
 
-  const columnHelper = createColumnHelper<LibraryItemPrismaRowType>()
-
-  const customGlobalFilter: FilterFn<any> = (
-    row: Row<ILibraryItem>,
-    columnId: string,
-    query: string
-  ) => {
-    if (columnId === "boardGameGeekThing_itemName") {
-      const valueToSearch = row.original.alias || row.original.boardGameGeekThing.itemName;
-      return valueToSearch.toLowerCase().startsWith(query.toLowerCase())
-    }
-    const search = query.toLowerCase()
-    const value = String(row.getValue<string>(columnId))
-    return value?.toLowerCase().startsWith(search)
-  }
-
+  // Column definition
+  const columnHelper = createColumnHelper<AttendeePrismaRowType>();
   const columns = [
     columnHelper.accessor("barcode", {
       header: () => "Barcode",
@@ -79,57 +56,82 @@ export function LibraryGameTable({
         sortIcon: <></>,
       },
     }),
-    columnHelper.accessor("boardGameGeekThing.itemName", {
-      header: () => "Game Name",
-      cell: (item) => item.row.original.alias ?? item.getValue(),
+    columnHelper.accessor("person.firstName", {
+      header: () => "Preferred",
+      cell: ({ cell }) => cell.row.original.person.preferredName ?? cell.row.original.person.firstName,
+      meta: {
+        sortAscIcon: <FcNumericalSorting12 className="pl-3 h-9 w-9" />,
+        sortDescIcon: <FcNumericalSorting21 className="pl-3 h-9 w-9" />,
+        sortIcon: <></>,
+      },
+    }),
+    columnHelper.accessor("person.lastName", {
+      header: () => "Last Name",
       meta: {
         sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
       },
+      enableGlobalFilter: true,
     }),
-    columnHelper.accessor("owner", {
-      header: () => "Owner",
-      meta: {
-        sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
-        sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
-        sortIcon: <></>,
-      },
-    }),
-    columnHelper.accessor("isCheckedOut", {
-      header: () => "Checked In?",
+    columnHelper.accessor("hasCancelled", {
+      header: () => "Cancelled?",
       cell: ({ cell }) => {
         return (
           <span className="flex justify-center">
-            {/* Is Checked out is the property */}
             {cell.getValue() ? (
-              <FaPersonWalkingArrowRight className="text-red-400 h-4 w-4" />
+              <FaCalendarTimes className="text-red-400 h-4 w-4" />
             ) : (
-              <FaCircleCheck className="text-green-400 h-4 w-4" />
+              <FaCalendar className="text-green-400 h-4 w-4" />
             )}
           </span>
-        );
+        )
       },
     }),
-    columnHelper.accessor("isHidden", {
-      header: () => "Hidden?",
+    columnHelper.accessor("checkedInUtc", {
+      header: () => "Checked In",
       cell: ({ cell }) => {
         return (
           <span className="flex justify-center">
-            {/* Is Checked out is the property */}
-            {cell.getValue() ? (
-              <FaEyeSlash className="text-red-400 h-5 w-5" />
+            { cell.getValue() ? (
+              <FaCheckCircle className="text-green-400 h-4 w-4" />
             ) : (
-              <FaEye className="text-green-400 h-5 w-5" />
+              <FaTimesCircle className="text-red-400 h-4 w-4" />
             )}
           </span>
-        );
-      },
+        )
+      }
     }),
+    columnHelper.accessor("passPurchased", {
+      header: () => "Pass Purchased"
+    }),
+    columnHelper.accessor("person.relatedPersonId", {
+      header: () => "With",
+      cell: ({ cell }) => {
+        return (
+          <span>{ cell.row.original.person.relatedTo?.preferredName ?? cell.row.original.person.relatedTo?.firstName } { cell.row.original.person.relatedTo?.lastName }</span>
+        )
+      }
+    })
   ]
 
+  const customGlobalFilter: FilterFn<any> = (
+    row: Row<AttendeePrismaRowType>,
+    columnId: string,
+    query: string
+  ) => {
+    console.log(columnId)
+    if (columnId === "person_preferredName") {
+      const valueToSearch = row.original.person.preferredName || row.original.person.firstName
+      return valueToSearch.toLowerCase().startsWith(query.toLowerCase())
+    }
+    const search = query.toLowerCase()
+    const value = String(row.getValue<string>(columnId))
+    return value?.toLowerCase().includes(search)
+  }
+
   const reactTable = useReactTable({
-    data: libraryItems,
+    data: attendees,
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
     state: {
@@ -143,18 +145,18 @@ export function LibraryGameTable({
     getSortedRowModel: getSortedRowModel(),
   })
 
-  return (
+  return(
     <>
       <div className="w-2/3 pb-6">
         <Search
           onChange={(e) => {
             setQuery(e.target.value);
           }}
-          placeholder={`Search ${total} games...`}
+          placeholder={`Search ${total} attendees...`}
           value={query}
         />
 
-        {libraryItems !== undefined && libraryItems.length > 0 && (
+        {attendees !== undefined && attendees.length > 0 && (
           <table className="min-w-full divide-y-0 divide-gray-300 bg-white rounded-t-xl rounded-b-xl">
             <thead className="border-b">
               {reactTable.getHeaderGroups().map((headerGroup) => (
@@ -196,9 +198,9 @@ export function LibraryGameTable({
                   <tr
                     key={row.id}
                     className="border-b hover:bg-blue-100 hover:cursor-pointer text-center"
-                    onClick={() => {
-                      router.push(`/library/edit/${row.original.id}`);
-                    }}
+                    // onClick={() => {
+                    //   router.push(`/library/edit/${row.original.id}`);
+                    // }}
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (

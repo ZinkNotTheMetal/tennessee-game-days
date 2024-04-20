@@ -1,26 +1,25 @@
-"use client";
+"use client"
 
-import { ApiListResponse, IConvention } from "@repo/shared";
-import { IVenue } from "@repo/shared/src/interfaces/venue";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import { DateTime } from "ts-luxon";
+import { Prisma } from "@prisma/client"
+import { ApiListResponse, IConvention } from "@repo/shared"
+import { IVenue } from "@repo/shared/src/interfaces/venue"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { SubmitHandler, useForm } from "react-hook-form"
+import { toast } from "react-toastify"
+import { DateTime } from "ts-luxon"
 
 interface ConventionFormProps {
-  id?: number;
-  convention?: IConvention;
+  payload?: Prisma.ConventionGetPayload<{ include: { venue: true }}>
 }
 
-export function ConventionForm({
-  id,
-  convention,
-}: ConventionFormProps): JSX.Element {
-  const [onSubmitting, setOnSubmitting] = useState<boolean>(false);
+export function ConventionForm({ payload }: ConventionFormProps): JSX.Element {
+  type ConventionFormType = Prisma.ConventionGetPayload<{ include: { venue: true }}>
+
+  const [onSubmitting, setOnSubmitting] = useState<boolean>(false)
   const [isNewVenue, setIsNewVenue] = useState<boolean>(false)
   const [venueList, setVenueList] = useState<IVenue[]>([])
-  const router = useRouter();
+  const router = useRouter()
 
   useEffect(() => {
     fetch(`/api/venue/list`,
@@ -41,25 +40,16 @@ export function ConventionForm({
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<IConvention>({
+  } = useForm<ConventionFormType>({
     values: {
-      id: id || 0,
-      name: convention?.name || '',
-      isCancelled: convention?.isCancelled || false,
-      venue: {
-        id: convention?.venue?.id ?? -1,
-        name: convention?.venue?.name ?? '',
-        streetNumber: convention?.venue?.streetNumber ?? '',
-        streetName: convention?.venue?.streetName ?? '',
-        city: convention?.venue?.city ?? '',
-        stateProvince: convention?.venue?.stateProvince ?? '',
-        postalCode: convention?.venue?.postalCode ?? ''
-      }
+      ...payload ?? {} as ConventionFormType
     },
   });
 
-  const onSubmit: SubmitHandler<IConvention> = async (data) => {
-    setOnSubmitting(true);
+  const onSubmit: SubmitHandler<ConventionFormType> = async (data) => {
+    setOnSubmitting(true)
+
+    console.log(data)
 
     // Updating
     if (data.id && data.id > 0) {
@@ -134,7 +124,7 @@ export function ConventionForm({
           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
           type="datetime-local"
           {...register("startDateTimeUtc", { setValueAs: (value) => DateTime.fromISO(value).toUTC().toISO()} )}
-          defaultValue={convention?.startDateTimeUtc && DateTime.fromISO(convention?.startDateTimeUtc).toFormat('yyyy-MM-dd HH:mm')}
+          defaultValue={(payload?.startDateTimeUtc && DateTime.fromJSDate(payload?.startDateTimeUtc).toFormat('yyyy-MM-dd HH:mm')) ?? undefined }
         />
       </div>
 
@@ -144,7 +134,7 @@ export function ConventionForm({
           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
           type="datetime-local"
           {...register("endDateTimeUtc", { setValueAs: (value) => DateTime.fromISO(value).toUTC().toISO()} )}
-          defaultValue={convention?.endDateTimeUtc && DateTime.fromISO(convention?.endDateTimeUtc).toFormat('yyyy-MM-dd HH:mm')}
+          defaultValue={(payload?.endDateTimeUtc && DateTime.fromJSDate(payload?.endDateTimeUtc).toFormat('yyyy-MM-dd HH:mm')) ?? undefined }
         />
       </div>
 
@@ -154,11 +144,11 @@ export function ConventionForm({
           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
           type="datetime-local"
           {...register("extraHoursStartDateTimeUtc", { setValueAs: (value) => DateTime.fromISO(value).toUTC().toISO()} )}
-          defaultValue={convention?.extraHoursStartDateTimeUtc && DateTime.fromISO(convention?.extraHoursStartDateTimeUtc).toFormat('yyyy-MM-dd HH:mm')}
+          defaultValue={(payload?.extraHoursStartDateTimeUtc && DateTime.fromJSDate(payload?.extraHoursStartDateTimeUtc).toFormat('yyyy-MM-dd HH:mm')) ?? undefined }
         />
       </div>
 
-      {Boolean(id) && (
+      {Boolean(payload?.id) && (
         <div className="mb-4">
           <input
             type="checkbox" 
@@ -270,7 +260,7 @@ export function ConventionForm({
               className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               {...register("venue.id")}
             >
-              <option value="-1" disabled className="text-gray-500">Select a venue</option>
+              <option value="-99" selected disabled className="text-gray-500">Select a venue</option>
                 {venueList.map(v => (
                   <option key={v.id} value={v.id}>{v.name}</option>
                 ))}
@@ -290,7 +280,7 @@ export function ConventionForm({
           disabled={onSubmitting}
           type='submit'
         >
-          {Boolean(id) ? 'Save' : 'Add'}
+          {Boolean(payload?.id) ? 'Save' : 'Add'}
         </button>
       </div>
     </form>

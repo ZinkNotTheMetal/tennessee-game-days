@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "type": "commonjs",
   "dependencies": {
-    "@prisma/client": "5.11.0",
+    "@prisma/client": "5.12.1",
     "@repo/board-game-geek-shared": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "boardgamegeekclient": "1.9.1",
@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "dotenv-cli": "^7.4.1",
-    "prisma": "5.11.0",
+    "prisma": "5.12.1",
     "prisma-dbml-generator": "^0.12.0"
   },
   "scripts": {

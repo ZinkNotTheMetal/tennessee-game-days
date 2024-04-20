@@ -1,4 +1,5 @@
 import { IBoardGameGeekEntity } from "../../../board-game-geek-shared";
+import { IAttendee } from "./attendee";
 
 interface ILibraryItem {
   /** @format int32 */
@@ -27,19 +28,4 @@ interface ICheckoutEvent {
   attendee: IAttendee
 }
 
-interface IAttendee {
-  id: number
-  personId: number
-  barcode: string
-  person: IPerson
-}
-
-interface IPerson {
-  firstName: string
-  preferredName: string
-  lastName: string
-  email: string
-  phoneNumber: string
-}
-
-export type { ILibraryItem, ICheckoutEvent, IAttendee, IPerson };
+export type { ILibraryItem, ICheckoutEvent };

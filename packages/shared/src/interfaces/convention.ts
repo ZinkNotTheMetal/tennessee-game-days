@@ -12,4 +12,4 @@ interface IConvention {
   venue?: IVenue
 }
 
-export type { IConvention };
+export type { IConvention }
