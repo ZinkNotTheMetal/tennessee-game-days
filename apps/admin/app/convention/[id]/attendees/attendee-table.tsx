@@ -20,12 +20,15 @@ import {
   FilterFn,
   RowData,
 } from "@tanstack/react-table"
-import Search from "@/app/components/search/search";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Search from "@/app/components/search/search"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+
+
+type AttendeePrismaRowType = Prisma.AttendeeGetPayload<{ include: { person: { include: { relatedTo: true, _count: { select: { attendee: true }} }} } }>
 
 interface AttendeeTableProps {
-  attendees: Prisma.AttendeeGetPayload<{ include: { person: { include: { relatedTo: true }} } }>[]
+  attendees: AttendeePrismaRowType[]
   total: number
 }
 
@@ -43,7 +46,7 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
     { id: "person_lastName", desc: false }
   ]);
   const router = useRouter();
-  type AttendeePrismaRowType = Prisma.AttendeeGetPayload<{ include: { person: { include: { relatedTo: true }} } }>
+  
 
   // Column definition
   const columnHelper = createColumnHelper<AttendeePrismaRowType>();
@@ -60,8 +63,8 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
       header: () => "Preferred",
       cell: ({ cell }) => cell.row.original.person.preferredName ?? cell.row.original.person.firstName,
       meta: {
-        sortAscIcon: <FcNumericalSorting12 className="pl-3 h-9 w-9" />,
-        sortDescIcon: <FcNumericalSorting21 className="pl-3 h-9 w-9" />,
+        sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
+        sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
       },
     }),
@@ -102,8 +105,26 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
         )
       }
     }),
+    columnHelper.accessor("isStayingOnSite", {
+      header: () => "Staying on Site",
+      cell: ({ cell }) => {
+        return (
+          <span className="flex justify-center">
+            { cell.getValue() ? (
+              <FaCheckCircle className="text-green-400 h-4 w-4" />
+            ) : (
+              <FaTimesCircle className="text-red-400 h-4 w-4" />
+            )}
+          </span>
+        )
+      }
+    }),
     columnHelper.accessor("passPurchased", {
       header: () => "Pass Purchased"
+    }),
+    columnHelper.accessor("person._count.attendee", {
+      header: () => "Conferences Attended",
+      cell: ({ cell }) => <span>{ cell.row.original.person._count.attendee }</span>
     }),
     columnHelper.accessor("person.relatedPersonId", {
       header: () => "With",
@@ -147,7 +168,7 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
 
   return(
     <>
-      <div className="w-2/3 pb-6">
+      <div className="w-4/5 pb-6">
         <Search
           onChange={(e) => {
             setQuery(e.target.value);

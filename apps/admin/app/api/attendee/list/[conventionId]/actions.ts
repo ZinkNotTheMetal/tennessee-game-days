@@ -12,7 +12,8 @@ export async function GetAllAttendeesForConvention(conventionId: number) {
     include: {
       person: {
         include: {
-          relatedTo: true
+          relatedTo: true,
+          _count: { select: { attendee: true }}
         }
       },
     }
