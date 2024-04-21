@@ -140,7 +140,7 @@ async function GenerateBarcodeAndAddAttendee(
     const generatedBarcode = `${DateTime.now().toFormat('yy')}${conventionId}-${personId}`
 
     // 4. Add a new barcode in a transaction
-    await prisma.$transaction(async (transaction) => {
+    prisma.$transaction(async (transaction) => {
       const newBarcode = await transaction.centralizedBarcode.create({
         data: {
           entityId: 0,

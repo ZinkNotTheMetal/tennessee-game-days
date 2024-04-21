@@ -1,7 +1,6 @@
-import Head from "next/head";
-import { LibraryForm } from "../../library-form";
-import type { ILibraryItem } from "@repo/shared";
-import { LibraryItemEditButtons } from "./library-edit-buttons";
+import { LibraryForm } from "../../library-form"
+import type { ILibraryItem } from "@repo/shared"
+import { LibraryItemEditButtons } from "./library-edit-buttons"
 
 interface Props {
   params: { id: string }
