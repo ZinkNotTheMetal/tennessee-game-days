@@ -15,8 +15,8 @@ importers:
         specifier: workspace:*
         version: link:packages/typescript-config
       prettier:
-        specifier: ^3.2.5
-        version: 3.2.5
+        specifier: ^3.3.0
+        version: 3.3.0
       turbo:
         specifier: latest
         version: 1.13.3
@@ -174,7 +174,7 @@ importers:
         version: 7.2.0(eslint@8.57.0)(typescript@5.4.5)
       '@vercel/style-guide':
         specifier: ^5.2.0
-        version: 5.2.0(@next/eslint-plugin-next@14.2.3)(eslint@8.57.0)(prettier@3.2.5)(typescript@5.4.5)
+        version: 5.2.0(@next/eslint-plugin-next@14.2.3)(eslint@8.57.0)(prettier@3.3.0)(typescript@5.4.5)
       eslint-config-prettier:
         specifier: ^9.1.0
         version: 9.1.0(eslint@8.57.0)
@@ -2837,8 +2837,8 @@ packages:
       prettier:
         optional: true
 
-  prettier@3.2.5:
-    resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
+  prettier@3.3.0:
+    resolution: {integrity: sha512-J9odKxERhCQ10OC2yb93583f6UnYutOeiV5i0zEDS7UGTdUt0u+y8erxl3lBKvwo/JHyyoEdXjwp4dke9oyZ/g==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -4476,7 +4476,7 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vercel/style-guide@5.2.0(@next/eslint-plugin-next@14.2.3)(eslint@8.57.0)(prettier@3.2.5)(typescript@5.4.5)':
+  '@vercel/style-guide@5.2.0(@next/eslint-plugin-next@14.2.3)(eslint@8.57.0)(prettier@3.3.0)(typescript@5.4.5)':
     dependencies:
       '@babel/core': 7.23.3
       '@babel/eslint-parser': 7.23.3(@babel/core@7.23.3)(eslint@8.57.0)
@@ -4496,11 +4496,11 @@ snapshots:
       eslint-plugin-testing-library: 6.1.2(eslint@8.57.0)(typescript@5.4.5)
       eslint-plugin-tsdoc: 0.2.17
       eslint-plugin-unicorn: 48.0.1(eslint@8.57.0)
-      prettier-plugin-packagejson: 2.4.6(prettier@3.2.5)
+      prettier-plugin-packagejson: 2.4.6(prettier@3.3.0)
     optionalDependencies:
       '@next/eslint-plugin-next': 14.2.3
       eslint: 8.57.0
-      prettier: 3.2.5
+      prettier: 3.3.0
       typescript: 5.4.5
     transitivePeerDependencies:
       - eslint-import-resolver-node
@@ -6801,14 +6801,14 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-packagejson@2.4.6(prettier@3.2.5):
+  prettier-plugin-packagejson@2.4.6(prettier@3.3.0):
     dependencies:
       sort-package-json: 2.6.0
       synckit: 0.8.5
     optionalDependencies:
-      prettier: 3.2.5
+      prettier: 3.3.0
 
-  prettier@3.2.5: {}
+  prettier@3.3.0: {}
 
   prisma-dbml-generator@0.12.0:
     dependencies:
