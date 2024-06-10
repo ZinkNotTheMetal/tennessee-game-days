@@ -67,8 +67,8 @@ importers:
         specifier: 3.4.4
         version: 3.4.4(ts-node@10.9.2(@types/node@20.12.12)(typescript@5.4.5))
       ts-luxon:
-        specifier: ^4.5.2
-        version: 4.5.2
+        specifier: ^4.6.2
+        version: 4.6.2
       use-debounce:
         specifier: ^10.0.1
         version: 10.0.1(react@18.3.1)
@@ -235,8 +235,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0
       ts-luxon:
-        specifier: ^4.5.2
-        version: 4.5.2
+        specifier: ^4.6.2
+        version: 4.6.2
       ts-node:
         specifier: 10.9.2
         version: 10.9.2(@types/node@20.12.12)(typescript@5.4.5)
@@ -3320,8 +3320,8 @@ packages:
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
-  ts-luxon@4.5.2:
-    resolution: {integrity: sha512-PqVfo1yiwAa1nYeyK/k4rOgHPGIqJQpGbOMA/+nLcpS2aXEO2mTSvBKUjPyo1PWCTD2/K2iH4OuRo3md344IoA==}
+  ts-luxon@4.6.2:
+    resolution: {integrity: sha512-I35AoZtDQ0O49rJh7tNyECISB6nhtdOzeFZSZzIxWSSUwnmgPOJK2wZr3fK0WVmKcmWPvDGSa+GKwWXFs4prjA==}
     engines: {node: '>=13'}
 
   ts-node@10.9.2:
@@ -7304,7 +7304,7 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
-  ts-luxon@4.5.2: {}
+  ts-luxon@4.6.2: {}
 
   ts-node@10.9.2(@types/node@20.12.12)(typescript@5.4.5):
     dependencies:
