@@ -6,7 +6,7 @@
     "NEXT_PUBLIC_VERCEL_PROTOCOL",
     "NODE_ENV"
   ],
-  "pipeline": {
+  "tasks": {
     "db:generate": {
       "cache": false
     },
