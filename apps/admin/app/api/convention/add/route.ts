@@ -3,6 +3,33 @@ import prisma from "@/app/lib/prisma"
 import type { IConventionRequest } from "@/app/api/requests/convention-request";
 import { DateTime } from 'ts-luxon'
 
+/**
+ * @swagger
+ * /api/convention/add:
+ *   post:
+ *     summary: Adds a new convention
+ *     requestBody:
+ *       description: Convention data to be added
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ConventionRequest'
+ *     description: Adds a new upcoming convention
+ *     responses:
+ *       201:
+ *         description: Successfully added a new convention
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ConventionListResponse'
+ *       400:
+ *         description: Invalid Data / Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *                message: string
+ */
 export async function POST(request: NextRequest) {
   const conventionToAdd: IConventionRequest = await request.json()
   const { venue, ...convention } = conventionToAdd

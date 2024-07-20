@@ -2,6 +2,37 @@ import prisma from "@/app/lib/prisma"
 import { NextRequest, NextResponse } from "next/server"
 import { DateTime } from "ts-luxon"
 
+/**
+ * @swagger
+ * /api/library/check-in/{libraryId}:
+ *   put:
+ *     summary: Check in a library item
+ *     description: Check in a game back into the library based on unique identifier
+ *     parameters:
+ *       - in: path
+ *         name: libraryId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The library item unique identifier
+ *     responses:
+ *       200:
+ *         description: Successfully checked in the library item
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                   type: string
+ *                   description: Success message after successful check-in of the item back into the library
+ *       404:
+ *         description: Invalid Data / Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *                message: string
+ */
 export async function PUT(request: NextRequest, { params }: { params: { libraryId: string } }) {
   const checkedInTime = DateTime.utc()
 
@@ -40,9 +71,7 @@ export async function PUT(request: NextRequest, { params }: { params: { libraryI
         }
       }
     })
-
   })
-
 
   return NextResponse.json({
     message: 'Successfully checked in!'

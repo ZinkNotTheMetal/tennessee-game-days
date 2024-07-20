@@ -1,12 +1,65 @@
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { DateTime } from "ts-luxon";
+import { CheckoutItemListResponse } from "./response";
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *    CheckOutRequest:
+ *      type: object
+ *      properties:
+ *        libraryId:
+ *          type: string
+ *          description: Unique identifier of the library item
+ *        attendeeId:
+ *          type: string
+ *          description: Unique identifier of the attendee (not the barcode)
+ */
 interface CheckOutRequest {
   libraryId: string
   attendeeId: string
 }
 
+/**
+ * @swagger
+ * /api/library/check-out/{libraryId}:
+ *   put:
+ *     summary: Check out a library item
+ *     description: Checks out a library item from the library to a user
+ *     parameters:
+ *       - in: path
+ *         name: libraryId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The library item unique identifier
+ *     requestBody:
+ *       description: Library Checkout Request
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CheckOutRequest'
+ *     responses:
+ *       200:
+ *         description: Successfully checked out the library game the library item
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                   type: string
+ *                   description: Success message after successful check-in of the item back into the library
+ *       404:
+ *         description: Invalid Data / Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *                message: string
+ */
 export async function POST(request: NextRequest) {
   const data: CheckOutRequest = await request.json()
   if (!data.attendeeId || !data.libraryId) return NextResponse.json({ message: "Request not properly formed" }, { status: 400 })
@@ -47,8 +100,6 @@ export async function POST(request: NextRequest) {
     }
   })
 
-  console.log("convention", currentConvention)
-
   await prisma.$transaction(async t => {
 
     await t.libraryItem.update({
@@ -76,7 +127,26 @@ export async function POST(request: NextRequest) {
 
 }
 
-
+/**
+ * @swagger
+ * /api/library/check-out:
+ *   get:
+ *     summary: Gets all games currently checked out
+ *     description: Gets a list of all library items that are currently checked out from the library
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CheckoutItemListResponse'
+ *       404:
+ *         description: Invalid Data / Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *                message: string
+ */
 export async function GET() {
   const count = await prisma.libraryItem.count({
     where: { isCheckedOut: true }
@@ -105,7 +175,7 @@ export async function GET() {
     },
   })
 
-  return NextResponse.json({
+  return NextResponse.json<CheckoutItemListResponse>({
     total: count,
     list: checkedOutGames,
   });
