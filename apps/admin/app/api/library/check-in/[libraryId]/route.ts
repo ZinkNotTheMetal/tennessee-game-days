@@ -7,6 +7,9 @@ import { DateTime } from "ts-luxon"
  * /api/library/check-in/{libraryId}:
  *   put:
  *     summary: Check in a library item
+ *     tags:
+ *       - Barcode
+ *       - Library
  *     description: Check in a game back into the library based on unique identifier
  *     parameters:
  *       - in: path

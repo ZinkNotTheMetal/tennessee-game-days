@@ -12,6 +12,8 @@ export const fetchCache = "force-no-store"
  * @swagger
  * /api/convention/list:
  *   get:
+ *     tags:
+ *       - Convention
  *     summary: Returns list of all conventions in descending order (latest first)
  *     description: A convention is an instance of TGD
  *     responses:

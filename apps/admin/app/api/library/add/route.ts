@@ -9,6 +9,8 @@ export const dynamic = "force-dynamic";
  * @swagger
  * /api/library/add:
  *   post:
+ *     tags:
+ *       - Library
  *     summary: Adds a new library item
  *     description: This api adds a new library item under the library items (typically board games)
  *     requestBody:

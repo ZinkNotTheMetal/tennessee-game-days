@@ -12,6 +12,8 @@ export const fetchCache = "force-no-store";
  * @swagger
  * /api/convention/upcoming:
  *   get:
+ *     tags:
+ *       - Convention
  *     summary: Returns next convention (upcoming)
  *     description: Returns the next convention (useful for getting the next ID)
  *     responses:

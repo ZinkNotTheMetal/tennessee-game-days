@@ -9,6 +9,8 @@ export const dynamic = "force-dynamic"
  * @swagger
  * /api/library/{id}:
  *   get:
+ *     tags:
+ *       - Library
  *     summary: Gets data related to a library item
  *     description: Gets all data listed below for a particular library item based on the unique identifier
  *     parameters:
@@ -46,6 +48,8 @@ export async function GET(
  * @swagger
  * /api/library/{id}:
  *   delete:
+ *     tags:
+ *       - Library
  *     summary: Deletes a library item
  *     description: Hard deletes a library item based on the unique identifier
  *     parameters:

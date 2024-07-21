@@ -9,6 +9,8 @@ export const dynamic = "force-dynamic"
  * @swagger
  * /api/convention/{id}:
  *   get:
+ *     tags:
+ *       - Convention
  *     summary: Get a convention by the unique identifier
  *     description: Gets basic convention information based on the unique identifier
  *     parameters:
@@ -51,6 +53,8 @@ export async function GET(
  * /api/convention/{id}:
  *   delete:
  *     summary: Deletes a convention
+ *     tags:
+ *       - Convention
  *     description: Hard deletes a convention based on the unique identifier
  *     parameters:
  *       - in: path

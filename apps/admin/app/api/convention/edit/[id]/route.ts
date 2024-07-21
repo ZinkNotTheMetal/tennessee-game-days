@@ -7,6 +7,8 @@ import { DateTime } from 'ts-luxon'
  * @swagger
  * /api/convention/edit:
  *   put:
+ *     tags:
+ *       - Convention
  *     summary: Edits an existing convention
  *     parameters:
  *       - in: path

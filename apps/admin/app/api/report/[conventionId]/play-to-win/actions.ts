@@ -33,8 +33,8 @@ export async function GetPlayToWinReportByConvention(conventionId: number) {
   const result = playsAndPlayersPerGame.map((game) => ({
     gameName: game.gameName,
     publisher: game.publisherName,
-    plays: game.playToWinPlays.length,
-    totalPlayers: game.playToWinPlays.reduce(
+    totalPlays: game.playToWinPlays.length,
+    totalPlayerCount: game.playToWinPlays.reduce(
       (total, play) => total + play.playToWinPlayAttendees.length,
       0
     ),

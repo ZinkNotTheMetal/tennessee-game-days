@@ -6,6 +6,8 @@ import { AttendeeBarcodeResponse, BarcodeResponse, LibraryBarcodeResponse } from
  * @swagger
  * /api/barcode/scan/{barcode}:
  *   get:
+ *     tags:
+ *       - Barcode
  *     summary: Returns what barcode was scanned
  *     description: Determines what barcode was scanned (Attendee, PTW or Library Game) and successfully returns that result
  *     parameters:

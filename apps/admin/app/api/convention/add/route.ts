@@ -7,6 +7,8 @@ import { DateTime } from 'ts-luxon'
  * @swagger
  * /api/convention/add:
  *   post:
+ *     tags:
+ *       - Convention
  *     summary: Adds a new convention
  *     requestBody:
  *       description: Convention data to be added

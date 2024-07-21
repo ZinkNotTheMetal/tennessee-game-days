@@ -27,6 +27,9 @@ interface CheckOutRequest {
  * /api/library/check-out/{libraryId}:
  *   put:
  *     summary: Check out a library item
+ *     tags:
+ *       - Barcode
+ *       - Library
  *     description: Checks out a library item from the library to a user
  *     parameters:
  *       - in: path
@@ -131,6 +134,8 @@ export async function POST(request: NextRequest) {
  * @swagger
  * /api/library/check-out:
  *   get:
+ *     tags:
+ *       - Library
  *     summary: Gets all games currently checked out
  *     description: Gets a list of all library items that are currently checked out from the library
  *     responses:

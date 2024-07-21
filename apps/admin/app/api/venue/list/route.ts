@@ -11,6 +11,8 @@ export const fetchCache = "force-no-store";
  * @swagger
  * /api/venue/list:
  *   get:
+ *     tags:
+ *       - Venue
  *     summary: Returns all venues used for conventions
  *     description: A venue is where a TGD conference will be held
  *     responses:
