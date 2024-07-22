@@ -30,7 +30,7 @@ export const fetchCache = "force-no-store"
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/AddAttendeeResponse'
+ *               $ref: '#/components/schemas/AttendeeCountResponse'
  */
 export async function GET(request: NextRequest, { params }: { params: { conventionId: string }}) {
 

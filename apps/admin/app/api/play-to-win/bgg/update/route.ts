@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma";
 import { MapToBoardGameEntity, SearchBoardGameGeek } from "@repo/board-game-geek-shared";
 import { DateTime } from "ts-luxon";
+import { Sleep, UpsertBoardGameGeekMechanics } from "./actions";
 
 
 // WZ: Cannot run this on Vercel due to the timeout limitations
@@ -9,6 +10,46 @@ import { DateTime } from "ts-luxon";
 // Uncomment below locally if needed
 //export const maxDuration = 300
 
+/**
+ * @swagger
+ * /api/play-to-win/bgg/update:
+ *   post:
+ *     tags:
+ *       - Play to Win Games
+ *     summary: Update Play to Win items with BoardGameGeek information
+ *     description: Fetches the next upcoming convention and updates Play to Win items with information from BoardGameGeek.
+ *     responses:
+ *       200:
+ *         description: Successfully updated play to win items
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message indicating the play to win items were updated
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating why the request failed
+ *       516:
+ *         description: No upcoming convention found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating no upcoming convention was found
+ */
 export async function POST(request: NextRequest) {
 
   try {
@@ -76,7 +117,7 @@ export async function POST(request: NextRequest) {
         continue
       }
 
-      await sleep(1900)
+      await Sleep(1900)
     }
 
 
@@ -90,42 +131,4 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     message: 'Successfully updated play to win items'
   }, { status: 200 })
-}
-
-async function UpsertBoardGameGeekMechanics(bggId: number, mechanics: {id: number, name: string}[]) {
-  console.log("BGG ID", bggId)
-  console.log("Mechanics", mechanics)
-  
-  for (const gm of mechanics) {
-    await prisma.mechanic.upsert({
-      where: { id: gm.id },
-      update: { name: gm.name },
-      create: { 
-        id: gm.id,
-        name: gm.name
-      }
-    })
-
-    await prisma.gameMechanic.upsert({
-      where: {
-        boardGameGeekId_mechanicId: {
-          boardGameGeekId: bggId,
-          mechanicId: gm.id,
-        },
-      },
-      create: {
-        mechanicId: gm.id,
-        boardGameGeekId: bggId,
-      },
-      update: {}
-    });
-
-  }
-
-}
-
-function sleep (ms: number) {
-  return new Promise(resolve => {
-    setTimeout(resolve, ms)
-  })
 }

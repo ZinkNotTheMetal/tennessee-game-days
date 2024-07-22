@@ -1,5 +1,7 @@
 import { Prisma } from "@prisma/client";
 
+
+//TODO: WZ - add attendee object
 /**
  * @swagger
  * components:
@@ -9,47 +11,55 @@ import { Prisma } from "@prisma/client";
  *       properties:
  *         id:
  *           type: number
- *           description: Unique identifier for the attendee
- *         personId:
- *           type: number
- *           description: Unique identifier for the person
+ *           description: The unique identifier for Attendee
  *         barcode:
  *           type: string
- *           description: The barcode assigned to the attendee
- *         person:
- *           $ref: '#/components/schemas/Person'
+ *           description: The barcode for the attendee
  *         isCheckedIn:
  *           type: boolean
- *           description: Flag that says if the user has checked in to the convention
+ *           description: Whether this attendee has checked in or not
  *         hasCancelled:
  *           type: boolean
- *           description: Flag to state if the user has cancelled and will not be attending
+ *           description: Whether this attendee has cancelled
  *         isStayingOnSite:
  *           type: boolean
- *           description: Flag to state whether the user planned on staying on site at the convention
- *         conventionId:
- *           type: number
- *           description: Convention that the attendee is attending
- *         convention:
- *           $ref: '#/components/schemas/Convention'
+ *           description: Flag that states whether the attendee is staying on site
  *         checkedInUtc:
  *           type: string
  *           format: date-time
- *           description: Date Time that they checked in (in UTC)
- *        dateRegistered:
- *           type: string
- *           format: date-time
- *           description: Date Time that the user registered to attend
- *        isVolunteer:
+ *           description: Date & Time when the person checked in
+ *         dateRegistered:
+ *            type: string
+ *            format: date-time
+ *            description: When a person registered for the convention
+ *         isVolunteer:
  *           type: boolean
- *           description: Flag to mark if this member was a volunteer for this convention
- *        idTgdOrganizer:
+ *           description: Flag that states whether this attendee is a volunteer for this event
+ *         isTgdOrganizer:
  *           type: boolean
- *           description: Flag to mark if this member was an organizer for this convention
- *        passPurchased:
+ *           description: Flag that states whether this attendee is a TGD organizer for this event
+ *         passPurchased:
  *           type: string
- *           description: The pass purchased by the attendee
- *           example: 'Free/Individual/Couple/Family'
+ *           description: Which pass was purchased
+ *           example: Free, Individual, Couple, Family
+ *         person:
+ *           $ref: '#/components/schemas/Person'
+ *     AttendeeCountResponse:
+ *       type: object
+ *       properties:
+ *         total:
+ *           type: number
+ *           description: Total amount of players (cancelled + registered)
+ *         cancelled:
+ *           type: number
+ *           description: The total amount of players who have cancelled for this convention
+ *         checkedIn:
+ *           type: number
+ *           description: The total amount of players who have checked in to this conference
+ *         list:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Attendee'
  */
 export interface AttendeeCountResponse {
   total: number
