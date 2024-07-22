@@ -1,16 +1,60 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma";
-import { DateTime } from "ts-luxon";
+import { GenerateBarcodeAndAddAttendee } from './actions'
 import { IAddAttendeeRequest } from "@/app/api/requests/add-attendee-request";
+import { AddAttendeeResponse } from "./response";
 
 
 // https://stackoverflow.com/questions/73839916/how-to-run-functions-that-take-more-than-10s-on-vercel
 // https://vercel.com/docs/functions/runtimes#max-execution-time
 export const maxDuration = 10; // 10 seconds
 
+/**
+ * @swagger
+ * /api/attendee/add/{conventionId}:
+ *   post:
+ *     tags:
+ *       - Convention
+ *       - Attendee
+ *     summary: Adds a person to a convention
+ *     description: Adds people to the convention and turns them into an attendee, use this after they have successfully purchased a ticket
+ *     parameters:
+ *       - in: path
+ *         name: conventionId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The convention ID
+ *     requestBody:
+ *       description: People information data to be added
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AddAttendeeRequest'
+ *     responses:
+ *       201:
+ *         description: Attendees successfully added
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AddAttendeeResponse'
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *                message: string
+ *       515:
+ *         description: Failed to add attendee as the barcode was already in the system
+ *         content:
+ *           application/json:
+ *             schema:
+ *               message: string
+ */
 export async function POST(request: NextRequest, { params }: { params: { conventionId: string }}) {
   const json: IAddAttendeeRequest = await request.json();
-  const { person, additionalAttendees, isStayingOnSite, passPurchased } = json
+  const { person, additionalPeople, isStayingOnSite, passPurchased } = json
   const { emergencyContact } = person
   let personId: number = -1
   let barcodesCreated: { personId: number, barcode: string | null }[] = []
@@ -87,9 +131,9 @@ export async function POST(request: NextRequest, { params }: { params: { convent
     }, { status: 515 })
   }
 
-  if (additionalAttendees !== undefined) {
+  if (additionalPeople !== undefined) {
 
-    for (const additionalAttendee of additionalAttendees) {
+    for (const additionalAttendee of additionalPeople) {
       const additionalPersonToAdd = await prisma.person.upsert({
         where: { 
           firstName_lastName_relatedPersonId: {
@@ -121,60 +165,8 @@ export async function POST(request: NextRequest, { params }: { params: { convent
 
   }
 
-  return NextResponse.json({
+  return NextResponse.json<AddAttendeeResponse>({
     message: "Successfully added attendee to conference",
-    barcodesCreated
+    barcodes: barcodesCreated
   },{ status: 201 })
-}
-
-
-async function GenerateBarcodeAndAddAttendee(
-  conventionId: number, 
-  personId: number, 
-  passPurchased: 'Free' | 'Individual' | 'Couple' | 'Family',
-  stayingOnSite: boolean
-): Promise<{ success: boolean, barcode: string | null }> {
-  let success = false
-  let barcode: string | null = null
-  try {
-    const generatedBarcode = `${DateTime.now().toFormat('yy')}${conventionId}-${personId}`
-
-    // 4. Add a new barcode in a transaction
-    prisma.$transaction(async (transaction) => {
-      const newBarcode = await transaction.centralizedBarcode.create({
-        data: {
-          entityId: 0,
-          entityType: 'Attendee',
-          barcode: generatedBarcode
-        }
-      })
-
-      const newAttendee = await transaction.attendee.create({
-        data: {
-          barcode: generatedBarcode,
-          isStayingOnSite: stayingOnSite,
-          passPurchased: passPurchased,
-          conventionId: conventionId,
-          personId: personId,
-          dateRegistered: DateTime.utc().toISO()
-        }
-      })
-
-      await transaction.centralizedBarcode.update({
-        where: { id: newBarcode.id },
-        data: { 
-          entityId: newAttendee.id
-        }
-      })
-
-    })
-    success = true
-    barcode = generatedBarcode
-
-  } catch (error) {
-    throw error
-  } finally {
-    return { success: success, barcode: barcode }
-  }
-
 }
