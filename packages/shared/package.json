@@ -14,7 +14,7 @@
     "@turbo/gen": "^1.13.2",
     "@types/node": "^20.12.12",
     "eslint": "^8.56.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "boardgamegeekclient": "^1.9.1"
