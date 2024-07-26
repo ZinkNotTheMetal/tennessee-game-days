@@ -93,9 +93,9 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
         </div>
         <h2 className="text-xl font-semibold mb-4">Play to Win Counts:</h2>
         <p>Total Play To Win Games: {playToWinReport?.length}</p>
-        <p>Games played at least once: {playToWinReport?.reduce((acc: any, current: { plays: any }) => acc + current.plays, 0)}</p>
-        <p>Games not played: {playToWinReport?.filter((g: { plays: number }) => g.plays === 0).length}</p>
-        <p>Total Play to Win players: {playToWinReport?.reduce((acc: any, current: { totalPlayers: any }) => acc + current.totalPlayers, 0)}</p>
+        <p>Games played at least once: {playToWinReport?.reduce((acc, current) => acc + (current.totalPlays > 0 ? 1 : 0), 0)}</p>
+        <p>Games not played: {playToWinReport?.filter((g) => g.totalPlays === 0).length}</p>
+        <p>Total Play to Win players: {playToWinReport?.reduce((acc, current) => acc + current.totalPlayerCount, 0)}</p>
       </div>
     </main>
   )
