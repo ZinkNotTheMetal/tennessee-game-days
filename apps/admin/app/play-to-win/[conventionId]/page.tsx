@@ -8,7 +8,7 @@ interface Props {
 }
 
 async function getAllConventions() : Promise<ApiListResponse<IConvention>> {
-  const conventionListApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/convention/list`, {
+  const conventionListApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/convention/list`, {
     cache: 'no-store',
   })
 
@@ -18,7 +18,7 @@ async function getAllConventions() : Promise<ApiListResponse<IConvention>> {
 }
 
 async function getPlayToWinItems(conventionId: number): Promise<ApiListResponse<IPlayToWinItem>> {
-  const playToWinItemsApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/play-to-win/list/${conventionId}`, {
+  const playToWinItemsApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/play-to-win/list/${conventionId}`, {
     cache: 'no-store',
   })
 

@@ -7,7 +7,7 @@ interface Props {
 
 async function getPlayToWinItem(id: number) {
   const playToWinItemById = await fetch(
-    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/play-to-win/${id}`,
+    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/play-to-win/${id}`,
     {
       method: "GET",
       cache: 'no-store',

@@ -3,6 +3,7 @@
 import { Prisma } from "@prisma/client"
 import { ApiListResponse, IConvention } from "@repo/shared"
 import { IVenue } from "@repo/shared/src/interfaces/venue"
+import { revalidateTag } from "next/cache"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
@@ -106,6 +107,8 @@ export function ConventionForm({ payload }: ConventionFormProps): JSX.Element {
           );
         });
     }
+
+    revalidateTag('convention')
     router.replace("/convention");
     router.refresh()
   };
