@@ -1,28 +1,69 @@
 import { NextRequest, NextResponse } from "next/server"
-import { parse as csvParse } from 'csv-parse'
-import { Readable } from 'stream'
 import prisma from "@/app/lib/prisma";
 import { PlayToWinCsvRow } from "../../requests/ptw-csv-request"
 import { DateTime } from "ts-luxon";
+import { ParseCsvFile, StandardizeGameName } from "./actions";
 
 
 // https://stackoverflow.com/questions/73839916/how-to-run-functions-that-take-more-than-10s-on-vercel
 // https://vercel.com/docs/functions/runtimes#max-execution-time
 export const maxDuration = 10; // 10 seconds
 
-function standardizeGameName(gameName: string): string {
-  let result = gameName.trim()
-  // Remove quotes from .csv name
-  result.replace('"', '')
-
-  // Articles can be at the end (i.e. Deadlines, The)
-  if (gameName.toLowerCase().endsWith(", the")) {
-    result = "The " + gameName.substring(0, gameName.length - 5)
-  }
-
-  return result
-}
-
+/**
+ * @swagger
+ * /api/play-to-win/add:
+ *   post:
+ *     tags:
+ *       - Play to Win Games
+ *     summary: Bulk adds play to win games for a convention
+ *     description: Adds play to win games based on a CSV file and attaches them to the convention based on the ID
+ *     requestBody:
+ *       description: Form data containing the CSV file and convention ID
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               csvFile:
+ *                 type: string
+ *                 format: binary
+ *                 description: The CSV file containing play to win game data
+ *               conventionId:
+ *                 type: number
+ *                 description: The unique identifier of the convention
+ *     responses:
+ *       201:
+ *         description: Successfully added play to win games
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message after successfully adding games to play-to-win
+ *       400:
+ *         description: Invalid Data / Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating why the request failed
+ *       500:
+ *         description: Error parsing CSV file
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message indicating an internal server error
+ */
 export async function POST(request: NextRequest) {
 
   const formData = await request.formData()
@@ -34,7 +75,7 @@ export async function POST(request: NextRequest) {
   } else {
 
     try {
-      const results = await parseCsvFile<PlayToWinCsvRow>(file)
+      const results = await ParseCsvFile<PlayToWinCsvRow>(file)
 
       for(const ptwItem of results) {
         // Add barcode
@@ -46,7 +87,7 @@ export async function POST(request: NextRequest) {
           },
         })
 
-        const gameName = standardizeGameName(ptwItem.gameName)
+        const gameName = StandardizeGameName(ptwItem.gameName)
 
         // Add to PTW Games
         const ptwAdded = await prisma.playToWinItem.create({
@@ -86,28 +127,4 @@ export async function POST(request: NextRequest) {
     { status: 201 }
   );
 
-}
-
-async function parseCsvFile<T>(file: File): Promise<T[]> {
-  const results: T[] = [];
-  const stream = new Readable();
-  stream.push(Buffer.from(await file.arrayBuffer()));
-  stream.push(null);
-
-  return new Promise((resolve, reject) => {
-    stream
-      .pipe(csvParse({
-        columns: true,
-        skipRecordsWithError: true,
-        skipRecordsWithEmptyValues: true,
-        skipEmptyLines: true,
-      }))
-      .on('data', (data) => results.push(data))
-      .on('end', () => {
-        resolve(results);
-      })
-      .on('error', (error) => {
-        reject(error);
-      });
-  });
 }

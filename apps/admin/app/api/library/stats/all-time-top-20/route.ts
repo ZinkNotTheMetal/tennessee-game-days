@@ -1,11 +1,30 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
+import { Top20LibraryListResponse } from "./response";
 
 export const revalidate = 0; //Very important
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Attendee
+ *     description: Operations related to attendees
+ *   - name: Barcode
+ *     description: Operations related to barcode scanning
+ *   - name: Convention
+ *     description: Operations related to conventions
+ *   - name: Library
+ *     description: Operations related to library items
+ *   - name: Play to Win Games
+ *     description: Operations related to play to win items within a convention
+ *   - name: Venue
+ *     description: Operations related to Venues for conventions
+ *   - name: Reports
+ *     description: Reporting related endpoints
+ */
 interface Top20CheckedOutGameDto {
   bgg_id: string
   total_checkout_minutes: bigint
@@ -19,11 +38,26 @@ interface Top20CheckedOutGameDto {
   all_copies_checked_out: boolean
 }
 
+/**
+ * @swagger
+ *   /api/library/stats/all-time-top-20:
+ *   get:
+ *     tags:
+ *       - Library
+ *     summary: Top 20 library games checked out Returns list of all library games
+ *     description: Retrieves a list of library games that have been checked out in all conventions
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Top20LibraryItemResult'
+ */
 export async function GET() {
 
   //https://github.com/prisma/prisma/discussions/16255
   // Only option for nested group by is to use raw query
-
   const top20CheckedOutGames: Top20CheckedOutGameDto[] = await prisma.$queryRaw`
     SELECT
     l.bgg_id,
@@ -58,7 +92,7 @@ export async function GET() {
     bggPlaytimeMinutes: entry.playing_time_min
   }));
 
-  return NextResponse.json({
+  return NextResponse.json<Top20LibraryListResponse>({
     list: formattedData,
   }, { status: 200 })
 }

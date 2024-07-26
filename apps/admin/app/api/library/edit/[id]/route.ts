@@ -5,6 +5,7 @@ import { DateTime } from "ts-luxon";
 
 export const dynamic = "force-dynamic";
 
+// TODO: Add docs
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   const libraryItemToEdit: ILibraryItemRequest = await request.json();
 

@@ -1,6 +1,66 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma"
 
+/**
+ * @swagger
+ * /api/play-to-win/{id}:
+ *   get:
+ *     tags:
+ *       - Play to Win Games
+ *     summary: Get details of a Play to Win item by ID
+ *     description: Retrieves details of a Play to Win item along with its associated BoardGameGeek information and mechanics by its ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the Play to Win item to retrieve
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved Play to Win item details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: number
+ *                   description: unique identifier for the play to win item
+ *                 barcode:
+ *                   type: string
+ *                   description: The unique barcode for the play to win
+ *                 gameName:
+ *                   type: string
+ *                   description: The name of the play to win name
+ *                 isHidden:
+ *                   type: boolean
+ *                   description: Flag that states if a game is hidden from users
+ *                 publisherName:
+ *                   type: string
+ *                   description: The name of the publisher
+ *                 dateAddedUtc:
+ *                   type: string
+ *                   format: date-time
+ *                 boardGameGeekThing:
+ *                   $ref: '#/components/schemas/BoardGameGeekThing'
+ *                 _count:
+ *                   type: object
+ *                   properties:
+ *                     playToWinPlays:
+ *                       type: number
+ *                       description: Amount of plays people have played for this item
+ *       404:
+ *         description: Game not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message indicating the game was not found
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -45,7 +105,43 @@ export async function GET(
   return NextResponse.json(response);
 }
 
+/**
+ * @swagger
+ * /api/play-to-win/{id}:
+ *   delete:
+ *     summary: Removes a play to win item from a convention
+ *     tags:
+ *       - Play to Win Games
+ *     description: Hard deletes a play to win item from the database, play to win items are tied with a convention. Also removes the barcode from the database
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The unique identifier for play to win item
+ *     responses:
+ *       200:
+ *         description: Play to Win item successfully deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *                message: string
+ *       404:
+ *         description: Play to win item not found with that unique identifier
+ *         content:
+ *           application/json:
+ *             schema:
+ *                message: string
+ */
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const playToWinItem = await prisma.playToWinItem.findFirst({
+    where: { id: Number(params.id)}
+  })
+
+  if (playToWinItem === null || playToWinItem === undefined)
+    return NextResponse.json({ message: "Play to win item not found" }, { status: 404 });
+
   await prisma.libraryItem.delete({
     where: { id: Number(params.id) },
   });

@@ -5,6 +5,42 @@ import { DateTime } from "ts-luxon";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * @swagger
+ * /api/library/add:
+ *   post:
+ *     tags:
+ *       - Library
+ *     summary: Adds a new library item
+ *     description: This api adds a new library item under the library items (typically board games)
+ *     requestBody:
+ *       description: Library Item to be added
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LibraryItemRequest'
+ *     responses:
+ *       201:
+ *         description: Successfully added a new library item
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                   type: string
+ *                   description: Success message after successful library item creation
+ *                 created:
+ *                   type: string
+ *                   description: The URL of where to edit the library item if needed
+ *       400:
+ *         description: Invalid Data / Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *                message: string
+ */
 export async function POST(request: NextRequest) {
   const libraryItemToAdd: ILibraryItemRequest = await request.json();
   const { boardGameGeekThing, additionalBoxContent } = libraryItemToAdd;

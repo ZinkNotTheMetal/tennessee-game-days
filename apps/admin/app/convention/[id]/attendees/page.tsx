@@ -1,6 +1,6 @@
 import { GetConventionById } from "@/app/api/convention/[id]/actions";
 import { AttendeesTable } from "./attendee-table"
-import { GetAllAttendeesForConvention } from "@/app/api/attendee/list/[conventionId]/actions"
+import { GetAllAttendeesForConvention } from "@/app/api/attendee/count/[conventionId]/actions"
 
 interface Props {
   params: { id: string }

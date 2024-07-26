@@ -2,6 +2,36 @@ import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { DateTime } from "ts-luxon";
 
+/**
+ * @swagger
+ * /api/attendee/check-in/{attendeeId}:
+ *   patch:
+ *     tags:
+ *       - Convention
+ *       - Attendee
+ *     summary: Checks in an attendee at the conference to mark them as attended
+ *     description: Checks in an attendee at the conference to mark them as attended
+ *     parameters:
+ *       - in: path
+ *         name: attendeeId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The unique identifier of an attendee
+ *     responses:
+ *       200:
+ *         description: Attendee successfully checked in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               message: string
+ *       404:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *                message: string
+ */
 export async function PATCH(request: NextRequest, { params }: { params: { attendeeId: string }}) {
 
   const attendee = await prisma.attendee.findFirst({
