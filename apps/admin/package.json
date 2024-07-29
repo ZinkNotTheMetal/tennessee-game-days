@@ -29,7 +29,7 @@
     "@repo/tgd-database": "workspace:*",
     "@tanstack/react-table": "^8.19.3",
     "csv-parse": "^5.5.5",
-    "next": "^14.2.3",
+    "next": "^14.2.5",
     "next-swagger-doc": "^0.4.0",
     "postcss": "8.4.38",
     "react": "^18.3.1",
