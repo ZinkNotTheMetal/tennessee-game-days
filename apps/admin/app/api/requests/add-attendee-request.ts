@@ -20,10 +20,10 @@
  *           example: Free, Individual, Couple, Family
  */
 interface IAddAttendeeRequest {
-  person: IPurchasingPerson
-  additionalPeople: IPerson[] | undefined
-  isStayingOnSite: boolean
-  passPurchased: 'Free' | 'Individual' | 'Couple' | 'Family'
+  person: IPurchasingPerson;
+  additionalPeople: IPerson[] | undefined;
+  isStayingOnSite: boolean;
+  passPurchased: "Free" | "Individual" | "Couple" | "Family";
 }
 
 /**
@@ -59,10 +59,10 @@ interface IAddAttendeeRequest {
  *           nullable: true
  */
 interface IPurchasingPerson extends IPerson {
-  phoneNumber: string
-  email: string
-  zipCode: string
-  emergencyContact?: IEmergencyContact
+  phoneNumber: string;
+  email: string;
+  zipCode: string;
+  emergencyContact?: IEmergencyContact;
 }
 
 /**
@@ -89,10 +89,10 @@ interface IPurchasingPerson extends IPerson {
  *           nullable: true
  */
 interface IPerson {
-  firstName: string
-  lastName: string
-  preferredName?: string
-  email?: string
+  firstName: string;
+  lastName: string;
+  preferredName?: string;
+  email?: string;
 }
 
 /**
@@ -111,9 +111,14 @@ interface IPerson {
  *           description: Phone number of the emergency contact person
  */
 interface IEmergencyContact {
-  name: string
-  phoneNumber: string
-  relationship: string
+  name: string;
+  phoneNumber: string;
+  relationship: string;
 }
 
-export type { IAddAttendeeRequest }
+export type {
+  IAddAttendeeRequest,
+  IPurchasingPerson,
+  IPerson,
+  IEmergencyContact,
+};

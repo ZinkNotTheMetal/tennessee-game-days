@@ -8,7 +8,7 @@ interface Props {
 
 async function getLibraryItem(id: number) {
   const libraryItemByIdApi = await fetch(
-    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_URL}/api/library/${id}`,
+    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/library/${id}`,
     {
       method: "GET",
       cache: 'no-store',
