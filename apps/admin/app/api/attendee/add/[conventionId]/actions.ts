@@ -19,6 +19,17 @@ export async function GenerateBarcodeAndAddAttendee(
 
     // 4. Add a new barcode in a transaction
     prisma.$transaction(async (transaction) => {
+      // 1. Ensure there is not already a code
+      const existingBarcode = await transaction.centralizedBarcode.findUnique({
+        where: {
+          barcode: generatedBarcode,
+        },
+      });
+
+      if (existingBarcode) {
+        throw new Error(`Barcode already exists - ${generatedBarcode}`);
+      }
+
       const newBarcode = await transaction.centralizedBarcode.create({
         data: {
           entityId: 0,
@@ -26,6 +37,16 @@ export async function GenerateBarcodeAndAddAttendee(
           barcode: generatedBarcode,
         },
       });
+
+      const existingAttendee = await transaction.attendee.findUnique({
+        where: {
+          barcode: generatedBarcode,
+        },
+      });
+
+      if (existingAttendee) {
+        throw new Error(`Attendee already exists - ${generatedBarcode}`);
+      }
 
       const newAttendee = await transaction.attendee.create({
         data: {
@@ -58,7 +79,6 @@ export async function AddPurchasingPersonIntoSystem(
   person: IPurchasingPerson,
   emergencyContact: IEmergencyContact | undefined
 ): Promise<number | undefined> {
-
   let personId: number;
 
   // Find first person with as much information as we can
@@ -67,7 +87,7 @@ export async function AddPurchasingPersonIntoSystem(
       OR: [
         { email: person.email ? person.email : undefined },
         { phoneNumber: person.phoneNumber ? person.phoneNumber : undefined },
-        { 
+        {
           firstName: person.preferredName || person.firstName,
           lastName: person.lastName,
         },
@@ -76,9 +96,9 @@ export async function AddPurchasingPersonIntoSystem(
           preferredName: person.preferredName,
           lastName: person.lastName,
         },
-      ]
-    }
-  })
+      ],
+    },
+  });
 
   if (!isPersonInSystem) {
     const personToAdd = await prisma.person.create({
@@ -93,9 +113,9 @@ export async function AddPurchasingPersonIntoSystem(
         emergencyContactName: emergencyContact?.name,
         emergencyContactPhoneNumber: emergencyContact?.phoneNumber,
         emergencyContactRelationship: emergencyContact?.relationship,
-      }
-    })
-    personId = personToAdd.id
+      },
+    });
+    personId = personToAdd.id;
   } else {
     const personToUpdate = await prisma.person.update({
       where: { id: isPersonInSystem.id },
@@ -106,51 +126,100 @@ export async function AddPurchasingPersonIntoSystem(
         lastName: person.lastName || isPersonInSystem?.lastName,
         email: person.email || isPersonInSystem?.email,
         phoneNumber: person.phoneNumber || isPersonInSystem?.phoneNumber,
-      }
-    })
-    personId = personToUpdate.id
+      },
+    });
+    personId = personToUpdate.id;
   }
 
   return personId;
 }
 
+export async function AddAdditionalPeopleUnderPurchasingPerson(
+  personId: number,
+  conventionId: number,
+  additionalAttendees: IPerson[],
+  passPurchased: "Free" | "Individual" | "Couple" | "Family",
+  isStayingOnSite: boolean
+): Promise<{ personId: number; barcode: string | null }[]> {
+  let barcodesCreated: { personId: number; barcode: string | null }[] = [];
 
-export async function AddAdditionalPeopleUnderPurchasingPerson(personId: number, conventionId: number, additionalAttendees: IPerson[], passPurchased: "Free" | "Individual" | "Couple" | "Family", isStayingOnSite: boolean) 
-: Promise<{ personId: number, barcode: string | null }[]> 
-{
-  let barcodesCreated: { personId: number, barcode: string | null }[] = []
-
-  console.log(`Adding ${additionalAttendees.length} people under the person`)
+  console.log(`Adding ${additionalAttendees.length} people under the person`);
 
   for (const additionalAttendee of additionalAttendees) {
-    const additionalPersonToAdd = await prisma.person.upsert({
-      where: { 
-        firstName_lastName_relatedPersonId: {
-          firstName: additionalAttendee.firstName,
-          lastName: additionalAttendee.lastName,
-          relatedPersonId: personId
-        }
-       },
-      create: {
-        email: additionalAttendee.email || null,
-        firstName: additionalAttendee.firstName,
-        lastName: additionalAttendee.lastName,
-        preferredName: additionalAttendee.preferredName,
-        relatedPersonId: personId,
+    let attendeeId: number = 0;
+    // Find first person with as much information as we can
+    const additionalAttendeeInSystem = await prisma.person.findFirst({
+      where: {
+        OR: [
+          {
+            firstName: additionalAttendee.firstName,
+            preferredName: additionalAttendee.preferredName,
+            lastName: additionalAttendee.lastName,
+            relatedPersonId: personId,
+          },
+          {
+            email: additionalAttendee.email
+              ? additionalAttendee.email
+              : undefined,
+          },
+          {
+            phoneNumber: additionalAttendee.phoneNumber
+              ? additionalAttendee.phoneNumber
+              : undefined,
+          },
+          {
+            firstName:
+              additionalAttendee.preferredName || additionalAttendee.firstName,
+            lastName: additionalAttendee.lastName,
+          },
+          {
+            firstName: additionalAttendee.firstName,
+            preferredName: additionalAttendee.preferredName,
+            lastName: additionalAttendee.lastName,
+          },
+        ],
       },
-      update: {
-        email: additionalAttendee.email || null,
-        firstName: additionalAttendee.firstName,
-        preferredName: additionalAttendee.preferredName,
-        lastName: additionalAttendee.lastName,
-      }
-    })
+    });
 
-    const response = await GenerateBarcodeAndAddAttendee(conventionId, additionalPersonToAdd.id, passPurchased, isStayingOnSite)
+    if (!additionalAttendeeInSystem) {
+      const additionalAttendeeToAdd = await prisma.person.create({
+        data: {
+          // Merge existing data with provided data
+          firstName: additionalAttendee.firstName,
+          preferredName: additionalAttendee.preferredName,
+          lastName: additionalAttendee.lastName,
+          email: additionalAttendee.email,
+          phoneNumber: additionalAttendee.phoneNumber,
+          relatedPersonId: personId,
+        },
+      });
+      attendeeId = additionalAttendeeToAdd.id;
+    } else {
+      const additionalAttendeeToUpdate = await prisma.person.update({
+        where: { id: additionalAttendeeInSystem.id },
+        data: {
+          // Merge existing data with provided data
+          firstName: additionalAttendee.firstName,
+          preferredName: additionalAttendee.preferredName,
+          lastName: additionalAttendee.lastName,
+          email: additionalAttendee.email,
+          phoneNumber: additionalAttendee.phoneNumber,
+          relatedPersonId: personId,
+        },
+      });
+      attendeeId = additionalAttendeeToUpdate.id;
+    }
+
+    const response = await GenerateBarcodeAndAddAttendee(
+      conventionId,
+      attendeeId,
+      passPurchased,
+      isStayingOnSite
+    );
     if (response.success) {
-      barcodesCreated.push({ personId: additionalPersonToAdd.id, barcode: response.barcode })
+      barcodesCreated.push({ personId: attendeeId, barcode: response.barcode });
     }
   }
 
-  return barcodesCreated
+  return barcodesCreated;
 }

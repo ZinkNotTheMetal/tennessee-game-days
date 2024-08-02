@@ -59,7 +59,6 @@ interface IAddAttendeeRequest {
  *           nullable: true
  */
 interface IPurchasingPerson extends IPerson {
-  phoneNumber: string;
   email: string;
   zipCode: string;
   emergencyContact?: IEmergencyContact;
@@ -93,6 +92,8 @@ interface IPerson {
   lastName: string;
   preferredName?: string;
   email?: string;
+  phoneNumber: string | undefined;
+  isAdult: boolean;
 }
 
 /**
