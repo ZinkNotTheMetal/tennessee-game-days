@@ -71,7 +71,7 @@ importers:
         version: 5.17.14(@types/react@18.3.3)(ramda@0.30.1)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       tailwindcss:
         specifier: 3.4.4
-        version: 3.4.4(ts-node@10.9.2(@types/node@20.12.12)(typescript@5.5.4))
+        version: 3.4.4(ts-node@10.9.2(@types/node@20.14.13)(typescript@5.5.4))
       ts-luxon:
         specifier: ^4.6.2
         version: 4.6.2
@@ -104,8 +104,8 @@ importers:
         specifier: ^8.56.10
         version: 8.56.10
       '@types/node':
-        specifier: ^20.12.12
-        version: 20.12.12
+        specifier: ^20.14.13
+        version: 20.14.13
       '@types/react':
         specifier: ^18.3.3
         version: 18.3.3
@@ -148,7 +148,7 @@ importers:
         version: link:../typescript-config
       '@turbo/gen':
         specifier: ^1.13.2
-        version: 1.13.2(@types/node@20.12.12)(typescript@5.5.4)
+        version: 1.13.2(@types/node@20.14.13)(typescript@5.5.4)
       '@types/eslint':
         specifier: ^8.56.7
         version: 8.56.7
@@ -156,8 +156,8 @@ importers:
         specifier: ^1.2.3
         version: 1.2.3
       '@types/node':
-        specifier: ^20.12.12
-        version: 20.12.12
+        specifier: ^20.14.13
+        version: 20.14.13
       '@types/react':
         specifier: ^18.3.3
         version: 18.3.3
@@ -215,10 +215,10 @@ importers:
         version: link:../typescript-config
       '@turbo/gen':
         specifier: ^1.13.2
-        version: 1.13.2(@types/node@20.12.12)(typescript@5.5.4)
+        version: 1.13.2(@types/node@20.14.13)(typescript@5.5.4)
       '@types/node':
-        specifier: ^20.12.12
-        version: 20.12.12
+        specifier: ^20.14.13
+        version: 20.14.13
       eslint:
         specifier: ^8.56.0
         version: 8.57.0
@@ -248,7 +248,7 @@ importers:
         version: 4.6.2
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@types/node@20.12.12)(typescript@5.5.4)
+        version: 10.9.2(@types/node@20.14.13)(typescript@5.5.4)
     devDependencies:
       dotenv-cli:
         specifier: ^7.4.1
@@ -774,8 +774,8 @@ packages:
   '@types/ms@0.7.34':
     resolution: {integrity: sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==}
 
-  '@types/node@20.12.12':
-    resolution: {integrity: sha512-eWLDGF/FOSPtAvEqeRAQ4C8LSA7M1I7i0ky1I8U7kD1J5ITyW3AsRhQrKVoWf5pFKZ2kILsEGJhsI9r93PYnOw==}
+  '@types/node@20.14.13':
+    resolution: {integrity: sha512-+bHoGiZb8UiQ0+WEtmph2IWQCjIqg8MDZMAV+ppRRhUZnquF5mQkP/9vpSwJClEiSM/C7fZZExPzfU0vJTyp8w==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -5033,7 +5033,7 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
-  '@turbo/gen@1.13.2(@types/node@20.12.12)(typescript@5.5.4)':
+  '@turbo/gen@1.13.2(@types/node@20.14.13)(typescript@5.5.4)':
     dependencies:
       '@turbo/workspaces': 1.13.2
       chalk: 2.4.2
@@ -5043,7 +5043,7 @@ snapshots:
       minimatch: 9.0.3
       node-plop: 0.26.3
       proxy-agent: 6.4.0
-      ts-node: 10.9.2(@types/node@20.12.12)(typescript@5.5.4)
+      ts-node: 10.9.2(@types/node@20.14.13)(typescript@5.5.4)
       update-check: 1.5.4
       validate-npm-package-name: 5.0.0
     transitivePeerDependencies:
@@ -5070,7 +5070,7 @@ snapshots:
 
   '@types/cross-spawn@6.0.2':
     dependencies:
-      '@types/node': 20.12.12
+      '@types/node': 20.14.13
 
   '@types/debug@4.1.8':
     dependencies:
@@ -5091,7 +5091,7 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 20.12.12
+      '@types/node': 20.14.13
 
   '@types/hast@2.3.10':
     dependencies:
@@ -5112,7 +5112,7 @@ snapshots:
 
   '@types/ms@0.7.34': {}
 
-  '@types/node@20.12.12':
+  '@types/node@20.14.13':
     dependencies:
       undici-types: 5.26.5
 
@@ -5145,7 +5145,7 @@ snapshots:
 
   '@types/through@0.0.33':
     dependencies:
-      '@types/node': 20.12.12
+      '@types/node': 20.14.13
 
   '@types/tinycolor2@1.4.6': {}
 
@@ -7914,13 +7914,13 @@ snapshots:
       camelcase-css: 2.0.1
       postcss: 8.4.38
 
-  postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.12.12)(typescript@5.5.4)):
+  postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.14.13)(typescript@5.5.4)):
     dependencies:
       lilconfig: 3.1.1
       yaml: 2.4.1
     optionalDependencies:
       postcss: 8.4.38
-      ts-node: 10.9.2(@types/node@20.12.12)(typescript@5.5.4)
+      ts-node: 10.9.2(@types/node@20.14.13)(typescript@5.5.4)
 
   postcss-nested@6.0.1(postcss@8.4.38):
     dependencies:
@@ -8665,7 +8665,7 @@ snapshots:
       '@pkgr/utils': 2.4.2
       tslib: 2.6.2
 
-  tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.12.12)(typescript@5.5.4)):
+  tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.13)(typescript@5.5.4)):
     dependencies:
       '@alloc/quick-lru': 5.2.0
       arg: 5.0.2
@@ -8684,7 +8684,7 @@ snapshots:
       postcss: 8.4.38
       postcss-import: 15.1.0(postcss@8.4.38)
       postcss-js: 4.0.1(postcss@8.4.38)
-      postcss-load-config: 4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.12.12)(typescript@5.5.4))
+      postcss-load-config: 4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.14.13)(typescript@5.5.4))
       postcss-nested: 6.0.1(postcss@8.4.38)
       postcss-selector-parser: 6.0.16
       resolve: 1.22.8
@@ -8809,14 +8809,14 @@ snapshots:
 
   ts-mixer@6.0.4: {}
 
-  ts-node@10.9.2(@types/node@20.12.12)(typescript@5.5.4):
+  ts-node@10.9.2(@types/node@20.14.13)(typescript@5.5.4):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 20.12.12
+      '@types/node': 20.14.13
       acorn: 8.11.3
       acorn-walk: 8.3.2
       arg: 4.1.3
