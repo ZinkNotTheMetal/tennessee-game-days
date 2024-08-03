@@ -6,6 +6,7 @@ import {
 import prisma from "@/app/lib/prisma";
 import { DateTime } from "ts-luxon";
 
+// Might need to this
 export async function GenerateBarcodeAndAddAttendee(
   conventionId: number,
   personId: number,
