@@ -20,25 +20,14 @@ export async function GenerateBarcodeAndAddAttendee(
 
     // 4. Add a new barcode in a transaction
     prisma.$transaction(async (transaction) => {
-      // 1. Ensure there is not already a code
-      const existingBarcode = await transaction.centralizedBarcode.findUnique({
-        where: {
-          barcode: generatedBarcode,
-        },
-      });
+      // Really needed to streamline this transaction due to the database hosting solution
+      // Vercel is very slow and unstable... oh and times out every 300 seconds
 
-      if (existingBarcode) {
-        throw new Error(`Barcode already exists - ${generatedBarcode}`);
-      }
-
-      const newBarcode = await transaction.centralizedBarcode.create({
-        data: {
-          entityId: 0,
-          entityType: "Attendee",
-          barcode: generatedBarcode,
-        },
-      });
-
+      // Desired:
+      //  1. Check if the barcode is already added in centralized database
+      //  2. Add attendee
+      //  3. if new attendee fails kill transaction
+      //  4. Add new centralized barcode with the proper entity id
       const existingAttendee = await transaction.attendee.findUnique({
         where: {
           barcode: generatedBarcode,
@@ -60,16 +49,22 @@ export async function GenerateBarcodeAndAddAttendee(
         },
       });
 
-      await transaction.centralizedBarcode.update({
-        where: { id: newBarcode.id },
+      const newBarcode = await transaction.centralizedBarcode.create({
         data: {
           entityId: newAttendee.id,
+          entityType: "Attendee",
+          barcode: generatedBarcode,
         },
       });
     });
+
     success = true;
     barcode = generatedBarcode;
+    console.log(
+      `Generate Barcode and add attendee completed - ${barcode} - ${success}`
+    );
   } catch (error) {
+    console.error(error);
     throw error;
   } finally {
     return { success: success, barcode: barcode };
