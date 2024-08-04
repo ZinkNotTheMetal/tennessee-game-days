@@ -20,24 +20,24 @@ export async function GenerateBarcodeAndAddAttendee(
 
     // 4. Add a new barcode in a transaction
     prisma.$transaction(async (transaction) => {
+      console.log(`Beginning barcode transaction`)
       // Really needed to streamline this transaction due to the database hosting solution
       // Vercel is very slow and unstable... oh and times out every 300 seconds
 
-      // Desired:
-      //  1. Check if the barcode is already added in centralized database
-      //  2. Add attendee
-      //  3. if new attendee fails kill transaction
-      //  4. Add new centralized barcode with the proper entity id
-      const existingAttendee = await transaction.attendee.findUnique({
-        where: {
+      // First you must insert a new barcode without an attendee
+      const newBarcode = await transaction.centralizedBarcode.create({
+        data: {
+          entityId: 0,
+          entityType: "Attendee",
           barcode: generatedBarcode,
         },
       });
 
-      if (existingAttendee) {
-        throw new Error(`Attendee already exists - ${generatedBarcode}`);
+      if (!newBarcode) {
+        throw new Error(`Barcode already exists - ${generatedBarcode}`);
       }
 
+      // Second we need to add an attendee...
       const newAttendee = await transaction.attendee.create({
         data: {
           barcode: generatedBarcode,
@@ -49,19 +49,21 @@ export async function GenerateBarcodeAndAddAttendee(
         },
       });
 
-      const newBarcode = await transaction.centralizedBarcode.create({
-        data: {
-          entityId: newAttendee.id,
-          entityType: "Attendee",
-          barcode: generatedBarcode,
+      await transaction.centralizedBarcode.update({
+        where: {
+          id: newBarcode.id
         },
-      });
+        data: {
+          entityId: newAttendee.id
+        }
+      })
+
     });
 
     success = true;
     barcode = generatedBarcode;
     console.log(
-      `Generate Barcode and add attendee completed - ${barcode} - ${success}`
+      `**Barcode & Attendee successfully added to database - ${barcode} - ${success}**`
     );
   } catch (error) {
     console.error(error);

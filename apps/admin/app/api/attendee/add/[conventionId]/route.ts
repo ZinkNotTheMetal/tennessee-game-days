@@ -88,7 +88,8 @@ export async function POST(request: NextRequest, { params }: { params: { convent
 
   console.log(`Purchasing Person has barcode created - ${barcodeForPurchasingPerson.barcode}`)
 
-  if (additionalPeople !== undefined) {
+  if (additionalPeople !== undefined && additionalPeople.length > 0) {
+    console.log('Adding additional people...')
     await AddAdditionalPeopleUnderPurchasingPerson(personId, Number(params.conventionId), additionalPeople, passPurchased, isStayingOnSite)
       .then(barcodes => barcodes.forEach(b => barcodesCreated.push(b)))
   }
