@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import ILibraryItemRequest from "../../requests/library-item-request";
 import { DateTime } from "ts-luxon";
+import { revalidateTag } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -125,6 +126,8 @@ export async function POST(request: NextRequest) {
       entityType: 'LibraryItem'
     }
   })
+
+  revalidateTag('library')
 
   return NextResponse.json(
     {

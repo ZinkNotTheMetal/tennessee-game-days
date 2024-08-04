@@ -10,6 +10,9 @@ interface Props {
 async function getAllConventions() : Promise<ApiListResponse<IConvention>> {
   const conventionListApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/convention/list`, {
     cache: 'no-store',
+    next: {
+      tags: ['convention'],
+    }
   })
 
   const conventions: ApiListResponse<IConvention> = await conventionListApi.json();

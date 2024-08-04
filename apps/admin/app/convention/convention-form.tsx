@@ -108,7 +108,6 @@ export function ConventionForm({ payload }: ConventionFormProps): JSX.Element {
         });
     }
 
-    revalidateTag('convention')
     router.replace("/convention");
     router.refresh()
   };

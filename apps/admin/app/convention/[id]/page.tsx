@@ -42,15 +42,15 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
         <h2 className="text-xl font-semibold mb-4">Event Details:</h2>
         <div className="flex flex-wrap items-center mb-4">
           <p className="w-full sm:w-1/2 mb-2 sm:mb-0">Extra Hours Start Date:</p>
-          <p className="w-full sm:w-1/2">{convention?.extraHoursStartDateTimeUtc && (DateTime.fromJSDate(convention.extraHoursStartDateTimeUtc).toLocaleString(DateTime.DATETIME_FULL))}</p>
+          <p className="w-full sm:w-1/2">{convention?.extraHoursStartDateTimeUtc && (DateTime.fromJSDate(convention.extraHoursStartDateTimeUtc).toLocal().toLocaleString(DateTime.DATETIME_FULL))}</p>
         </div>
         <div className="flex flex-wrap items-center mb-4">
           <p className="w-full sm:w-1/2 mb-2 sm:mb-0">Start Date:</p>
-          <p className="w-full sm:w-1/2">{convention?.startDateTimeUtc && (DateTime.fromJSDate(convention.startDateTimeUtc).toLocaleString(DateTime.DATETIME_FULL))}</p>
+          <p className="w-full sm:w-1/2">{convention?.startDateTimeUtc && (DateTime.fromJSDate(convention.startDateTimeUtc).toLocal().toLocal().toLocaleString(DateTime.DATETIME_FULL))}</p>
         </div>
         <div className="flex flex-wrap items-center mb-4">
           <p className="w-full sm:w-1/2 mb-2 sm:mb-0">End Date:</p>
-          <p className="w-full sm:w-1/2">{convention?.endDateTimeUtc && (DateTime.fromJSDate(convention.endDateTimeUtc).toLocaleString(DateTime.DATETIME_FULL))}</p>
+          <p className="w-full sm:w-1/2">{convention?.endDateTimeUtc && (DateTime.fromJSDate(convention.endDateTimeUtc).toLocal().toLocaleString(DateTime.DATETIME_FULL))}</p>
         </div>
         <div className="flex flex-wrap items-center mb-4">
           <p className="w-full sm:w-1/2 mb-2 sm:mb-0">Venue:</p>
@@ -62,7 +62,7 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
         </div>
         <div className="flex flex-wrap items-center mb-4">
           <p className="w-full sm:w-1/2 mb-2 sm:mb-0">Last Updated Date:</p>
-          <p className="w-full sm:w-1/2">{convention?.updatedAtUtc && (DateTime.fromISO(convention.updatedAtUtc).toLocaleString(DateTime.DATETIME_FULL))}</p>
+          <p className="w-full sm:w-1/2">{convention?.updatedAtUtc && (DateTime.fromISO(convention.updatedAtUtc).toLocal().toLocaleString(DateTime.DATETIME_FULL))}</p>
         </div>
         <div className="flex flex-wrap items-center">
           <p className="w-full sm:w-1/2 mb-2 sm:mb-0">Cancelled:</p>

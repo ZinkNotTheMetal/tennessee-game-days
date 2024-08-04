@@ -15,6 +15,7 @@ async function getConventionsFromApi() {
       method: "GET",
       next: {
         tags: ["convention"],
+        revalidate: 3600,
       },
     }
   );

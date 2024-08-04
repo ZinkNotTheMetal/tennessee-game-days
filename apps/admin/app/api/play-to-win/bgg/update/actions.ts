@@ -1,4 +1,5 @@
 import prisma from "@/app/lib/prisma";
+import { revalidateTag } from "next/cache";
 
 export async function UpsertBoardGameGeekMechanics(bggId: number, mechanics: {id: number, name: string}[]) {
   console.log("BGG ID", bggId)
@@ -29,6 +30,7 @@ export async function UpsertBoardGameGeekMechanics(bggId: number, mechanics: {id
     });
 
   }
+  revalidateTag('play-to-win')
 
 }
 

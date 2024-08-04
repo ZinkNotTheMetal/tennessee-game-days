@@ -1,6 +1,7 @@
 import { IPlayToWinRequest } from "@/app/api/requests/play-to-win-request";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
+import { revalidateTag } from "next/cache";
 
 /**
  * @swagger
@@ -122,6 +123,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       },
     });
   }
+
+  revalidateTag('play-to-win')
 
   return NextResponse.json(
     {

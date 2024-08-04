@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { DateTime } from "ts-luxon";
 import { UpcomingConventionResponse } from "./response";
+import { revalidateTag } from "next/cache";
 
 export const revalidate = 0; //Very important
 
@@ -42,6 +43,8 @@ export async function GET() {
       startDateTimeUtc: 'asc'
     }
   })
+
+  revalidateTag('convention')
 
   return NextResponse.json<UpcomingConventionResponse>({
     convention: nextUpcomingConvention

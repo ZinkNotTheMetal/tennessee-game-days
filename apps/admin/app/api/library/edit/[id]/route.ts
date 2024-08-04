@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import ILibraryItemRequest from "../../../requests/library-item-request";
 import { DateTime } from "ts-luxon";
+import { revalidateTag } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
@@ -80,6 +81,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       },
     });
   }
+
+  revalidateTag('library')
 
   return NextResponse.json(
     {
