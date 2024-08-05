@@ -3,6 +3,7 @@ import prisma from "@/app/lib/prisma";
 import { PlayToWinCsvRow } from "../../requests/ptw-csv-request"
 import { DateTime } from "ts-luxon";
 import { ParseCsvFile, StandardizeGameName } from "./actions";
+import { revalidateTag } from "next/cache";
 
 
 // https://stackoverflow.com/questions/73839916/how-to-run-functions-that-take-more-than-10s-on-vercel
@@ -119,6 +120,7 @@ export async function POST(request: NextRequest) {
       )
     }
   }
+  revalidateTag('play-to-win')
 
   return NextResponse.json(
     {

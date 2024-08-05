@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import type { IConventionRequest } from "@/app/api/requests/convention-request";
 import { DateTime } from 'ts-luxon'
+import { revalidateTag } from "next/cache";
 
 /**
  * @swagger
@@ -68,6 +69,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       venueId: (venueAddedId === -1 ? undefined : Number(venueAddedId))
     },
   });
+
+  revalidateTag('convention')
 
   return NextResponse.json(
     {

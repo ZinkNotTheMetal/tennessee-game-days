@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { DateTime } from "ts-luxon";
 import { UpcomingConventionResponse } from "./response";
+import { revalidateTag } from "next/cache";
 
 export const revalidate = 0; //Very important
 
@@ -25,6 +26,8 @@ export const fetchCache = "force-no-store";
  *               $ref: '#/components/schemas/UpcomingConventionResponse'
  */
 export async function GET() {
+  console.log(process.env.DATABASE_URL)
+
   const nextUpcomingConvention = await prisma.convention.findFirst({
     where: {
       startDateTimeUtc: {
@@ -42,6 +45,8 @@ export async function GET() {
       startDateTimeUtc: 'asc'
     }
   })
+
+  revalidateTag('convention')
 
   return NextResponse.json<UpcomingConventionResponse>({
     convention: nextUpcomingConvention

@@ -15,6 +15,7 @@ async function getConventionsFromApi() {
       method: "GET",
       next: {
         tags: ["convention"],
+        revalidate: 3600,
       },
     }
   );
@@ -64,3 +65,4 @@ export default async function Page() {
     </main>
   );
 }
+

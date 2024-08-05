@@ -3,6 +3,7 @@ import prisma from "@/app/lib/prisma";
 import { AddAdditionalPeopleUnderPurchasingPerson, AddPurchasingPersonIntoSystem, GenerateBarcodeAndAddAttendee } from './actions'
 import { IAddAttendeeRequest } from "@/app/api/requests/add-attendee-request";
 import { AddAttendeeResponse } from "./response";
+import { revalidateTag } from "next/cache";
 
 
 // https://stackoverflow.com/questions/73839916/how-to-run-functions-that-take-more-than-10s-on-vercel
@@ -25,6 +26,12 @@ export const maxDuration = 10; // 10 seconds
  *         schema:
  *           type: integer
  *         description: The convention ID
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token for authentication
  *     requestBody:
  *       description: People information data to be added
  *       required: true
@@ -41,6 +48,12 @@ export const maxDuration = 10; // 10 seconds
  *               $ref: '#/components/schemas/AddAttendeeResponse'
  *       400:
  *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *                message: string
+ *       401:
+ *         description: Unauthorized to call this API
  *         content:
  *           application/json:
  *             schema:
@@ -93,6 +106,8 @@ export async function POST(request: NextRequest, { params }: { params: { convent
     await AddAdditionalPeopleUnderPurchasingPerson(personId, Number(params.conventionId), additionalPeople, passPurchased, isStayingOnSite)
       .then(barcodes => barcodes.forEach(b => barcodesCreated.push(b)))
   }
+
+  revalidateTag('attendee')
 
   return NextResponse.json<AddAttendeeResponse>({
     message: "Successfully added attendee to conference",
