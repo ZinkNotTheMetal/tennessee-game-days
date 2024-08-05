@@ -4,6 +4,8 @@ import {
   IEmergencyContact,
 } from "@/app/api/requests/add-attendee-request";
 import prisma from "@/app/lib/prisma";
+import { Prisma, PrismaClient } from "@prisma/client";
+import { DefaultArgs } from "@prisma/client/runtime/library";
 import { DateTime } from "ts-luxon";
 
 // Might need to this
@@ -19,7 +21,7 @@ export async function GenerateBarcodeAndAddAttendee(
     const generatedBarcode = `${DateTime.now().toFormat("yy")}${conventionId}-${personId}`;
 
     // 4. Add a new barcode in a transaction
-    prisma.$transaction(async (transaction) => {
+    prisma.$transaction(async (transaction: Omit<PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">) => {
       console.log(`Beginning barcode transaction`)
       // Really needed to streamline this transaction due to the database hosting solution
       // Vercel is very slow and unstable... oh and times out every 300 seconds
