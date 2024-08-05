@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "type": "commonjs",
   "dependencies": {
-    "@prisma/client": "5.12.1",
+    "@prisma/client": "5.17.0",
     "@repo/board-game-geek-shared": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "boardgamegeekclient": "1.9.1",
     "he": "^1.2.0",
-    "ts-luxon": "^4.6.2",
+    "ts-luxon": "^5.0.5",
     "ts-node": "10.9.2"
   },
   "devDependencies": {
