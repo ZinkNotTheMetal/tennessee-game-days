@@ -26,6 +26,12 @@ export const maxDuration = 10; // 10 seconds
  *         schema:
  *           type: integer
  *         description: The convention ID
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Bearer token for authentication
  *     requestBody:
  *       description: People information data to be added
  *       required: true
@@ -42,6 +48,12 @@ export const maxDuration = 10; // 10 seconds
  *               $ref: '#/components/schemas/AddAttendeeResponse'
  *       400:
  *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *                message: string
+ *       401:
+ *         description: Unauthorized to call this API
  *         content:
  *           application/json:
  *             schema:
