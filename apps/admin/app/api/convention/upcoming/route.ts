@@ -26,6 +26,8 @@ export const fetchCache = "force-no-store";
  *               $ref: '#/components/schemas/UpcomingConventionResponse'
  */
 export async function GET() {
+  console.log(process.env.DATABASE_URL)
+
   const nextUpcomingConvention = await prisma.convention.findFirst({
     where: {
       startDateTimeUtc: {
