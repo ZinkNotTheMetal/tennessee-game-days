@@ -76,7 +76,10 @@ export async function POST(request: NextRequest, { params }: { params: { convent
     where: { id: Number(params.conventionId)}
   })
 
-  if (conventionExists <= 0) return NextResponse.json({ message: 'Unable to find convention that you are trying to add the Attendee for'}, { status: 400 })
+  if (conventionExists <= 0) {
+    console.log('convention does not exist', request)
+    return NextResponse.json({ message: 'Unable to find convention that you are trying to add the Attendee for'}, { status: 400 }) 
+  }
 
   let personId = await AddPurchasingPersonIntoSystem(person, emergencyContact)
 
