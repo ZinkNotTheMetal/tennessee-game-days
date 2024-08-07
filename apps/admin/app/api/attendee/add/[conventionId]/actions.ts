@@ -145,6 +145,7 @@ export async function AddPurchasingPersonIntoSystem(
     });
     personDbId = personToUpdate.id;
   }
+  console.log(`Purchasing Pereson DB ID: ${personDbId}`)
 
   return personDbId;
 }
@@ -232,6 +233,7 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
       });
       personDbId = additionalAttendeeToUpdate.id;
     }
+    console.log(`Attendee Person DB ID: ${personDbId}`)
 
     const response = await GenerateBarcodeAndAddAttendee(
       conventionId,
