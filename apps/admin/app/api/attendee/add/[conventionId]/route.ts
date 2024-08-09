@@ -106,8 +106,9 @@ export async function POST(request: NextRequest, { params }: { params: { convent
 
   if (additionalPeople !== undefined && additionalPeople.length > 0) {
     console.log('Adding additional people...')
-    await AddAdditionalPeopleUnderPurchasingPerson(personId, Number(params.conventionId), additionalPeople, passPurchased, isStayingOnSite)
-      .then(barcodes => barcodes.forEach(b => barcodesCreated.push(b)))
+
+    const barcodesForAdditionalPeople = await AddAdditionalPeopleUnderPurchasingPerson(personId,  Number(params.conventionId), additionalPeople, passPurchased, isStayingOnSite);
+    barcodesForAdditionalPeople.forEach(barcode => barcodesCreated.push(barcode));
   }
 
   revalidateTag('attendee')

@@ -164,7 +164,9 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
   );
 
   for (const additionalAttendee of additionalAttendees) {
-    console.log(`Adding additional person to purchasing person Person ID: ${personId} - Name: ${additionalAttendee.preferredName ?? additionalAttendee.firstName} | Last Name: `)
+    console.log(
+      `Adding additional person to purchasing person Person ID: ${personId} - Name: ${additionalAttendee.preferredName ?? additionalAttendee.firstName} | Last Name: `
+    );
 
     // Find first person with as much information as we can
     const additionalAttendeeInSystem = await prisma.person.findFirst({
@@ -233,14 +235,26 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
       personDbId = additionalAttendeeToUpdate.id;
     }
 
-    const response = await GenerateBarcodeAndAddAttendee(
-      conventionId,
-      personDbId,
-      passPurchased,
-      isStayingOnSite
-    );
-    if (response.success) {
-      barcodesCreated.push({ personId: personDbId, barcode: response.barcode });
+    try {
+      const response = await GenerateBarcodeAndAddAttendee(
+        conventionId,
+        personDbId,
+        passPurchased,
+        isStayingOnSite
+      );
+
+      if (response.success) {
+        barcodesCreated.push({
+          personId: personDbId,
+          barcode: response.barcode,
+        });
+      } else {
+        console.error(
+          "Failed to Generate Barcode for additional people under purchasing person"
+        );
+      }
+    } catch (e) {
+      console.log("transaction error", e);
     }
   }
 
