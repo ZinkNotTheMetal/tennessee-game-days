@@ -21,46 +21,61 @@ export async function GenerateBarcodeAndAddAttendee(
     const generatedBarcode = `${DateTime.now().toFormat("yy")}${conventionId}-${personId}`;
 
     // 4. Add a new barcode in a transaction
-    prisma.$transaction(async (transaction: Omit<PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">) => {
-      console.log(`Beginning barcode transaction`)
-      // Really needed to streamline this transaction due to the database hosting solution
-      // Vercel is very slow and unstable... oh and times out every 300 seconds
+    prisma.$transaction(
+      async (
+        transaction: Omit<
+          PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+          | "$connect"
+          | "$disconnect"
+          | "$on"
+          | "$transaction"
+          | "$use"
+          | "$extends"
+        >
+      ) => {
+        console.log(
+          `Attempting to create barcode for Person: ${personId} - ${barcode}`
+        );
+        // Really needed to streamline this transaction due to the database hosting solution
+        // Vercel is very slow and unstable... oh and times out every 300 seconds
 
-      // First you must insert a new barcode without an attendee
-      const newBarcode = await transaction.centralizedBarcode.create({
-        data: {
-          entityId: 0,
-          entityType: "Attendee",
-          barcode: generatedBarcode,
-        },
-      });
+        // First you must insert a new barcode without an attendee
+        const newBarcode = await transaction.centralizedBarcode.create({
+          data: {
+            entityId: 0,
+            entityType: "Attendee",
+            barcode: generatedBarcode,
+          },
+        });
 
-      if (!newBarcode) {
-        throw new Error(`Barcode already exists - ${generatedBarcode}`);
-      }
-
-      // Second we need to add an attendee...
-      const newAttendee = await transaction.attendee.create({
-        data: {
-          barcode: generatedBarcode,
-          isStayingOnSite: stayingOnSite,
-          passPurchased: passPurchased,
-          conventionId: conventionId,
-          personId: personId,
-          dateRegistered: DateTime.utc().toISO(),
-        },
-      });
-
-      await transaction.centralizedBarcode.update({
-        where: {
-          id: newBarcode.id
-        },
-        data: {
-          entityId: newAttendee.id
+        if (!newBarcode) {
+          throw new Error(`Barcode already exists - ${generatedBarcode}`);
         }
-      })
 
-    });
+        // Second we need to add an attendee...
+        const newAttendee = await transaction.attendee.create({
+          data: {
+            barcode: generatedBarcode,
+            isStayingOnSite: stayingOnSite,
+            passPurchased: passPurchased,
+            conventionId: conventionId,
+            personId: personId,
+            dateRegistered: DateTime.utc().toISO(),
+          },
+        });
+
+        await transaction.centralizedBarcode.update({
+          where: {
+            id: newBarcode.id,
+          },
+          data: {
+            entityId: newAttendee.id,
+          },
+        });
+
+        return;
+      }
+    );
 
     success = true;
     barcode = generatedBarcode;
@@ -79,7 +94,7 @@ export async function AddPurchasingPersonIntoSystem(
   person: IPurchasingPerson,
   emergencyContact: IEmergencyContact | undefined
 ): Promise<number | undefined> {
-  let personId: number;
+  let personDbId: number;
 
   // Find first person with as much information as we can
   const isPersonInSystem = await prisma.person.findFirst({
@@ -115,7 +130,7 @@ export async function AddPurchasingPersonIntoSystem(
         emergencyContactRelationship: emergencyContact?.relationship,
       },
     });
-    personId = personToAdd.id;
+    personDbId = personToAdd.id;
   } else {
     const personToUpdate = await prisma.person.update({
       where: { id: isPersonInSystem.id },
@@ -128,10 +143,10 @@ export async function AddPurchasingPersonIntoSystem(
         phoneNumber: person.phoneNumber || isPersonInSystem?.phoneNumber,
       },
     });
-    personId = personToUpdate.id;
+    personDbId = personToUpdate.id;
   }
 
-  return personId;
+  return personDbId;
 }
 
 export async function AddAdditionalPeopleUnderPurchasingPerson(
@@ -142,11 +157,15 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
   isStayingOnSite: boolean
 ): Promise<{ personId: number; barcode: string | null }[]> {
   let barcodesCreated: { personId: number; barcode: string | null }[] = [];
+  let personDbId: number;
 
-  console.log(`Adding ${additionalAttendees.length} people under the person`);
+  console.log(
+    `Adding ${additionalAttendees.length} people under the person: ${personId}`
+  );
 
   for (const additionalAttendee of additionalAttendees) {
-    let attendeeId: number = 0;
+    console.log(`Adding additional person to purchasing person Person ID: ${personId} - Name: ${additionalAttendee.preferredName ?? additionalAttendee.firstName} | Last Name: `)
+
     // Find first person with as much information as we can
     const additionalAttendeeInSystem = await prisma.person.findFirst({
       where: {
@@ -193,8 +212,12 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
           relatedPersonId: personId,
         },
       });
-      attendeeId = additionalAttendeeToAdd.id;
+      personDbId = additionalAttendeeToAdd.id;
     } else {
+      console.log(
+        `** Match found** - ${additionalAttendeeInSystem.id} | First Name: ${additionalAttendee.firstName} | Last Name: ${additionalAttendee.lastName} | Preferred Name: ${additionalAttendee.preferredName}`
+      );
+
       const additionalAttendeeToUpdate = await prisma.person.update({
         where: { id: additionalAttendeeInSystem.id },
         data: {
@@ -207,17 +230,17 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
           relatedPersonId: personId,
         },
       });
-      attendeeId = additionalAttendeeToUpdate.id;
+      personDbId = additionalAttendeeToUpdate.id;
     }
 
     const response = await GenerateBarcodeAndAddAttendee(
       conventionId,
-      attendeeId,
+      personDbId,
       passPurchased,
       isStayingOnSite
     );
     if (response.success) {
-      barcodesCreated.push({ personId: attendeeId, barcode: response.barcode });
+      barcodesCreated.push({ personId: personDbId, barcode: response.barcode });
     }
   }
 
