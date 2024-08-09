@@ -33,7 +33,9 @@ export async function GenerateBarcodeAndAddAttendee(
           | "$extends"
         >
       ) => {
-        console.log(`Beginning barcode transaction`);
+        console.log(
+          `Attempting to create barcode for Person: ${personId} - ${barcode}`
+        );
         // Really needed to streamline this transaction due to the database hosting solution
         // Vercel is very slow and unstable... oh and times out every 300 seconds
 
@@ -70,6 +72,8 @@ export async function GenerateBarcodeAndAddAttendee(
             entityId: newAttendee.id,
           },
         });
+
+        return;
       }
     );
 
@@ -141,7 +145,6 @@ export async function AddPurchasingPersonIntoSystem(
     });
     personDbId = personToUpdate.id;
   }
-  console.log(`Purchasing Pereson DB ID: ${personDbId}`)
 
   return personDbId;
 }
@@ -156,9 +159,13 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
   let barcodesCreated: { personId: number; barcode: string | null }[] = [];
   let personDbId: number;
 
-  console.log(`Adding ${additionalAttendees.length} people under the person`);
+  console.log(
+    `Adding ${additionalAttendees.length} people under the person: ${personId}`
+  );
 
   for (const additionalAttendee of additionalAttendees) {
+    console.log(`Adding additional person to purchasing person Person ID: ${personId} - Name: ${additionalAttendee.preferredName ?? additionalAttendee.firstName} | Last Name: `)
+
     // Find first person with as much information as we can
     const additionalAttendeeInSystem = await prisma.person.findFirst({
       where: {
@@ -193,8 +200,6 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
       },
     });
 
-    console.log(`Found this record in the db: ${additionalAttendeeInSystem?.id} | First Name: ${additionalAttendeeInSystem?.firstName} | Last Name: ${additionalAttendeeInSystem?.lastName}`)
-
     if (!additionalAttendeeInSystem) {
       const additionalAttendeeToAdd = await prisma.person.create({
         data: {
@@ -209,6 +214,10 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
       });
       personDbId = additionalAttendeeToAdd.id;
     } else {
+      console.log(
+        `** Match found** - ${additionalAttendeeInSystem.id} | First Name: ${additionalAttendee.firstName} | Last Name: ${additionalAttendee.lastName} | Preferred Name: ${additionalAttendee.preferredName}`
+      );
+
       const additionalAttendeeToUpdate = await prisma.person.update({
         where: { id: additionalAttendeeInSystem.id },
         data: {
@@ -223,7 +232,6 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
       });
       personDbId = additionalAttendeeToUpdate.id;
     }
-    console.log(`Attendee Person DB ID: ${personDbId}`)
 
     const response = await GenerateBarcodeAndAddAttendee(
       conventionId,
