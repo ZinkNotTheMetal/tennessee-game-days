@@ -16,14 +16,16 @@ interface LibraryFormProps {
 }
 
 function DisplayLastCheckedInTime(checkoutEvents: ICheckoutEvent[]) {
-  
-  if (checkoutEvents.length === 0) return 'No one has checked out this game'
+  if (checkoutEvents.length === 0) return "No one has checked out this game";
 
-  const lastCheckedIn = checkoutEvents.find(f => f.checkedInTimeUtcIso !== null)?.checkedInTimeUtcIso
+  const lastCheckedIn = checkoutEvents.find(
+    (f) => f.checkedInTimeUtcIso !== null
+  )?.checkedInTimeUtcIso;
 
-  if (lastCheckedIn === undefined) return 'Checked out - but not checked back in yet'
+  if (lastCheckedIn === undefined)
+    return "Checked out - but not checked back in yet";
 
-  return DateTime.fromISO(lastCheckedIn).toLocal().toFormat('MM/dd/yyyy t')
+  return DateTime.fromISO(lastCheckedIn).toLocal().toFormat("MM/dd/yyyy t");
 }
 
 export function LibraryForm({
@@ -44,23 +46,21 @@ export function LibraryForm({
       ...rest,
       boardGameGeekThing,
     },
-  })
+  });
 
   const onSubmit: SubmitHandler<ILibraryItem> = async (data) => {
     setOnSubmitting(true);
     // Updating
     if (data.id && data.id > 0) {
-      fetch(`/api/library/edit/${data.id}`,
-      {
+      fetch(`/api/library/edit/${data.id}`, {
         method: "PUT",
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       })
         .then((response) => {
           if (response.ok) {
-            toast(
-              `Successfully edited ${data.boardGameGeekThing.itemName}`,
-              { type: "success" }
-            );
+            toast(`Successfully edited ${data.boardGameGeekThing.itemName}`, {
+              type: "success",
+            });
           } else {
             toast(
               `Failed to edit ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
@@ -69,19 +69,17 @@ export function LibraryForm({
           }
         })
         .catch((error) => {
-          console.log(error)
+          console.log(error);
           toast(
             `Failed to edit ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
             { type: "error" }
           );
         });
     } else {
-      fetch(`/api/library/add`,
-        {
-          method: "POST",
-          body: JSON.stringify(data),
-        }
-      )
+      fetch(`/api/library/add`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      })
         .then((response) => {
           if (response.ok) {
             toast(
@@ -96,7 +94,7 @@ export function LibraryForm({
           }
         })
         .catch((error) => {
-          console.log(error)
+          console.log(error);
           toast(
             `Failed to add ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
             { type: "error" }
@@ -104,7 +102,7 @@ export function LibraryForm({
         });
     }
     router.replace("/library");
-    router.refresh()
+    router.refresh();
   };
 
   return (
@@ -421,7 +419,7 @@ export function LibraryForm({
                 Last Time Checked In
               </label>
               <span className="">
-                { DisplayLastCheckedInTime(libraryItem.checkOutEvents) }
+                {DisplayLastCheckedInTime(libraryItem.checkOutEvents)}
               </span>
             </div>
           </div>

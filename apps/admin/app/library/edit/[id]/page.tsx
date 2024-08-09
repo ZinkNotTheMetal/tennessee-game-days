@@ -15,8 +15,8 @@ async function getLibraryItem(id: number) {
     }
   );
 
-  const item: ILibraryItem = await libraryItemByIdApi.json();
-  return item;
+  const libraryItemResponse = await libraryItemByIdApi.json();
+  return libraryItemResponse.item;
 }
 
 export async function generateMetadata(
