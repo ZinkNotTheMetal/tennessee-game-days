@@ -21,8 +21,7 @@ export async function GenerateBarcodeAndAddAttendee(
     const generatedBarcode = `${DateTime.now().toFormat("yy")}${conventionId}-${personId}`;
 
     // 4. Add a new barcode in a transaction
-    prisma.$transaction(
-      async (
+    return await prisma.$transaction(async (
         transaction: Omit<
           PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
           | "$connect"
@@ -64,6 +63,12 @@ export async function GenerateBarcodeAndAddAttendee(
           },
         });
 
+        // Ensure proper error handling here
+        if (!newBarcode || !newAttendee) {
+          console.log(`New barcode: ${newBarcode} | ${newAttendee} was not successfully created`)
+          throw new Error("Transaction failed");
+        }
+
         await transaction.centralizedBarcode.update({
           where: {
             id: newBarcode.id,
@@ -73,20 +78,14 @@ export async function GenerateBarcodeAndAddAttendee(
           },
         });
 
-        return;
+        console.log(`**Barcode & Attendee successfully added to database - ${barcode} - ${success}**`)
+        return { success: true, barcode: generatedBarcode };
       }
     );
 
-    success = true;
-    barcode = generatedBarcode;
-    console.log(
-      `**Barcode & Attendee successfully added to database - ${barcode} - ${success}**`
-    );
   } catch (error) {
     console.error(error);
     throw error;
-  } finally {
-    return { success: success, barcode: barcode };
   }
 }
 
