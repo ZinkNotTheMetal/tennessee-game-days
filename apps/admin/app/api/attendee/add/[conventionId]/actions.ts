@@ -145,7 +145,6 @@ export async function AddPurchasingPersonIntoSystem(
     });
     personDbId = personToUpdate.id;
   }
-  console.log(`Purchasing Pereson DB ID: ${personDbId}`)
 
   return personDbId;
 }
@@ -201,8 +200,6 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
       },
     });
 
-    console.log(`Found this record in the db: ${additionalAttendeeInSystem?.id} | First Name: ${additionalAttendeeInSystem?.firstName} | Last Name: ${additionalAttendeeInSystem?.lastName}`)
-
     if (!additionalAttendeeInSystem) {
       const additionalAttendeeToAdd = await prisma.person.create({
         data: {
@@ -235,7 +232,6 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
       });
       personDbId = additionalAttendeeToUpdate.id;
     }
-    console.log(`Attendee Person DB ID: ${personDbId}`)
 
     const response = await GenerateBarcodeAndAddAttendee(
       conventionId,
