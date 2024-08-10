@@ -1,4 +1,5 @@
 interface TopCheckedOutGame {
+  id: number
   bggId: number
   libraryItemName: string
   allCopiesCheckedOut: boolean

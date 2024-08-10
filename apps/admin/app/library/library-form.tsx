@@ -22,8 +22,7 @@ function DisplayLastCheckedInTime(checkoutEvents: ICheckoutEvent[]) {
     (f) => f.checkedInTimeUtcIso !== null
   )?.checkedInTimeUtcIso;
 
-  if (lastCheckedIn === undefined)
-    return "Checked out - but not checked back in yet";
+  if (lastCheckedIn === undefined) return "Currently checked out";
 
   return DateTime.fromISO(lastCheckedIn).toLocal().toFormat("MM/dd/yyyy t");
 }

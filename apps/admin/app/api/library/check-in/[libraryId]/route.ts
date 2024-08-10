@@ -75,6 +75,8 @@ export async function PUT(request: NextRequest, { params }: { params: { libraryI
         }
       }
     })
+
+    return
   })
 
   revalidateTag('scanner')

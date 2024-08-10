@@ -3,6 +3,7 @@ import ScanningTerminalClient from "./scanning-form"
 import TopCheckedOutGames from "../components/top-20-results/results-table"
 import GameCheckoutItemOverview from "../components/checked-out-overview/overview";
 import { getCheckedOutGames, getPlayToWinPlays, getTop20CheckedOutGames } from "./actions";
+import { useRouter } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Scanning Terminal",
@@ -34,8 +35,9 @@ export default async function Page() {
           { checkedOutGames.list.map((game) => (
             <>
               { game.checkOutEvents[0]?.checkedInTimeUtcIso !== undefined && (
-                <div className="flex justify-between">
+                <div className="hover:bg-slate-200">
                   <GameCheckoutItemOverview
+                    id={game.id}
                     key={game.barcode}
                     gameName={game.alias || game.boardGameGeekThing.itemName} 
                     checkOutTimeUtcIso={game.checkOutEvents[0]?.checkedOutTimeUtcIso || ''}
