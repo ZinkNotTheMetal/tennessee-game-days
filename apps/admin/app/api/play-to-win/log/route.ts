@@ -1,4 +1,5 @@
 import prisma from "@/app/lib/prisma";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { DateTime } from "ts-luxon";
 
@@ -14,12 +15,24 @@ export async function POST(request: NextRequest) {
   if (data === undefined) return NextResponse.json({ error: 'Request is not correct, please verify your request'}, { status: 400 })
   if (data.attendeeIds === undefined || data.attendeeIds.length <= 0) return NextResponse.json({ error: 'No attendee Ids were linked and could not add the PTW play'}, { status: 400 })
 
-  // TODO: @WZ - Fix this to be during convention
+
   const nextUpcomingConvention = await prisma.convention.findFirst({
     where: {
-      endDateTimeUtc: {
-        gt: DateTime.utc().toISO()
-      }
+      OR: [
+        {
+          startDateTimeUtc: {
+            lte: DateTime.utc().toISO() // Convention is ongoing
+          },
+          endDateTimeUtc: {
+            gt: DateTime.utc().toISO()
+          }
+        },
+        {
+          startDateTimeUtc: {
+            gt: DateTime.utc().toISO() // Convention has not started yet
+          }
+        }
+      ]
     },
     include: {
       venue: true
@@ -47,6 +60,8 @@ export async function POST(request: NextRequest) {
       }
     }
   })
+
+  revalidateTag('scanner')
 
   return NextResponse.json({
     message: 'Successfully logged Play to Win Play'

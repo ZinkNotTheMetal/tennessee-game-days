@@ -1,9 +1,9 @@
-import { LibraryForm } from "../../library-form"
-import type { ILibraryItem } from "@repo/shared"
-import { LibraryItemEditButtons } from "./library-edit-buttons"
+import { LibraryForm } from "../../library-form";
+import type { ILibraryItem } from "@repo/shared";
+import { LibraryItemEditButtons } from "./library-edit-buttons";
 
 interface Props {
-  params: { id: string }
+  params: { id: string };
 }
 
 async function getLibraryItem(id: number) {
@@ -11,27 +11,25 @@ async function getLibraryItem(id: number) {
     `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/library/${id}`,
     {
       method: "GET",
-      cache: 'no-store',
+      cache: "no-store",
     }
   );
 
-  const libraryItemResponse = await libraryItemByIdApi.json();
-  return libraryItemResponse.item;
+  const libraryItemResponse: ILibraryItem = await libraryItemByIdApi.json();
+  return libraryItemResponse;
 }
 
-export async function generateMetadata(
-  { params }: Props
-) {
-  const libraryItem = await getLibraryItem(Number(params.id))
+export async function generateMetadata({ params }: Props) {
+  const libraryItem = await getLibraryItem(Number(params.id));
 
   return {
-    title: `Edit - ${libraryItem.barcode} - ${libraryItem.alias || libraryItem.boardGameGeekThing?.itemName}`
-  }
+    title: `Edit - ${libraryItem.barcode} - ${libraryItem.alias || libraryItem.boardGameGeekThing?.itemName}`,
+  };
 }
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const libraryItemId = Number(params.id)
-  const libraryItem = await getLibraryItem(libraryItemId)
+  const libraryItemId = Number(params.id);
+  const libraryItem = await getLibraryItem(libraryItemId);
 
   return (
     <main className="container mx-auto p-8">
@@ -39,7 +37,10 @@ export default async function Page({ params }: { params: { id: string } }) {
         Edit Game in library
       </h1>
 
-      <LibraryItemEditButtons id={libraryItemId} gameName={libraryItem?.boardGameGeekThing?.itemName || ''} />
+      <LibraryItemEditButtons
+        id={libraryItemId}
+        gameName={libraryItem?.boardGameGeekThing?.itemName || ""}
+      />
 
       <div className="pt-4">
         {!libraryItem && (

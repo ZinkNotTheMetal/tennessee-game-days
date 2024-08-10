@@ -19,6 +19,7 @@ export default function ScanningTerminalClient() {
     // Scenarios:
     const scannedAttendees = barcodeResults.filter(f => f.entityType === 'Attendee')
     const scannedLibraryItem = barcodeResults.find(f => f.entityType === 'LibraryItem')
+    // Play to Win is handled in the submit handler
 
     // 1. Check in a user who isn't checked in
     if (scannedAttendees[0] && !(scannedAttendees[0].isUserCheckedIn) && !scannedLibraryItem) {
@@ -36,7 +37,6 @@ export default function ScanningTerminalClient() {
         .finally(() => {
           setBarcodeResults([])
           reset()
-          router.refresh()
         })
     }
     
@@ -52,11 +52,10 @@ export default function ScanningTerminalClient() {
         .finally(() => {
           setBarcodeResults([])
           reset()
-          router.refresh()
         })
     }
     
-    // 2. If an attendee and library item (not checked out) are scanned in any order
+    // 3. If an attendee and library item (not checked out) are scanned in any order
     if (scannedLibraryItem && scannedAttendees.length === 1 && scannedAttendees[0]) {
       CheckOutLibraryItem(scannedLibraryItem.entityId, scannedAttendees[0].entityId)
         .then((response) => {
@@ -71,8 +70,19 @@ export default function ScanningTerminalClient() {
         .finally(() => {
           setBarcodeResults([])
           reset()
-          router.refresh()
         })
+    }
+
+    // 4. Clear and reset to last if multiple library games are scanned
+    const libraryItems = barcodeResults.filter(f => f.entityType == 'LibraryItem');
+
+    if (libraryItems.length > 1) {
+      const lastBarCodeResult = libraryItems.slice(-1)[0]
+      setBarcodeResults([lastBarCodeResult ?? {} as BarcodeResponse])
+      reset()
+      remove(0)
+      append({ barcode: lastBarCodeResult?.barcode ?? '', })
+      append({ barcode: '' })
     }
 
     router.refresh()
@@ -136,7 +146,7 @@ export default function ScanningTerminalClient() {
       toast(`Successfully logged Play to Win play ${scannedPlayToWinGame.barcode}`, { type: "success" })
       playCompleteChime()
     } else {
-      toast(`Error - logging Play to Win play ${scannedPlayToWinGame.barcode}`, { type: "success" })
+      toast(`Error - logging Play to Win play ${scannedPlayToWinGame.barcode}`, { type: "error" })
       playErrorChime()
     }
 
@@ -164,23 +174,27 @@ export default function ScanningTerminalClient() {
               }
             }}
           />
-          <button type="button" 
-            key={`${id}-btn`}
-            onClick={(e) => {
-              e.preventDefault()
-              remove(index)
-              append({ barcode: ''})
-              // Remove the barcode from barcodeResults
-              setBarcodeResults(previous => {
-                const updatedResults = [...previous];
-                updatedResults.splice(index, 1); // Remove the barcode at the specified index
-                return updatedResults;
-              })
-            }}
-            className="w-4 h-4"
-          >
-            <FaRegTrashCan />
-          </button>
+          {index === 0 ? (
+            <span className="w-4 h-4">&nbsp;</span>
+          ) : (
+            <button
+              type="button"
+              key={`${id}-btn`}
+              onClick={(e) => {
+                e.preventDefault();
+                remove(index);
+                // Remove the barcode from barcodeResults
+                setBarcodeResults((previous) => {
+                  const updatedResults = [...previous];
+                  updatedResults.splice(index, 1); // Remove the barcode at the specified index
+                  return updatedResults;
+                });
+              }}
+              className="w-4 h-4"
+            >
+              <FaRegTrashCan />
+            </button>
+          )}
         </div>
       ))}
 

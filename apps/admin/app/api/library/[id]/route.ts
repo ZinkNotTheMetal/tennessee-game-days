@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma"
 import { GetLibraryItemById } from "./actions"
-import { LibraryItemResponse } from "./response"
+import { ILibraryItem } from "@repo/shared"
 
 export const dynamic = "force-dynamic"
 
@@ -26,7 +26,7 @@ export const dynamic = "force-dynamic"
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/LibraryItemResponse'
+ *               $ref: '#/components/schemas/LibraryItem'
  *       404:
  *         description: Library item was not found with that unique identifier
  *         content:
@@ -41,7 +41,7 @@ export async function GET(
   const response = await GetLibraryItemById(Number(params.id))
   if (response === null) NextResponse.json({ message: "Game not found" }, { status: 404 })
 
-  return NextResponse.json<LibraryItemResponse>({ item: response }, { status: 200 })
+  return NextResponse.json<ILibraryItem>(response ?? {} as ILibraryItem, { status: 200 })
 }
 
 /**

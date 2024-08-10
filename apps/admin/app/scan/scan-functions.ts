@@ -39,6 +39,9 @@ async function CheckInLibraryItem(libraryItemId: number) : Promise<number> {
     `/api/library/check-in/${libraryItemId}`,
     {
       method: "PUT",
+      next: {
+        tags: ['scanner']
+      }
     }
   )
   if (!response.ok) {
@@ -50,11 +53,12 @@ async function CheckInLibraryItem(libraryItemId: number) : Promise<number> {
 }
 
 async function CheckInAttendee(attendeeId: number): Promise<number> {
-  const response = await fetch(
-    `/api/attendee/check-in/${attendeeId}`,
-    {
+  const response = await fetch(`/api/attendee/check-in/${attendeeId}`, {
       method: "PATCH",
-    }
+      next: {
+        tags: ['scanner']
+      }
+    },
   )
   if (!response.ok) {
     console.log(response.status)
@@ -68,7 +72,10 @@ async function CheckOutLibraryItem(libraryItemId: number, attendeeId: number): P
     `/api/library/check-out`,
     {
       method: "POST",
-      body: JSON.stringify({ libraryId: libraryItemId, attendeeId: attendeeId })
+      body: JSON.stringify({ libraryId: libraryItemId, attendeeId: attendeeId }),
+      next: {
+        tags: ['scanner']
+      }
     }
   )
   if (!response.ok) {
@@ -84,7 +91,10 @@ async function LogPlayToWinPlay(playToWinItemId: number, attendeeIds: number[]):
     `/api/play-to-win/log`,
     {
       method: "POST",
-      body: JSON.stringify({ playToWinItemId: playToWinItemId, attendeeIds: attendeeIds })
+      body: JSON.stringify({ playToWinItemId: playToWinItemId, attendeeIds: attendeeIds }),
+      next: {
+        tags: ['scanner']
+      }
     }
   )
   if (!response.ok) {

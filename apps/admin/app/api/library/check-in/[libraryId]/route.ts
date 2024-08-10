@@ -1,4 +1,5 @@
 import prisma from "@/app/lib/prisma"
+import { revalidateTag } from "next/cache"
 import { NextRequest, NextResponse } from "next/server"
 import { DateTime } from "ts-luxon"
 
@@ -75,6 +76,8 @@ export async function PUT(request: NextRequest, { params }: { params: { libraryI
       }
     })
   })
+
+  revalidateTag('scanner')
 
   return NextResponse.json({
     message: 'Successfully checked in!'
