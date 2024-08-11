@@ -69,10 +69,15 @@ export async function POST(request: NextRequest) {
 
 }
 
+/* TODO: Document this */
 export async function GET() {
   const nextUpcomingConvention = await prisma.convention.findFirst({
     where: {
+      startDateTimeUtc: {
+        not: null
+      },
       endDateTimeUtc: {
+        not: null,
         gt: DateTime.utc().toISO()
       }
     },
