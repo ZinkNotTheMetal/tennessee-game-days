@@ -2,12 +2,58 @@ import { Metadata } from "next"
 import ScanningTerminalClient from "./scanning-form"
 import TopCheckedOutGames from "../components/top-20-results/results-table"
 import GameCheckoutItemOverview from "../components/checked-out-overview/overview";
-import { getCheckedOutGames, getPlayToWinPlays, getTop20CheckedOutGames } from "./actions";
-import { useRouter } from "next/navigation";
+import { ApiListResponse, ILibraryItem, TopCheckedOutGame } from "@repo/shared";
 
 export const metadata: Metadata = {
   title: "Scanning Terminal",
 };
+
+async function getCheckedOutGames() {
+  const checkedOutGamesApi = await fetch(
+    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/library/check-out`,
+    {
+      method: "GET",
+      next: {
+        tags: ['scanner']
+      }
+    }
+  );
+  const checkedOutItems: ApiListResponse<ILibraryItem> = await checkedOutGamesApi.json()
+  return checkedOutItems;
+}
+
+async function getPlayToWinPlays() {
+  const getPlayToWinPlayCount = await fetch(
+    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/play-to-win/log`,
+    {
+      method: "GET",
+      next: {
+        tags: ['scanner']
+      }
+    }
+  );
+
+  const response = await getPlayToWinPlayCount.json();
+  const count: number = response.count; 
+  return count;
+}
+
+async function getTop20CheckedOutGames() {
+  const top20AllTimeApi = await fetch(
+    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/library/stats/all-time-top-20`,
+    {
+      method: "GET",
+      next: {
+        tags: ['scanner']
+      }
+    }
+  );
+  const response: { list: TopCheckedOutGame[] } = await top20AllTimeApi.json()
+
+  return response.list
+
+}
+
 
 export default async function Page() {
   const checkedOutGames = await getCheckedOutGames()

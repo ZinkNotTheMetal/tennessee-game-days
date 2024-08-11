@@ -57,8 +57,8 @@ export async function GetLibraryItemById(id: number) {
     },
     checkOutEvents: libraryItemById.checkOutEvents.map(event => ({
       ...event,
-      checkedInTimeUtcIso: event.checkedInTimeUtcIso?.toUTCString(),
-      checkedOutTimeUtcIso: event.checkedOutTimeUtcIso.toUTCString(),
+      checkedInTimeUtcIso: event.checkedInTimeUtcIso?.toISOString(),
+      checkedOutTimeUtcIso: event.checkedOutTimeUtcIso.toISOString(),
       attendee: {} as IAttendee
     }))
   }

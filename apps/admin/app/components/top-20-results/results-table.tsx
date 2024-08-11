@@ -98,6 +98,7 @@ function ResultsTableRow({
   return (
     <tr
       className={`${allCopiesCheckedOut ? 'italic text-red-400' : ''}`}
+      key={libraryItemName}
     >
       <td className="p-3">{ libraryItemName }</td>
       <td className="p-3">{ totalCheckedOutEvents }</td>
