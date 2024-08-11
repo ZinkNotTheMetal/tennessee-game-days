@@ -10,9 +10,10 @@ interface CheckedOutItemRow {
   checkOutTimeUtcIso: string
   attendeePreferredName: string
   attendeeLastName: string
+  attendeeBadgeNumber: string
 }
 
-export default function GameCheckoutItemOverview({ id, gameName, checkOutTimeUtcIso, attendeePreferredName, attendeeLastName }: CheckedOutItemRow): JSX.Element {
+export default function GameCheckoutItemOverview({ id, gameName, checkOutTimeUtcIso, attendeePreferredName, attendeeLastName, attendeeBadgeNumber }: CheckedOutItemRow): JSX.Element {
   const [elapsedTime, setElapsedTime] = useState<string>('');
   const router = useRouter()
 
@@ -26,7 +27,7 @@ export default function GameCheckoutItemOverview({ id, gameName, checkOutTimeUtc
 
   return (
     <div className="flex justify-between hover:bg-slate-300 cursor-pointer px-1" onClick={() => router.push(`/library/edit/${id}`)}>
-      <span>{gameName} - {attendeePreferredName} {attendeeLastName}</span>
+      <span>{gameName} - {attendeePreferredName} {attendeeLastName} ({attendeeBadgeNumber})</span>
       <span>{elapsedTime}</span>
     </div>
   );

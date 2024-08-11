@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ConventionTable } from "./convention-table";
 import { ApiListResponse } from "@repo/shared";
 import type { IConvention } from "@repo/shared";
+import BackToTopButton from "@/app/components/back-to-top/back-to-top-button";
 
 export const metadata: Metadata = {
   title: "TGD - Conventions",
@@ -59,6 +60,7 @@ export default async function Page() {
               conventions={conventionsResponse.list}
               total={conventionsResponse.total}
             />
+            <BackToTopButton />
           </div>
         )}
       </div>

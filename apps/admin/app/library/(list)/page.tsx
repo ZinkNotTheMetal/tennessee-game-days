@@ -1,6 +1,7 @@
 import { GetAllLibraryItems } from "@/app/api/library/list/actions";
 import { LibraryGameTable } from "./library-table"
 import AddGameToLibraryButton from "@/app/components/buttons/add-game-to-library"
+import BackToTopButton from "@/app/components/back-to-top/back-to-top-button";
 
 export const revalidate = 0; //Very important
 
@@ -41,6 +42,7 @@ export default async function Page() {
               libraryItems={libraryItems}
               total={libraryItemCount}
             />
+            <BackToTopButton />
           </div>
         </>
       )}

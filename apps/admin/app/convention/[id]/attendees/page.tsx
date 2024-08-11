@@ -1,6 +1,7 @@
 import { GetConventionById } from "@/app/api/convention/[id]/actions";
 import { AttendeesTable } from "./attendee-table"
 import { GetAllAttendeesForConvention } from "@/app/api/attendee/count/[conventionId]/actions"
+import BackToTopButton from "@/app/components/back-to-top/back-to-top-button";
 
 interface Props {
   params: { id: string }
@@ -31,6 +32,7 @@ export default async function Page({ params }: { params: { id: string }}): Promi
       { allAttendees.length > 0 && (
         <div className="py-8 flex justify-center">
           <AttendeesTable attendees={allAttendees} total={allAttendees.length} />
+          <BackToTopButton />
         </div>
       )}
     </main>
