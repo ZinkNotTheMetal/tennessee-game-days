@@ -69,5 +69,5 @@ export interface AttendeeCountResponse {
   cancelled: number
   checkedIn: number
   volunteer: number
-  list: Prisma.AttendeeGetPayload<{}>[]
+  list: Prisma.AttendeeGetPayload<{ include: { person: { include: { relatedTo: true, _count: { select: { attendee: true}}}}}}>[]
 }
