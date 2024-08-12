@@ -8,6 +8,7 @@ generator client {
   provider = "prisma-client-js"
   //output = "../node_modules/.prisma/client"
   //output = "../../node_modules/.prisma/client"
+  //output = "../../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -253,7 +254,7 @@ model Attendee {
   checkedInUtc       DateTime?          @map(name: "checked_in_utc") @db.Timestamptz()
   dateRegistered     DateTime           @map(name: "registered_date_utc") @db.Timestamptz()
   isVolunteer        Boolean            @default(false) @map(name: "is_volunteer")
-  idTgdOrganizer     Boolean            @default(false) @map(name: "is_organizer")
+  isTgdOrganizer     Boolean            @default(false) @map(name: "is_organizer")
   passPurchased      PassTypePurchased  @map(name: "pass_purchased")
 
   centralizedBarcode CentralizedBarcode    @relation(fields: [barcode], references: [barcode])

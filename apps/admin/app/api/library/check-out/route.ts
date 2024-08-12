@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { DateTime } from "ts-luxon";
 import { CheckoutItemListResponse } from "./response";
 import { revalidateTag } from "next/cache";
+import { Prisma } from "@prisma/client";
 
 /**
  * @swagger
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  await prisma.$transaction(async (t) => {
+  await prisma.$transaction(async (t: Prisma.TransactionClient) => {
     await t.libraryItem.update({
       where: { id: Number(data.libraryId) },
       data: {

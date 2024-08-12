@@ -2,6 +2,7 @@ import { PlayToWinItemsTable } from "./play-to-win-item-table"
 import { ApiListResponse, IConvention, IPlayToWinItem } from "@repo/shared"
 import PlayToWinItemUploadButton from "./upload-ptw-games-button"
 import ConventionSelectDropdown from "./convention-select-dropdown"
+import BackToTopButton from "@/app/components/back-to-top/back-to-top-button"
 
 interface Props {
   params: { conventionId: string }
@@ -56,6 +57,7 @@ export default async function Page({ params }: Props) {
           items={playToWinItems.list}
           total={playToWinItems.total}
         />
+        <BackToTopButton />
       </div>
     </main>
   )

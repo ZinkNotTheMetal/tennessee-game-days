@@ -4,9 +4,10 @@ import {
   IEmergencyContact,
 } from "@/app/api/requests/add-attendee-request";
 import prisma from "@/app/lib/prisma";
-import { Prisma, PrismaClient } from "@prisma/client";
-import { DefaultArgs } from "@prisma/client/runtime/library";
+import { Prisma } from "@prisma/client";
 import { DateTime } from "ts-luxon";
+
+
 
 // Might need to this
 export async function GenerateBarcodeAndAddAttendee(
@@ -20,17 +21,10 @@ export async function GenerateBarcodeAndAddAttendee(
   try {
     const generatedBarcode = `${DateTime.now().toFormat("yy")}${conventionId}-${personId}`;
 
+    
     // 4. Add a new barcode in a transaction
     return await prisma.$transaction(async (
-        transaction: Omit<
-          PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-          | "$connect"
-          | "$disconnect"
-          | "$on"
-          | "$transaction"
-          | "$use"
-          | "$extends"
-        >
+        transaction: Prisma.TransactionClient
       ) => {
         console.log(
           `Attempting to create barcode for Person: ${personId} - ${barcode}`

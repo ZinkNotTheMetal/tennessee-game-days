@@ -31,8 +31,10 @@ import {
 import { Prisma } from "@prisma/client";
 
 interface LibraryGameTableProps {
-  libraryItems: Prisma.LibraryItemGetPayload<{ include: { boardGameGeekThing: true }}>[]
-  total: number
+  libraryItems: Prisma.LibraryItemGetPayload<{
+    include: { boardGameGeekThing: true };
+  }>[];
+  total: number;
 }
 
 declare module "@tanstack/react-table" {
@@ -49,12 +51,14 @@ export function LibraryGameTable({
 }: LibraryGameTableProps): JSX.Element {
   const [query, setQuery] = useState<string>("");
   const [sorting, setSorting] = useState<SortingState>([
-    { id: "boardGameGeekThing_itemName", desc: false }
+    { id: "boardGameGeekThing_itemName", desc: false },
   ]);
-  const router = useRouter()
-  type LibraryItemPrismaRowType = Prisma.LibraryItemGetPayload<{ include: { boardGameGeekThing: true } }>
+  const router = useRouter();
+  type LibraryItemPrismaRowType = Prisma.LibraryItemGetPayload<{
+    include: { boardGameGeekThing: true };
+  }>;
 
-  const columnHelper = createColumnHelper<LibraryItemPrismaRowType>()
+  const columnHelper = createColumnHelper<LibraryItemPrismaRowType>();
 
   const customGlobalFilter: FilterFn<any> = (
     row: Row<ILibraryItem>,
@@ -62,13 +66,14 @@ export function LibraryGameTable({
     query: string
   ) => {
     if (columnId === "boardGameGeekThing_itemName") {
-      const valueToSearch = row.original.alias || row.original.boardGameGeekThing.itemName;
-      return valueToSearch.toLowerCase().startsWith(query.toLowerCase())
+      const valueToSearch =
+        row.original.alias || row.original.boardGameGeekThing.itemName;
+      return valueToSearch.toLowerCase().startsWith(query.toLowerCase());
     }
-    const search = query.toLowerCase()
-    const value = String(row.getValue<string>(columnId))
-    return value?.toLowerCase().startsWith(search)
-  }
+    const search = query.toLowerCase();
+    const value = String(row.getValue<string>(columnId));
+    return value?.toLowerCase().startsWith(search);
+  };
 
   const columns = [
     columnHelper.accessor("barcode", {
@@ -126,7 +131,7 @@ export function LibraryGameTable({
         );
       },
     }),
-  ]
+  ];
 
   const reactTable = useReactTable({
     data: libraryItems,
@@ -141,7 +146,7 @@ export function LibraryGameTable({
     onGlobalFilterChange: setQuery,
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-  })
+  });
 
   return (
     <>
@@ -172,17 +177,14 @@ export function LibraryGameTable({
                           : flexRender(
                               header.column.columnDef.header,
                               header.getContext()
-                        )}
+                            )}
                       </span>
                       {/* Render sort icon based on meta properties */}
                       <span className="inline-block align-middle">
-                        {
-                          { 
-                            asc: header.column.columnDef.meta?.sortAscIcon,
-                            desc: header.column.columnDef.meta?.sortDescIcon
-                          }
-                          [header.column.getIsSorted() as string] ?? null
-                        }
+                        {{
+                          asc: header.column.columnDef.meta?.sortAscIcon,
+                          desc: header.column.columnDef.meta?.sortDescIcon,
+                        }[header.column.getIsSorted() as string] ?? null}
                       </span>
                     </th>
                   ))}
@@ -208,15 +210,15 @@ export function LibraryGameTable({
                             cell.getContext()
                           )}
                         </td>
-                      )
+                      );
                     })}
                   </tr>
-                )
+                );
               })}
             </tbody>
           </table>
         )}
       </div>
     </>
-  )
+  );
 }

@@ -89,6 +89,7 @@ export default async function Page() {
                     checkOutTimeUtcIso={game.checkOutEvents[0]?.checkedOutTimeUtcIso || ''}
                     attendeePreferredName={game.checkOutEvents[0]?.attendee.person.preferredName || game.checkOutEvents[0]?.attendee.person.firstName || ''}
                     attendeeLastName={game.checkOutEvents[0]?.attendee.person.lastName || ''}
+                    attendeeBadgeNumber={game.checkOutEvents[0].attendee.barcode}
                   />
                 </div>
               )}
