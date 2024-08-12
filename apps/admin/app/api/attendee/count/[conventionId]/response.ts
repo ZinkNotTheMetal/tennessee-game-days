@@ -56,6 +56,9 @@ import { Prisma } from "@prisma/client";
  *         checkedIn:
  *           type: number
  *           description: The total amount of players who have checked in to this conference
+ *         volunteer:
+ *           type: number
+ *           description: The total amount of volunteers that are associated with the conference (includes TGD organizers)
  *         list:
  *           type: array
  *           items:
@@ -65,5 +68,6 @@ export interface AttendeeCountResponse {
   total: number
   cancelled: number
   checkedIn: number
+  volunteer: number
   list: Prisma.AttendeeGetPayload<{}>[]
 }

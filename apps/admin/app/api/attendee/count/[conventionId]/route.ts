@@ -34,7 +34,7 @@ export const fetchCache = "force-no-store"
  */
 export async function GET(request: NextRequest, { params }: { params: { conventionId: string }}) {
 
-  const [cancelledCount, nonCancelledCount, checkedInCount, attendees] = await Promise.all([
+  const [cancelledCount, nonCancelledCount, checkedInCount, volunteerCount, attendees] = await Promise.all([
     prisma.attendee.count({
       where: {
         AND: [
@@ -71,6 +71,21 @@ export async function GET(request: NextRequest, { params }: { params: { conventi
         ]
       }
     }),
+    prisma.attendee.count({
+      where: {
+        AND: [
+          {
+            OR: [
+              { isVolunteer: true },
+              { isTgdOrganizer: true }
+            ]
+          },
+          {
+            conventionId: Number(params.conventionId)
+          }
+        ]
+      }
+    }),
     GetAllAttendeesForConvention(Number(params.conventionId))
   ])
 
@@ -78,6 +93,7 @@ export async function GET(request: NextRequest, { params }: { params: { conventi
     total: cancelledCount + nonCancelledCount,
     cancelled: cancelledCount,
     checkedIn: checkedInCount,
+    volunteer: volunteerCount,
     list: attendees,
   });
 }
