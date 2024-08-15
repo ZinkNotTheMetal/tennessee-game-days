@@ -14,7 +14,8 @@ async function getCheckedOutGames() {
     {
       method: "GET",
       next: {
-        tags: ['scanner']
+        tags: ['scanner'],
+        revalidate: 300
       }
     }
   );
@@ -28,7 +29,8 @@ async function getPlayToWinPlays() {
     {
       method: "GET",
       next: {
-        tags: ['scanner']
+        tags: ['scanner'],
+        revalidate: 300
       }
     }
   );
@@ -44,7 +46,8 @@ async function getTop20CheckedOutGames() {
     {
       method: "GET",
       next: {
-        tags: ['scanner']
+        tags: ['scanner'],
+        revalidate: 300
       }
     }
   );
