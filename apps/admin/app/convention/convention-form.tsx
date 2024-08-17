@@ -20,11 +20,6 @@ export function ConventionForm({ payload }: ConventionFormProps): JSX.Element {
   const router = useRouter()
 
   useEffect(() => {
-    console.log('default start date', payload?.startDateTimeUtc)
-    console.log('transformed date',  DateTime.fromISO(payload?.startDateTimeUtc?.toString() ?? '').toLocal().toFormat('yyyy-MM-dd\'T\'HH:mm'))
-  })
-
-  useEffect(() => {
     fetch(`/api/venue/list`,
     {
       method: "GET"
