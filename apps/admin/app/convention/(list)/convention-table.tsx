@@ -82,7 +82,10 @@ function ConventionRow({ id, name, startDateTimeUtc, endDateTimeUtc, isCancelled
     <tr
       className="border-b hover:bg-blue-100 hover:cursor-pointer text-center"
       key={id}
-      onClick={() => router.push(`/convention/${id}`)}
+      onClick={() => {
+        router.prefetch(`/convention/${id}`)
+        router.push(`/convention/${id}`)
+      }}
     >
       <td className="py-4 px-6 border-b">{name}</td>
       <td className="py-4 px-6 border-b">{venue?.name}</td>

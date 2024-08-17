@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma"
-import { GetConventionById } from "./actions"
-import { ConventionResponse } from "./response"
+import { revalidateTag } from "next/cache"
+import { Prisma } from "@prisma/client"
 
 export const dynamic = "force-dynamic"
 
@@ -38,14 +38,17 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const convention = await GetConventionById(Number(params.id))
+  const convention = await prisma.convention.findFirst({
+    where: { id: Number(params.id) },
+    include: {
+      venue: true,
+    },
+  })
 
   if (convention === null || convention === undefined)
     return NextResponse.json({ message: "Convention not found" }, { status: 404 });
 
-  return NextResponse.json<ConventionResponse>({
-    convention: convention
-  });
+  return NextResponse.json<Prisma.ConventionGetPayload<{include: { venue: true }}>>(convention);
 }
 
 /**
@@ -78,15 +81,22 @@ export async function GET(
  *                message: string
  */
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  const convention = await GetConventionById(Number(params.id))
+  const conventionById = await prisma.convention.findFirst({
+    where: { id: Number(params.id) },
+    include: {
+      venue: true,
+    },
+  })
 
-  if (convention === null || convention === undefined)
+  if (conventionById === null || conventionById === undefined)
     return NextResponse.json({ message: "Convention not found" }, { status: 404 });
 
   // TODO: Fix 500 error (PTW items not deleted) or return unable to delete
   await prisma.convention.delete({
     where: { id: Number(params.id) },
   });
+
+  revalidateTag('convention')
 
   return NextResponse.json(
     {

@@ -1,7 +1,7 @@
-import { GetConventionById } from "@/app/api/convention/[id]/actions";
 import { AttendeesTable } from "./attendee-table"
 import { GetAllAttendeesForConvention } from "@/app/api/attendee/count/[conventionId]/actions"
 import BackToTopButton from "@/app/components/back-to-top/back-to-top-button";
+import { GetConventionById } from "../page";
 
 interface Props {
   params: { id: string }

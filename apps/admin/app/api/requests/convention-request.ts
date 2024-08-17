@@ -49,6 +49,7 @@ interface IVenueRequest {
   latitude?: number
   /** @format decimal */
   longitude?: number
+  timeZone?: string
 }
 
 /**

@@ -3,18 +3,35 @@ import EditConventionButton from "@/app/components/buttons/edit-convention-butto
 import BackButton from "@/app/components/buttons/back-button"
 import ViewPlayToWinGamesForConvention from "@/app/components/buttons/view-ptw-games-button"
 import ViewAttendeesForConvention from "./view-attendees-button"
-import { GetConventionById } from "@/app/api/convention/[id]/actions"
 import { GetAttendeeCounts } from "@/app/api/report/[conventionId]/attendee/actions"
 import { GetPlayToWinReportByConvention } from "@/app/api/report/[conventionId]/play-to-win/actions"
 import { GetLibraryPlaytimeCounts } from "@/app/api/report/[conventionId]/library/actions"
+import { IConvention } from "@repo/shared"
 
 interface Props {
   params: { id: string }
 }
 
+export async function GetConventionById(id: number) {
+  const conventionApi = await fetch(
+    `${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/convention/${id}`,
+    {
+      method: "GET",
+      next: {
+        tags: ["convention"],
+        revalidate: 3600,
+      },
+    }
+  );
+
+  const convention: IConvention = await conventionApi.json()
+  return convention;
+}
+
 export async function generateMetadata(
   { params }: Props
 ) {
+  
   const convention = await GetConventionById(Number(params.id))
 
   return {
@@ -42,15 +59,15 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
         <h2 className="text-xl font-semibold mb-4">Event Details:</h2>
         <div className="flex flex-wrap items-center mb-4">
           <p className="w-full sm:w-1/2 mb-2 sm:mb-0">Extra Hours Start Date:</p>
-          <p className="w-full sm:w-1/2">{convention?.extraHoursStartDateTimeUtc && (DateTime.fromJSDate(convention.extraHoursStartDateTimeUtc).toLocal().toLocaleString(DateTime.DATETIME_FULL))}</p>
+          <p className="w-full sm:w-1/2">{convention?.extraHoursStartDateTimeUtc && (DateTime.fromISO(convention.extraHoursStartDateTimeUtc.toString()).toLocal().toLocaleString(DateTime.DATETIME_FULL))}</p>
         </div>
         <div className="flex flex-wrap items-center mb-4">
           <p className="w-full sm:w-1/2 mb-2 sm:mb-0">Start Date:</p>
-          <p className="w-full sm:w-1/2">{convention?.startDateTimeUtc && (DateTime.fromJSDate(convention.startDateTimeUtc).toLocal().toLocal().toLocaleString(DateTime.DATETIME_FULL))}</p>
+          <p className="w-full sm:w-1/2">{convention?.startDateTimeUtc && (DateTime.fromISO(convention.startDateTimeUtc.toString()).toLocal().toLocal().toLocaleString(DateTime.DATETIME_FULL))}</p>
         </div>
         <div className="flex flex-wrap items-center mb-4">
           <p className="w-full sm:w-1/2 mb-2 sm:mb-0">End Date:</p>
-          <p className="w-full sm:w-1/2">{convention?.endDateTimeUtc && (DateTime.fromJSDate(convention.endDateTimeUtc).toLocal().toLocaleString(DateTime.DATETIME_FULL))}</p>
+          <p className="w-full sm:w-1/2">{convention?.endDateTimeUtc && (DateTime.fromISO(convention.endDateTimeUtc.toString()).toLocal().toLocaleString(DateTime.DATETIME_FULL))}</p>
         </div>
         <div className="flex flex-wrap items-center mb-4">
           <p className="w-full sm:w-1/2 mb-2 sm:mb-0">Venue:</p>

@@ -41,6 +41,7 @@ Table venues {
   postalCode String [not null]
   latitude Decimal
   longitude Decimal
+  timeZone String
   convention conventions [not null]
 }
 

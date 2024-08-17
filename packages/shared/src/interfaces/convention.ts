@@ -9,6 +9,7 @@ interface IConvention {
   endDateTimeUtc?: string // ISO format in string
   updatedAtUtc?: string // ISO format in string
   isCancelled: boolean
+  venueId: number
   venue?: IVenue
 }
 

@@ -26,29 +26,27 @@ export const fetchCache = "force-no-store";
  *               $ref: '#/components/schemas/UpcomingConventionResponse'
  */
 export async function GET() {
-  console.log(process.env.DATABASE_URL)
-
   const nextUpcomingConvention = await prisma.convention.findFirst({
     where: {
       startDateTimeUtc: {
-        not: null
+        not: null,
       },
       endDateTimeUtc: {
         not: null,
-        gt: DateTime.utc().toISO()
-      }
+        gt: DateTime.utc().toISO(),
+      },
     },
     include: {
-      venue: true
+      venue: true,
     },
     orderBy: {
-      startDateTimeUtc: 'asc'
-    }
-  })
+      startDateTimeUtc: "asc",
+    },
+  });
 
-  revalidateTag('convention')
+  revalidateTag("convention");
 
   return NextResponse.json<UpcomingConventionResponse>({
-    convention: nextUpcomingConvention
-  })
+    convention: nextUpcomingConvention,
+  });
 }
