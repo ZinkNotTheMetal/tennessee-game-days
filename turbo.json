@@ -6,7 +6,9 @@
     "NEXT_PUBLIC_VERCEL_PROTOCOL",
     "NODE_ENV",
     "DATABASE_URL",
-    "NEXT_PUBLIC_API_KEY"
+    "NEXT_PUBLIC_API_KEY",
+    "GEOAPIFY_API_URL",
+    "GEOAPIFY_API_KEY"
   ],
   "tasks": {
     "db:generate": {

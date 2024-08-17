@@ -70,6 +70,7 @@ model Venue {
   postalCode    String   @map(name: "postal_code")
   latitude      Decimal? @map(name: "latitude")
   longitude     Decimal? @map(name: "longitude")
+  timeZone      String?  @map(name: "time_zone")
 
   convention Convention[]
 

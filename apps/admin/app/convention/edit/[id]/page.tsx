@@ -1,4 +1,4 @@
-import { GetConventionById } from "@/app/api/convention/[id]/actions";
+import { GetConventionById } from "../../[id]/page";
 import { ConventionForm } from "../../convention-form"
 import DeleteConventionButton from "./delete-convention-button"
 import BackButton from "@/app/components/buttons/back-button"
