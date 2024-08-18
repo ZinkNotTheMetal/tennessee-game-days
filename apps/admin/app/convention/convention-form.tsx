@@ -1,6 +1,5 @@
 "use client"
 
-import { Prisma } from "@prisma/client"
 import { ApiListResponse, IConvention } from "@repo/shared"
 import { IVenue } from "@repo/shared/src/interfaces/venue"
 import { useRouter } from "next/navigation"

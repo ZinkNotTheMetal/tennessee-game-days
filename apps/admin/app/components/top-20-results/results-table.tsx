@@ -71,7 +71,7 @@ function ResultsTableBody({ games }: ResultsTableBodyProps): JSX.Element {
     <tbody className="text-center">
 
       { games.map((game) => (
-        <ResultsTableRow key={game.bggId} {...game} />
+        <ResultsTableRow key={game.id} {...game} />
       ))}
 
     </tbody>
@@ -79,6 +79,7 @@ function ResultsTableBody({ games }: ResultsTableBodyProps): JSX.Element {
 }
 
 interface ResultsRowProps {
+  id: number
   bggId: number
   libraryItemName: string
   allCopiesCheckedOut: boolean
@@ -92,13 +93,12 @@ interface ResultsRowProps {
 }
 
 function ResultsTableRow({ 
-  bggId, libraryItemName, allCopiesCheckedOut, totalCheckedOutMinutes, totalCheckedOutEvents, bggAverageRating, bggAverageComplexity, minPlayerCount, maxPlayerCount, bggPlaytimeMinutes
+  id, libraryItemName, allCopiesCheckedOut, totalCheckedOutMinutes, totalCheckedOutEvents, bggAverageRating, bggAverageComplexity, minPlayerCount, maxPlayerCount, bggPlaytimeMinutes
 }: ResultsRowProps) : JSX.Element {
 
   return (
     <tr
       className={`${allCopiesCheckedOut ? 'italic text-red-400' : ''}`}
-      key={libraryItemName}
     >
       <td className="p-3">{ libraryItemName }</td>
       <td className="p-3">{ totalCheckedOutEvents }</td>
