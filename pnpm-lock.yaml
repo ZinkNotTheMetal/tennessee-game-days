@@ -76,8 +76,8 @@ importers:
         specifier: ^5.0.5
         version: 5.0.5
       use-debounce:
-        specifier: ^10.0.2
-        version: 10.0.2(react@18.3.1)
+        specifier: ^10.0.3
+        version: 10.0.3(react@18.3.1)
       use-sound:
         specifier: ^4.0.3
         version: 4.0.3(react@18.3.1)
@@ -4012,11 +4012,11 @@ packages:
   url-parse@1.5.10:
     resolution: {integrity: sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==}
 
-  use-debounce@10.0.2:
-    resolution: {integrity: sha512-MwBiJK2dk+2qhMDVDCPRPeLuIekKfH2t1UYMnrW9pwcJJGFDbTLliSMBz2UKGmE1PJs8l3XoMqbIU1MemMAJ8g==}
+  use-debounce@10.0.3:
+    resolution: {integrity: sha512-DxQSI9ZKso689WM1mjgGU3ozcxU1TJElBJ3X6S4SMzMNcm2lVH0AHmyXB+K7ewjz2BSUKJTDqTcwtSMRfB89dg==}
     engines: {node: '>= 16.0.0'}
     peerDependencies:
-      react: '>=16.8.0'
+      react: '*'
 
   use-sound@4.0.3:
     resolution: {integrity: sha512-L205pEUFIrLsGYsCUKHQVCt0ajs//YQOFbEQeNwaWaqQj3y3st4SuR+rvpMHLmv8hgTcfUFlvMQawZNI3OE18w==}
@@ -8920,7 +8920,7 @@ snapshots:
       querystringify: 2.2.0
       requires-port: 1.0.0
 
-  use-debounce@10.0.2(react@18.3.1):
+  use-debounce@10.0.3(react@18.3.1):
     dependencies:
       react: 18.3.1
 
