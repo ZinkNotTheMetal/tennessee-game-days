@@ -7,6 +7,7 @@ interface TopCheckedOutGame {
   totalCheckedOutEvents: string // bigint needs to be string
   bggAverageRating: number
   bggAverageComplexity: number
+  votedBestPlayerCount: number
   minPlayerCount: number
   maxPlayerCount: number
   bggPlaytimeMinutes: number

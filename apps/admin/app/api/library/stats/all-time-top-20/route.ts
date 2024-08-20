@@ -36,6 +36,7 @@ interface Top20CheckedOutGameDto {
   playing_time_min: number
   min_player_count: number
   max_player_count: number
+  voted_best_player_count: number
   all_copies_checked_out: boolean
 }
 
@@ -71,11 +72,12 @@ export async function GET() {
     COUNT(*) = SUM(CASE WHEN l.is_checked_out = true THEN 1 ELSE 0 END) AS all_copies_checked_out,
     b.playing_time_min,
     b.min_player_count,
-    b.max_player_count
+    b.max_player_count,
+    b.best_player_count AS voted_best_player_count
     FROM public.library_checkout_events AS e
     INNER JOIN public.library_items AS l ON l.id = e.library_item_id
     INNER JOIN public.board_game_geek_items as b ON b.bgg_id = l.bgg_id
-    GROUP BY library_item_id, l.bgg_id, library_item_name, b.bgg_average_rating, b.bgg_weight_rating, b.playing_time_min, b.min_player_count, b.max_player_count
+    GROUP BY library_item_id, l.bgg_id, library_item_name, b.bgg_average_rating, b.bgg_weight_rating, b.playing_time_min, b.min_player_count, b.max_player_count, voted_best_player_count
     ORDER BY total_checkout_minutes DESC
     LIMIT 20
   `
@@ -92,6 +94,7 @@ export async function GET() {
     bggAverageComplexity: entry.bgg_average_complexity,
     minPlayerCount: entry.min_player_count,
     maxPlayerCount: entry.max_player_count,
+    votedBestPlayerCount: entry.voted_best_player_count,
     bggPlaytimeMinutes: entry.playing_time_min
   }));
 
