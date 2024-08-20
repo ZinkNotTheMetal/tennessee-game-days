@@ -26,7 +26,11 @@ export default function GameCheckoutItemOverview({ id, gameName, checkOutTimeUtc
   }, [checkOutTimeUtcIso]);
 
   return (
-    <div className="flex justify-between hover:bg-slate-300 cursor-pointer px-1" onClick={() => router.push(`/library/edit/${id}`)}>
+    <div 
+      className="flex justify-between hover:bg-green-300 rounded-md cursor-pointer px-1" 
+      onClick={() => router.push(`/library/edit/${id}`)}
+      key={id}
+    >
       <span>{gameName} - {attendeePreferredName} {attendeeLastName} ({attendeeBadgeNumber})</span>
       <span>{elapsedTime}</span>
     </div>

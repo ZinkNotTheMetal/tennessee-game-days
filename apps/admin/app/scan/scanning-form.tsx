@@ -140,6 +140,9 @@ export default function ScanningTerminalClient() {
         if (result === 200) {
           toast(`Successfully checked out ${scannedLibraryItems[0].barcode} to ${scannedAttendees[0]?.barcode}`, { type: "success" })
           playCompleteChime()
+        } else {
+          toast(`Failed to check out - ${scannedAttendees[0]?.barcode} already has an item checked out!`)
+          playErrorChime()
         }
       } catch (error) {
         console.log(error)
@@ -153,6 +156,9 @@ export default function ScanningTerminalClient() {
         if (result === 200) {
           toast(`Successfully checked ${scannedLibraryItems[0].barcode} game back into library `, { type: "success" })
           playCompleteChime()
+        } else {
+          toast(`Failed to check ${scannedLibraryItems[0].barcode} back into library`)
+          playErrorChime()
         }
       } catch (error) {
         console.log(error)

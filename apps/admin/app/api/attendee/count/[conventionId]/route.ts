@@ -33,67 +33,13 @@ export const fetchCache = "force-no-store"
  *               $ref: '#/components/schemas/AttendeeCountResponse'
  */
 export async function GET(request: NextRequest, { params }: { params: { conventionId: string }}) {
-
-  const [cancelledCount, nonCancelledCount, checkedInCount, volunteerCount, attendees] = await Promise.all([
-    prisma.attendee.count({
-      where: {
-        AND: [
-          { 
-            hasCancelled: true,
-          },
-          {
-            conventionId: Number(params.conventionId)
-          }
-        ]
-      }
-    }),
-    prisma.attendee.count({
-      where: {
-        AND: [
-          { 
-            hasCancelled: false,
-          },
-          {
-            conventionId: Number(params.conventionId)
-          }
-        ]
-      }
-    }),
-    prisma.attendee.count({
-      where: {
-        AND: [
-          {
-            isCheckedIn: true
-          },
-          {
-            conventionId: Number(params.conventionId)
-          }
-        ]
-      }
-    }),
-    prisma.attendee.count({
-      where: {
-        AND: [
-          {
-            OR: [
-              { isVolunteer: true },
-              { isTgdOrganizer: true }
-            ]
-          },
-          {
-            conventionId: Number(params.conventionId)
-          }
-        ]
-      }
-    }),
-    GetAllAttendeesForConvention(Number(params.conventionId))
-  ])
+  const attendeeInformation = await GetAllAttendeesForConvention(Number(params.conventionId))
 
   return NextResponse.json<AttendeeCountResponse>({
-    total: cancelledCount + nonCancelledCount,
-    cancelled: cancelledCount,
-    checkedIn: checkedInCount,
-    volunteer: volunteerCount,
-    list: attendees,
+    total: attendeeInformation.length,
+    cancelled: attendeeInformation.filter(a => a.hasCancelled).length,
+    checkedIn: attendeeInformation.filter(a => a.checkedInUtc).length,
+    volunteers: attendeeInformation.filter(a => a.isTgdOrganizer || a.isVolunteer).length,
+    list: attendeeInformation,
   });
 }
