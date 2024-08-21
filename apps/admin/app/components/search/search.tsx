@@ -6,7 +6,7 @@ export function Search({
   onChange,
 }: React.InputHTMLAttributes<HTMLInputElement>): JSX.Element {
   return (
-    <div className="mb-4">
+    <>
       <div className="relative text-gray-600 focus-within:text-gray-400">
         <input
           autoComplete="off"
@@ -18,7 +18,7 @@ export function Search({
           value={value}
         />
       </div>
-    </div>
+    </>
   );
 }
 
