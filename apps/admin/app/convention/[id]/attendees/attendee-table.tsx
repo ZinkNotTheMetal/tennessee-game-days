@@ -32,14 +32,6 @@ interface AttendeeTableProps {
   total: number
 }
 
-declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData extends RowData, TValue> {
-    sortAscIcon: JSX.Element;
-    sortDescIcon: JSX.Element;
-    sortIcon: JSX.Element;
-  }
-}
-
 export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.Element {
   const [query, setQuery] = useState<string>("");
   const [sorting, setSorting] = useState<SortingState>([
@@ -57,15 +49,21 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
         sortAscIcon: <FcNumericalSorting12 className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcNumericalSorting21 className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: false
       },
     }),
     columnHelper.accessor("person.firstName", {
       header: () => "Preferred",
-      cell: ({ cell }) => cell.row.original.person.preferredName ?? cell.row.original.person.firstName,
+      cell: ({ cell }) => <span>
+          {!cell.row.original.person.preferredName || cell.row.original.person.preferredName.trim() === ""
+            ? cell.row.original.person.firstName
+            : cell.row.original.person.preferredName}
+        </span>,
       meta: {
         sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: false
       },
     }),
     columnHelper.accessor("person.lastName", {
@@ -74,6 +72,7 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
         sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: false
       },
       enableGlobalFilter: true,
     }),
@@ -130,7 +129,11 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
       header: () => "With",
       cell: ({ cell }) => {
         return (
-          <span>{ cell.row.original.person.relatedTo?.preferredName ?? cell.row.original.person.relatedTo?.firstName } { cell.row.original.person.relatedTo?.lastName }</span>
+          <span>
+            {!cell.row.original.person.preferredName || cell.row.original.person.preferredName.trim() === ""
+              ? cell.row.original.person.firstName
+              : cell.row.original.person.preferredName }&nbsp;{ cell.row.original.person.relatedTo?.lastName }
+          </span>
         )
       }
     })

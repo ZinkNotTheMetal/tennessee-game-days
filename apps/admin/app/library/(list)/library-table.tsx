@@ -37,14 +37,6 @@ interface LibraryGameTableProps {
   total: number;
 }
 
-declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData extends RowData, TValue> {
-    sortAscIcon: JSX.Element;
-    sortDescIcon: JSX.Element;
-    sortIcon: JSX.Element;
-  }
-}
-
 export function LibraryGameTable({
   libraryItems,
   total,
@@ -78,10 +70,12 @@ export function LibraryGameTable({
   const columns = [
     columnHelper.accessor("barcode", {
       header: () => "Barcode",
+      cell: (item) => <span className="py-2 px-4 text-nowrap">{item.getValue()}</span>,
       meta: {
         sortAscIcon: <FcNumericalSorting12 className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcNumericalSorting21 className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: false
       },
     }),
     columnHelper.accessor("boardGameGeekThing.itemName", {
@@ -91,21 +85,29 @@ export function LibraryGameTable({
         sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: false
       },
     }),
     columnHelper.accessor("owner", {
-      header: () => "Owner",
+      header: () => <span className="hidden md:inline">Owner</span>,
       meta: {
         sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: true
       },
     }),
     columnHelper.accessor("isCheckedOut", {
-      header: () => "Checked In?",
+      header: () => <span className="hidden md:inline">Checked In?</span>,
+      meta: {
+        sortAscIcon: <></>,
+        sortDescIcon:  <></>,
+        sortIcon: <></>,
+        canHide: true
+      },
       cell: ({ cell }) => {
         return (
-          <span className="flex justify-center">
+          <span className="hidden md:flex justify-center">
             {/* Is Checked out is the property */}
             {cell.getValue() ? (
               <FaPersonWalkingArrowRight className="text-red-400 h-4 w-4" />
@@ -113,14 +115,20 @@ export function LibraryGameTable({
               <FaCircleCheck className="text-green-400 h-4 w-4" />
             )}
           </span>
-        );
+        )
       },
     }),
     columnHelper.accessor("isHidden", {
-      header: () => "Hidden?",
+      header: () => <span className="hidden md:inline">Hidden?</span>,
+      meta: {
+        sortAscIcon: <></>,
+        sortDescIcon:  <></>,
+        sortIcon: <></>,
+        canHide: true
+      },
       cell: ({ cell }) => {
         return (
-          <span className="flex justify-center">
+          <span className="hidden md:flex justify-center">
             {/* Is Checked out is the property */}
             {cell.getValue() ? (
               <FaEyeSlash className="text-red-400 h-5 w-5" />
@@ -150,24 +158,27 @@ export function LibraryGameTable({
 
   return (
     <>
-      <div className="w-2/3 pb-6">
-        <Search
-          onChange={(e) => {
-            setQuery(e.target.value);
-          }}
-          placeholder={`Search ${total} games...`}
-          value={query}
-        />
+      <div className="w-full px-2 md:w-4/5 lg:w-3/4">
+        <div className="mb-1 md:mb-3">
+          <Search
+            onChange={(e) => {
+              setQuery(e.target.value);
+            }}
+            placeholder={`Search ${total} games...`}
+            value={query}
+          />
+        </div>
+
 
         {libraryItems !== undefined && libraryItems.length > 0 && (
           <table className="min-w-full divide-y-0 divide-gray-300 bg-white rounded-t-xl rounded-b-xl">
-            <thead className="border-b">
+            <thead className="border-b text-sm md:text-lg">
               {reactTable.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className="py-2 px-4 text-gray-500"
+                      className={`${header.column.columnDef.meta?.canHide ? 'hidden md:table-cell' : ''} text-gray-500 py-2 px-4`}
                       colSpan={header.colSpan}
                       onClick={header.column.getToggleSortingHandler()}
                     >
@@ -204,7 +215,7 @@ export function LibraryGameTable({
                   >
                     {row.getVisibleCells().map((cell) => {
                       return (
-                        <td className="p-4" key={cell.id}>
+                        <td className={`${cell.column.columnDef.meta?.canHide ? 'hidden md:table-cell' : ''} p-4 text-xs md:text-base`} key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

@@ -23,7 +23,7 @@ export default async function Page() {
   const libraryItemCount = libraryItems.length
 
   return (
-    <main className="pt-6">
+    <main className="md:pt-6">
       {libraryItemCount <= 0 && (
         <div>
           No games have been loaded in the library, ensure that you have games
@@ -34,10 +34,10 @@ export default async function Page() {
 
       {libraryItemCount > 0 && (
         <>
-          <div className="flex justify-end pr-8 py-2">
+          <div className="hidden md:flex justify-end pr-8 pt-2">
             <AddGameToLibraryButton />
           </div>
-          <div className="flex justify-center">
+          <div className="flex pt-2 justify-center">
             <LibraryGameTable
               libraryItems={libraryItems}
               total={libraryItemCount}
