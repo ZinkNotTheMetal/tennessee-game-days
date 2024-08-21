@@ -5,10 +5,9 @@ import Image from "next/image"
 interface RecommendedGameImageProps {
   src: string
   gameName: string
-  isCheckedOut: boolean
 }
 
-export default function RecommendedGameImage({ src, gameName, isCheckedOut }: RecommendedGameImageProps) : JSX.Element {
+export default function RecommendedGameImage({ src, gameName }: RecommendedGameImageProps) : JSX.Element {
 
   return (
     <Image
@@ -16,7 +15,7 @@ export default function RecommendedGameImage({ src, gameName, isCheckedOut }: Re
       alt={`Image for ${gameName}`}
       priority={true}
       fill={true}
-      className={`${isCheckedOut ? "rounded opacity-15" : "rounded"}`}
+      className="rounded"
     />
   )
 }
