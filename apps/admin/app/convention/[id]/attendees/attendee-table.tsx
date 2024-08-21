@@ -130,9 +130,9 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
       cell: ({ cell }) => {
         return (
           <span>
-            {!cell.row.original.person.preferredName || cell.row.original.person.preferredName.trim() === ""
-              ? cell.row.original.person.firstName
-              : cell.row.original.person.preferredName }&nbsp;{ cell.row.original.person.relatedTo?.lastName }
+            {!cell.row.original.person.relatedTo?.preferredName || cell.row.original.person.relatedTo?.preferredName.trim() === ""
+              ? cell.row.original.person.relatedTo?.firstName
+              : cell.row.original.person.relatedTo?.preferredName }&nbsp;{ cell.row.original.person.relatedTo?.lastName }
           </span>
         )
       }
