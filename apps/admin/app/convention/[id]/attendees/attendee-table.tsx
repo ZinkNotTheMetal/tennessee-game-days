@@ -172,13 +172,15 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
   return(
     <>
       <div className="w-4/5 pb-6">
-        <Search
-          onChange={(e) => {
-            setQuery(e.target.value);
-          }}
-          placeholder={`Search ${total} attendees...`}
-          value={query}
-        />
+        <div className="mb-1 md:mb-3">
+          <Search
+            onChange={(e) => {
+              setQuery(e.target.value);
+            }}
+            placeholder={`Search ${total} attendees...`}
+            value={query}
+          />
+        </div>
 
         {attendees !== undefined && attendees.length > 0 && (
           <table className="min-w-full divide-y-0 divide-gray-300 bg-white rounded-t-xl rounded-b-xl">
