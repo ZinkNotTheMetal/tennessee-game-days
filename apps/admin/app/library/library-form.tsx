@@ -51,57 +51,43 @@ export function LibraryForm({
     setOnSubmitting(true);
     // Updating
     if (data.id && data.id > 0) {
-      fetch(`/api/library/edit/${data.id}`, {
-        method: "PUT",
-        body: JSON.stringify(data),
+      const response = await fetch(`/api/library/edit/${data.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
       })
-        .then((response) => {
-          if (response.ok) {
-            toast(`Successfully edited ${data.boardGameGeekThing.itemName}`, {
-              type: "success",
-            });
-          } else {
-            toast(
-              `Failed to edit ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
-              { type: "error" }
-            );
-          }
+
+      if (response.ok) {
+        toast(`Successfully edited ${data.boardGameGeekThing.itemName}`, {
+          type: "success",
         })
-        .catch((error) => {
-          console.log(error);
-          toast(
-            `Failed to edit ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
-            { type: "error" }
-          );
-        });
+      } else {
+        toast(
+          `Failed to edit ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
+          { type: "error" }
+        );
+      }
+
     } else {
-      fetch(`/api/library/add`, {
-        method: "POST",
-        body: JSON.stringify(data),
+      const response = await fetch(`/api/library/add`, {
+        method: 'POST',
+        body: JSON.stringify(data)
       })
-        .then((response) => {
-          if (response.ok) {
-            toast(
-              `Successfully added ${data.boardGameGeekThing.itemName} to the library`,
-              { type: "success" }
-            );
-          } else {
-            toast(
-              `Failed to add ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
-              { type: "error" }
-            );
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          toast(
-            `Failed to add ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
-            { type: "error" }
-          );
-        });
+
+      if (response.ok) {
+        toast(
+          `Successfully added ${data.boardGameGeekThing.itemName} to the library`,
+          { type: "success" }
+        );
+      } else {
+        toast(
+          `Failed to add ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
+          { type: "error" }
+        );
+      }
     }
+
+    setOnSubmitting(false)
     router.replace("/library");
-    router.refresh();
   };
 
   return (

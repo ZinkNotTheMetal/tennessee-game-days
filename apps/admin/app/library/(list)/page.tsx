@@ -1,7 +1,7 @@
-import { GetAllLibraryItems } from "@/app/api/library/list/actions";
 import { LibraryGameTable } from "./library-table"
 import AddGameToLibraryButton from "@/app/components/buttons/add-game-to-library"
 import BackToTopButton from "@/app/components/back-to-top/back-to-top-button";
+import { ApiListResponse, ILibraryItem } from "@repo/shared";
 
 export const revalidate = 0; //Very important
 
@@ -9,18 +9,31 @@ export const dynamic = "force-dynamic"
 export const fetchCache = "force-no-store"
 
 export async function generateMetadata() {
-  const libraryItems = await GetAllLibraryItems()
-  const libraryItemCount = libraryItems.length
+  const libraryItems = await GetLibraryItems()
+  const libraryItemCount = libraryItems.total
 
   return {
     title: `TGD - Game Library - ${libraryItemCount} games`
   }
 }
 
+async function GetLibraryItems() {
+  const libraryListApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/library/list`, {
+    method: 'GET',
+    next: {
+      revalidate: 600,
+      tags: ['library']
+    }
+  })
+
+  const response : ApiListResponse<ILibraryItem> = await libraryListApi.json()
+  return response
+}
+
 
 export default async function Page() {
-  const libraryItems = await GetAllLibraryItems()
-  const libraryItemCount = libraryItems.length
+  const libraryItems: ApiListResponse<ILibraryItem> = await GetLibraryItems()
+  const libraryItemCount = libraryItems.total
 
   return (
     <main className="md:pt-6">

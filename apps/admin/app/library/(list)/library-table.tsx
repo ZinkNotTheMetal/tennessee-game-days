@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Search } from "@/app/components/search/search";
 import { useRouter } from "next/navigation";
-import { ILibraryItem } from "@repo/shared";
+import { ApiListResponse, ILibraryItem } from "@repo/shared";
 import {
   FaPersonWalkingArrowRight,
   FaCircleCheck,
@@ -28,13 +28,11 @@ import {
   FilterFn,
   RowData,
 } from "@tanstack/react-table";
-import { Prisma } from "@prisma/client";
+import { LibraryItem, Prisma } from "@prisma/client";
 
 interface LibraryGameTableProps {
-  libraryItems: Prisma.LibraryItemGetPayload<{
-    include: { boardGameGeekThing: true };
-  }>[];
-  total: number;
+  libraryItems: ApiListResponse<ILibraryItem>
+  total: number
 }
 
 export function LibraryGameTable({
@@ -50,7 +48,7 @@ export function LibraryGameTable({
     include: { boardGameGeekThing: true };
   }>;
 
-  const columnHelper = createColumnHelper<LibraryItemPrismaRowType>();
+  const columnHelper = createColumnHelper<ILibraryItem>();
 
   const customGlobalFilter: FilterFn<any> = (
     row: Row<ILibraryItem>,
@@ -142,7 +140,7 @@ export function LibraryGameTable({
   ];
 
   const reactTable = useReactTable({
-    data: libraryItems,
+    data: libraryItems.list,
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
     state: {
@@ -170,7 +168,7 @@ export function LibraryGameTable({
         </div>
 
 
-        {libraryItems !== undefined && libraryItems.length > 0 && (
+        {libraryItems !== undefined && libraryItems.total > 0 && (
           <table className="min-w-full divide-y-0 divide-gray-300 bg-white rounded-t-xl rounded-b-xl">
             <thead className="border-b text-sm md:text-lg">
               {reactTable.getHeaderGroups().map((headerGroup) => (
