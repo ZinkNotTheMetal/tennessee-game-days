@@ -2,9 +2,11 @@
 
 import { useSelectedLayoutSegment } from "next/navigation";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 
 export default function NavBar(): JSX.Element {
   const activeSegment = useSelectedLayoutSegment();
+  const session = useSession();
 
   return (
     <nav className="relative flex justify-between items-center py-4 px-2 bg-slate-900 text-white">
@@ -93,6 +95,16 @@ export default function NavBar(): JSX.Element {
       </ul>
       {/* Sign In vs Name */}
       <div className="pr-1"></div>
+      <div>
+        {session.status === 'authenticated' && (
+          <button
+            type="button"
+            onClick={() => signOut()}
+          >
+            {session.data.user?.email}
+          </button>
+        )}
+      </div>
     </nav>
   );
 }

@@ -1,21 +1,21 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { chain } from "./middlewares/chain";
+import { withAuthMiddleware } from "./middlewares/authentication";
+import { withApiKeyAuthentication } from "./middlewares/apiKeyAuthentication";
 
-export function middleware(request: NextRequest, response: NextResponse, ) {
-  // Only process requests to /api/*
-  if (request.nextUrl.pathname.startsWith('/api')) {
-
-    const apiKeyPassedIn = request.headers.get('authorization')?.split(' ')[1];
-
-    if (apiKeyPassedIn !== process.env.NEXT_PUBLIC_API_KEY) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
-    }
-    // Custom logic for API requests
-    console.log('Processing API request:', request.nextUrl.pathname);
-  }
-  return NextResponse.next();
-}
+export default chain([withAuthMiddleware, withApiKeyAuthentication]);
 
 export const config = {
-  matcher: ['/api/attendee/add/:path*'],
-};
+  matcher: [
+    // Match API routes that require API key protection
+    '/api/attendee/add/:path*',
+
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
+}
