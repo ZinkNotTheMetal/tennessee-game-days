@@ -96,7 +96,7 @@ export default function NavBar(): JSX.Element {
       {/* Sign In vs Name */}
       <div className="pr-1"></div>
       <div>
-        {session.status === 'authenticated' && (
+        {session.data?.user?.email && (
           <button
             type="button"
             onClick={() => signOut()}
