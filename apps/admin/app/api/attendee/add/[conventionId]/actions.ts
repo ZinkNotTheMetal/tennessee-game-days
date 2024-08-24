@@ -70,12 +70,11 @@ export async function GenerateBarcodeAndAddAttendee(
           data: {
             entityId: newAttendee.id,
           },
-        });
+        })
 
-        console.log(`**Barcode & Attendee successfully added to database - ${barcode} - ${success}**`)
         return { success: true, barcode: generatedBarcode };
       }
-    );
+    )
 
   } catch (error) {
     console.error(error);
@@ -106,7 +105,7 @@ export async function AddPurchasingPersonIntoSystem(
         },
       ],
     },
-  });
+  })
 
   if (!isPersonInSystem) {
     const personToAdd = await prisma.person.create({
@@ -122,7 +121,7 @@ export async function AddPurchasingPersonIntoSystem(
         emergencyContactPhoneNumber: emergencyContact?.phoneNumber,
         emergencyContactRelationship: emergencyContact?.relationship,
       },
-    });
+    })
     personDbId = personToAdd.id;
   } else {
     const personToUpdate = await prisma.person.update({
@@ -135,8 +134,8 @@ export async function AddPurchasingPersonIntoSystem(
         email: person.email || isPersonInSystem?.email,
         phoneNumber: person.phoneNumber || isPersonInSystem?.phoneNumber,
       },
-    });
-    personDbId = personToUpdate.id;
+    })
+    personDbId = personToUpdate.id
   }
 
   return personDbId;
@@ -154,12 +153,12 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
 
   console.log(
     `Adding ${additionalAttendees.length} people under the person: ${personId}`
-  );
+  )
 
   for (const additionalAttendee of additionalAttendees) {
     console.log(
       `Adding additional person to purchasing person Person ID: ${personId} - Name: ${additionalAttendee.preferredName ?? additionalAttendee.firstName} | Last Name: `
-    );
+    )
 
     // Find first person with as much information as we can
     const additionalAttendeeInSystem = await prisma.person.findFirst({
@@ -193,7 +192,7 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
           },
         ],
       },
-    });
+    })
 
     if (!additionalAttendeeInSystem) {
       const additionalAttendeeToAdd = await prisma.person.create({
@@ -206,12 +205,12 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
           phoneNumber: additionalAttendee.phoneNumber,
           relatedPersonId: personId,
         },
-      });
+      })
       personDbId = additionalAttendeeToAdd.id;
     } else {
       console.log(
         `** Match found** - ${additionalAttendeeInSystem.id} | First Name: ${additionalAttendee.firstName} | Last Name: ${additionalAttendee.lastName} | Preferred Name: ${additionalAttendee.preferredName}`
-      );
+      )
 
       const additionalAttendeeToUpdate = await prisma.person.update({
         where: { id: additionalAttendeeInSystem.id },
@@ -224,7 +223,7 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
           phoneNumber: additionalAttendee.phoneNumber,
           relatedPersonId: personId,
         },
-      });
+      })
       personDbId = additionalAttendeeToUpdate.id;
     }
 
@@ -234,7 +233,7 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
         personDbId,
         passPurchased,
         isStayingOnSite
-      );
+      )
 
       if (response.success) {
         barcodesCreated.push({
@@ -244,12 +243,12 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
       } else {
         console.error(
           "Failed to Generate Barcode for additional people under purchasing person"
-        );
+        )
       }
     } catch (e) {
-      console.log("transaction error", e);
+      console.log("transaction error", e)
     }
   }
 
-  return barcodesCreated;
+  return barcodesCreated
 }
