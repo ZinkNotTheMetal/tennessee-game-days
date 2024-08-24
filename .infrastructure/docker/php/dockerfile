@@ -1,5 +1,5 @@
 FROM php:apache
 WORKDIR /var/www/html
 
-COPY cart.php index.php
+COPY . .
 EXPOSE 80
