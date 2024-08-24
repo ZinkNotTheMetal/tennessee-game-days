@@ -1,0 +1,1 @@
+export { FirebaseAuthorization } from './auth.init'

@@ -1,0 +1,17 @@
+{
+  "name": "@repo/firebase",
+  "version": "0.0.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "description": "Web configuration for firebase",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "firebase": "^10.13.0",
+    "typescript": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.2"
+  }
+}
