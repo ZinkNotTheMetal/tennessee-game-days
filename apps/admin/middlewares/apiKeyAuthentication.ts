@@ -2,7 +2,8 @@ import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { CustomMiddleware } from "./chain";
 
 const protectedApiRoutes = [
-  '/api/attendee/add'
+  '/api/attendee/add',
+  '/api/attendee/export',
 ]
 
 export function withApiKeyAuthentication(middleware: CustomMiddleware): CustomMiddleware {
