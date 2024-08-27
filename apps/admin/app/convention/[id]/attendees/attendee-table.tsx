@@ -1,6 +1,5 @@
 'use client'
 
-import { Prisma } from "@prisma/client"
 import {
   FcAlphabeticalSortingAz,
   FcAlphabeticalSortingZa,
@@ -53,7 +52,7 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
       },
     }),
     columnHelper.accessor("person.firstName", {
-      header: () => "Preferred",
+      header: () => "First/Preferred",
       cell: ({ cell }) => <span>
           {!cell.row.original.person.preferredName || cell.row.original.person.preferredName.trim() === ""
             ? cell.row.original.person.firstName
@@ -104,26 +103,11 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
         )
       }
     }),
-    columnHelper.accessor("isStayingOnSite", {
-      header: () => "Staying on Site",
-      cell: ({ cell }) => {
-        return (
-          <span className="flex justify-center">
-            { cell.getValue() ? (
-              <FaCheckCircle className="text-green-400 h-4 w-4" />
-            ) : (
-              <FaTimesCircle className="text-red-400 h-4 w-4" />
-            )}
-          </span>
-        )
-      }
+    columnHelper.accessor("person.phoneNumber", {
+      header: () => "Phone"
     }),
-    columnHelper.accessor("passPurchased", {
-      header: () => "Pass Purchased"
-    }),
-    columnHelper.accessor("previousConventionsAttended", {
-      header: () => "Previously attended",
-      cell: ({ cell }) => <span>{ cell.row.original.previousConventionsAttended }</span>
+    columnHelper.accessor("person.email", {
+      header: () => "Email"
     }),
     columnHelper.accessor("person.relatedPersonId", {
       header: () => "With",
@@ -136,7 +120,11 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
           </span>
         )
       }
-    })
+    }),
+    columnHelper.accessor("previousConventionsAttended", {
+      header: () => "Previously attended",
+      cell: ({ cell }) => <span>{ cell.row.original.previousConventionsAttended }</span>
+    }),
   ]
 
   const customGlobalFilter: FilterFn<any> = (
