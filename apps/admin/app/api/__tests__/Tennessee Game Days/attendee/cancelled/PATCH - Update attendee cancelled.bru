@@ -4,8 +4,17 @@ meta {
   seq: 1
 }
 
-get {
+patch {
   url: {{tgd.api_url}}/api/attendee/cancelled
-  body: none
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "firstName": "Nick",
+    "lastName": "Cavin",
+    "email": "nick23394@gmail.com",
+    "barcode": "241-636"
+  }
 }

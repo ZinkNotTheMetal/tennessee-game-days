@@ -35,7 +35,7 @@ export async function GET(request: NextRequest, { params }: { params: { conventi
   const attendeeInformation = await GetAllAttendeesForConvention(Number(params.conventionId))
 
   return NextResponse.json<AttendeeCountResponse>({
-    total: attendeeInformation.length,
+    total: attendeeInformation.filter(a => !a.hasCancelled).length,
     cancelled: attendeeInformation.filter(a => a.hasCancelled).length,
     checkedIn: attendeeInformation.filter(a => a.checkedInUtc).length,
     volunteers: attendeeInformation.filter(a => a.isTgdOrganizer || a.isVolunteer).length,
