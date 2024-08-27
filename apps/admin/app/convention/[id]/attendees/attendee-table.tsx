@@ -17,15 +17,15 @@ import {
   getSortedRowModel,
   SortingState,
   Row,
-  FilterFn,
-  RowData,
+  FilterFn
 } from "@tanstack/react-table"
 import Search from "@/app/components/search/search"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { AttendeeWithPreviousConventions } from "@/app/api/attendee/count/[conventionId]/response";
 
 
-type AttendeePrismaRowType = Prisma.AttendeeGetPayload<{ include: { person: { include: { relatedTo: true, _count: { select: { attendee: true }} }} } }>
+type AttendeePrismaRowType = AttendeeWithPreviousConventions
 
 interface AttendeeTableProps {
   attendees: AttendeePrismaRowType[]
@@ -121,9 +121,9 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
     columnHelper.accessor("passPurchased", {
       header: () => "Pass Purchased"
     }),
-    columnHelper.accessor("person._count.attendee", {
-      header: () => "Conferences Attended",
-      cell: ({ cell }) => <span>{ cell.row.original.person._count.attendee }</span>
+    columnHelper.accessor("previousConventionsAttended", {
+      header: () => "Previously attended",
+      cell: ({ cell }) => <span>{ cell.row.original.previousConventionsAttended }</span>
     }),
     columnHelper.accessor("person.relatedPersonId", {
       header: () => "With",

@@ -8,6 +8,7 @@ export const config = {
   matcher: [
     // Match API routes that require API key protection
     '/api/attendee/add/:path*',
+    '/api/attendee/export/:path*',
 
     /*
      * Match all request paths except for the ones starting with:

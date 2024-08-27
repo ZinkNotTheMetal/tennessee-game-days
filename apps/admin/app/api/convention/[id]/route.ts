@@ -89,7 +89,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   })
 
   if (conventionById === null || conventionById === undefined)
-    return NextResponse.json({ message: "Convention not found" }, { status: 404 });
+    return NextResponse.json({ message: "Convention not found" }, { status: 404 })
 
   // TODO: Fix 500 error (PTW items not deleted) or return unable to delete
   await prisma.convention.delete({
