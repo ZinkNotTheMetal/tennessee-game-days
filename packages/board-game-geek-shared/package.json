@@ -15,7 +15,7 @@
     "@types/eslint": "^9.6.0",
     "@types/he": "^1.2.3",
     "@types/node": "^22.4.1",
-    "@types/react": "^18.3.3",
+    "@types/react": "^18.3.4",
     "@types/react-dom": "^18.2.25",
     "eslint": "^9.9.0",
     "react": "^18.3.1",
