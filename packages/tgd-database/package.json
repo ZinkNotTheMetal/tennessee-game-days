@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "type": "commonjs",
   "dependencies": {
-    "@prisma/client": "5.18.0",
+    "@prisma/client": "5.19.1",
     "@repo/board-game-geek-shared": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "boardgamegeekclient": "1.9.1",

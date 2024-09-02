@@ -26,7 +26,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@prisma/client": "5.18.0",
+    "@prisma/client": "5.19.1",
     "@repo/board-game-geek-shared": "workspace:*",
     "@repo/tgd-database": "workspace:*",
     "@tanstack/react-table": "^8.20.5",
