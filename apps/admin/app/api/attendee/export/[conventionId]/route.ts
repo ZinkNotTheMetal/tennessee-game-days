@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }: { params: { conventi
   }
 
   const csvFileName = `${conventionById.name}_${conventionById.startDateTimeUtc?.getFullYear()}${params.conventionId}_attendees.csv`;
-  const columns = ['Barcode', 'First Name', 'Last Name', 'Preferred Name', 'Conventions Attended', 'Email'];
+  const columns = ['Barcode', 'First Name', 'Preferred Name', 'Last Name', 'Volunteer', 'Conventions Attended', 'Email'];
 
   const attendees = await prisma.attendee.findMany({
     where: {
