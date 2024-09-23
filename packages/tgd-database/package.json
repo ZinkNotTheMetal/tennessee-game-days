@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "dotenv-cli": "^7.4.2",
-    "prisma": "5.18.0",
+    "prisma": "5.19.1",
     "prisma-dbml-generator": "^0.12.0"
   },
   "scripts": {

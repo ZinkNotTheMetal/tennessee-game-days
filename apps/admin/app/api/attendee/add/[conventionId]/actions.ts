@@ -5,7 +5,7 @@ import {
 } from "@/app/api/requests/add-attendee-request";
 import prisma from "@/app/lib/prisma";
 import { convertToTitleCase } from "@/utils/stringUtils";
-import { Prisma } from "@prisma/client";
+import { Prisma } from '@prisma/client'
 import { DateTime } from "ts-luxon";
 
 
