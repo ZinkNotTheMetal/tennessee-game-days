@@ -4,6 +4,7 @@ import {
   IEmergencyContact,
 } from "@/app/api/requests/add-attendee-request";
 import prisma from "@/app/lib/prisma";
+import { convertToTitleCase } from "@/utils/stringUtils";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "ts-luxon";
 
@@ -13,6 +14,7 @@ import { DateTime } from "ts-luxon";
 export async function GenerateBarcodeAndAddAttendee(
   conventionId: number,
   personId: number,
+  isVolunteer: boolean,
   passPurchased: "Free" | "Individual" | "Couple" | "Family",
   stayingOnSite: boolean
 ): Promise<{ success: boolean; barcode: string | null }> {
@@ -53,6 +55,7 @@ export async function GenerateBarcodeAndAddAttendee(
             passPurchased: passPurchased,
             conventionId: conventionId,
             personId: personId,
+            isVolunteer: isVolunteer,
             dateRegistered: DateTime.utc().toISO(),
           },
         });
@@ -110,14 +113,13 @@ export async function AddPurchasingPersonIntoSystem(
   if (!isPersonInSystem) {
     const personToAdd = await prisma.person.create({
       data: {
-        // Merge existing data with provided data
-        firstName: person.firstName,
-        preferredName: person.preferredName,
-        lastName: person.lastName,
+        firstName: convertToTitleCase(person.firstName),
+        preferredName: person.preferredName ? convertToTitleCase(person.preferredName) : null,
+        lastName: convertToTitleCase(person.lastName),
         email: person.email,
         phoneNumber: person.phoneNumber,
         zipCode: person.zipCode,
-        emergencyContactName: emergencyContact?.name,
+        emergencyContactName: emergencyContact?.name ? convertToTitleCase(emergencyContact.name) : null,
         emergencyContactPhoneNumber: emergencyContact?.phoneNumber,
         emergencyContactRelationship: emergencyContact?.relationship,
       },
@@ -128,9 +130,9 @@ export async function AddPurchasingPersonIntoSystem(
       where: { id: isPersonInSystem.id },
       data: {
         // Merge existing data with provided data
-        firstName: person.firstName || isPersonInSystem?.firstName,
+        firstName: convertToTitleCase(person.firstName) || isPersonInSystem?.firstName,
         preferredName: person.preferredName || isPersonInSystem?.preferredName,
-        lastName: person.lastName || isPersonInSystem?.lastName,
+        lastName: convertToTitleCase(person.lastName) || isPersonInSystem?.lastName,
         email: person.email || isPersonInSystem?.email,
         phoneNumber: person.phoneNumber || isPersonInSystem?.phoneNumber,
       },
@@ -145,6 +147,7 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
   personId: number,
   conventionId: number,
   additionalAttendees: IPerson[],
+  isVolunteer: boolean,
   passPurchased: "Free" | "Individual" | "Couple" | "Family",
   isStayingOnSite: boolean
 ): Promise<{ personId: number; barcode: string | null }[]> {
@@ -231,6 +234,7 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
       const response = await GenerateBarcodeAndAddAttendee(
         conventionId,
         personDbId,
+        isVolunteer,
         passPurchased,
         isStayingOnSite
       )

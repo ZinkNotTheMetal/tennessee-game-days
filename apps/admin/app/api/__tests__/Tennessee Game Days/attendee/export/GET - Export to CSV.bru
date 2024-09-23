@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: {{tgd.api_url}}/api/attendee/export/3
+  url: {{tgd.api_url}}/api/attendee/export/1
   body: none
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tgd.api_key}}
 }

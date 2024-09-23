@@ -4,8 +4,47 @@ meta {
   seq: 1
 }
 
-get {
+post {
   url: {{tgd.api_url}}/api/attendee/add/{{test_convention_id}}
-  body: none
-  auth: none
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tgd.api_key}}
+}
+
+body:json {
+  {
+    "person": {
+      "firstName": "Sam",
+      "lastName": "Smith",
+      "preferredName": "Sam",
+      "isAdult": "1",
+      "email": "sam@foo.com",
+      "emergencyContact": {
+        "name": null,
+        "phoneNumber": null,
+        "relationship": null
+      }
+    },
+    "additionalPeople": [
+      {
+        "firstName": "Sally",
+        "lastName": "Smith",
+        "preferredName": "Sally",
+        "isAdult": "1",
+        "email": "sally@bar.com"
+      },
+      {
+        "firstName": "Sammy",
+        "lastName": "Smith",
+        "preferredName": "Sammy",
+        "isAdult": null,
+        "email": ""
+      }
+    ],
+    "isStayingAtConvention": true,
+    "passPurchased": "Individual"
+  }
 }

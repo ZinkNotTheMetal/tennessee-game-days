@@ -47,10 +47,11 @@ export async function GET(request: NextRequest, { params }: { params: { conventi
     return {
       'Barcode': attendee.barcode,
       'First Name': attendee.person.firstName,
-      'Last Name': attendee.person.lastName,
       'Preferred Name': attendee.person.preferredName || '',
+      'Last Name': attendee.person.lastName,
       'Conventions Attended': previousConventionsAttended.toString(),
-      'Email': attendee.person.email || ''
+      'Email': attendee.person.email || '',
+      'Volunteer': attendee.isVolunteer,
     };
   }));
 

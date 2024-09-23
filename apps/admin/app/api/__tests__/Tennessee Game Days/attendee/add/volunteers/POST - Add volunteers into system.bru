@@ -1,0 +1,34 @@
+meta {
+  name: POST - Add volunteers into system
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{tgd.api_url}}/api/attendee/add/{{test_convention_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tgd.api_key}}
+}
+
+body:json {
+  {
+    "person": {
+      "firstName": "Alan",
+      "lastName": "Hatcher",
+      "email": "jahatcher@gmail.com",
+      "isAdult": "1",
+      "emergencyContact": {
+        "name": null,
+        "phoneNumber": null,
+        "relationship": null
+      }
+    },
+    "isVolunteer": true,
+    "isStayingAtConvention": true,
+    "passPurchased": "Free"
+  }
+}
