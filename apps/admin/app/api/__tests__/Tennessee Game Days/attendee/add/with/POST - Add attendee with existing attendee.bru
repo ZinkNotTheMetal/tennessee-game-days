@@ -4,8 +4,37 @@ meta {
   seq: 1
 }
 
-get {
-  url: 
-  body: none
-  auth: none
+post {
+  url: {{tgd.api_url}}/api/attendee/add/1/with/803
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tgd.api_key}}
+}
+
+body:json {
+  {
+     "people":[
+       {
+         "firstName":"Bri",
+         "lastName":"Amann",
+         "isAdult":"1"
+       },
+       {
+         "firstName":"Fox",
+         "lastName":"Amann",
+         "isAdult":"1"
+       },
+       {
+         "firstName":"Arrow",
+         "lastName":"Amann",
+         "isAdult":"1"
+       }
+     ],
+     "isStayingAtConvention":false,
+     "passPurchased":"Family"
+  }
+  
 }

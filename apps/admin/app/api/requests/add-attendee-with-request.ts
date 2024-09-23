@@ -1,8 +1,9 @@
 import { IPerson } from "./add-attendee-request";
 
 interface IAddAttendeeWithRequest {
-  people: IPerson[] | undefined;
-  isStayingOnSite: boolean;
+  people: IPerson[] | undefined
+  isVolunteer: boolean
+  isStayingOnSite: boolean
   passPurchased: "Free" | "Individual" | "Couple" | "Family";
 }
 

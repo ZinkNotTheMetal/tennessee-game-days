@@ -67,7 +67,7 @@ export const maxDuration = 10; // 10 seconds
  */
 export async function POST(request: NextRequest, { params }: { params: { conventionId: string }}) {
   const json: IAddAttendeeRequest = await request.json();
-  const { person, additionalPeople, isStayingOnSite, passPurchased } = json
+  const { person, additionalPeople, isVolunteer, isStayingOnSite, passPurchased } = json
   const { emergencyContact } = person
   let barcodesCreated: { personId: number, barcode: string | null }[] = []
 
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest, { params }: { params: { convent
 
   console.log(`Adding Purchasing Person to Attendees - PersonID: ${personId} | ConventionID: ${params.conventionId}`)
 
-  let barcodeForPurchasingPerson = await GenerateBarcodeAndAddAttendee(Number(params.conventionId), personId, passPurchased, isStayingOnSite)
+  let barcodeForPurchasingPerson = await GenerateBarcodeAndAddAttendee(Number(params.conventionId), personId, isVolunteer, passPurchased, isStayingOnSite)
   if (barcodeForPurchasingPerson.success) {
     barcodesCreated.push({ personId: personId, barcode: barcodeForPurchasingPerson.barcode })
   } else { 

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest, { params }: { params: { convent
   if (people !== undefined && people.length > 0) {
     console.log('Adding additional people...')
 
-    const barcodesForAdditionalPeople = await AddAdditionalPeopleUnderPurchasingPerson(Number(params.attendeePersonId),  Number(params.conventionId), people, json.passPurchased, json.isStayingOnSite);
+    const barcodesForAdditionalPeople = await AddAdditionalPeopleUnderPurchasingPerson(Number(params.attendeePersonId), Number(params.conventionId), people, json.isVolunteer, json.passPurchased, json.isStayingOnSite);
     barcodesForAdditionalPeople.forEach(barcode => barcodesCreated.push(barcode));
   }
 

@@ -23,6 +23,7 @@ interface IAddAttendeeRequest {
   person: IPurchasingPerson;
   additionalPeople: IPerson[] | undefined;
   isStayingOnSite: boolean;
+  isVolunteer: boolean;
   passPurchased: "Free" | "Individual" | "Couple" | "Family";
 }
 
