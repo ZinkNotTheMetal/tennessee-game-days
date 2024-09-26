@@ -2,11 +2,12 @@ import { DateTime } from "ts-luxon"
 import EditConventionButton from "@/app/components/buttons/edit-convention-button"
 import BackButton from "@/app/components/buttons/back-button"
 import ViewPlayToWinGamesForConvention from "@/app/components/buttons/view-ptw-games-button"
-import ViewAttendeesForConvention from "./view-attendees-button"
+import ViewAttendeesForConventionButton from "./view-attendees-button"
 import { GetAttendeeCounts } from "@/app/api/report/[conventionId]/attendee/actions"
 import { GetPlayToWinReportByConvention } from "@/app/api/report/[conventionId]/play-to-win/actions"
 import { GetLibraryPlaytimeCounts } from "@/app/api/report/[conventionId]/library/actions"
 import { IConvention } from "@repo/shared"
+import ExportAttendeesButton from "./export-attendees-button"
 
 interface Props {
   params: { id: string }
@@ -89,7 +90,8 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
 
       <div className="bg-gray-100 rounded-md p-6 mb-8">
         <div className="flex justify-end space-x-4">
-          <ViewAttendeesForConvention conventionId={Number(params.id)} />
+          <ExportAttendeesButton conventionId={Number(params.id)} />
+          <ViewAttendeesForConventionButton conventionId={Number(params.id)} />
         </div>
         <h2 className="text-xl font-semibold mb-4">Attendance Counts:</h2>
         <p>All Attendees: {attendeeCount?.allAttendees}</p>
