@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic"
 export const fetchCache = "force-no-store"
 
 export async function generateMetadata() {
-  const libraryItems = await GetLibraryItems()
+  const libraryItems = await GetAllLibraryItems()
   const libraryItemCount = libraryItems.total
 
   return {
@@ -17,8 +17,8 @@ export async function generateMetadata() {
   }
 }
 
-async function GetLibraryItems() {
-  const libraryListApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/library/list`, {
+async function GetAllLibraryItems() {
+  const libraryListApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/library/list?showHidden=true`, {
     method: 'GET',
     next: {
       revalidate: 600,
@@ -32,7 +32,7 @@ async function GetLibraryItems() {
 
 
 export default async function Page() {
-  const libraryItems: ApiListResponse<ILibraryItem> = await GetLibraryItems()
+  const libraryItems: ApiListResponse<ILibraryItem> = await GetAllLibraryItems()
   const libraryItemCount = libraryItems.total
 
   return (

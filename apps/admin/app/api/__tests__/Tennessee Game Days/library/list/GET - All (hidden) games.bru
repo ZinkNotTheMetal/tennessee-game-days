@@ -1,0 +1,15 @@
+meta {
+  name: GET - All (hidden) games
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{tgd.api_url}}/api/library/list?showHidden=true
+  body: none
+  auth: none
+}
+
+params:query {
+  showHidden: true
+}

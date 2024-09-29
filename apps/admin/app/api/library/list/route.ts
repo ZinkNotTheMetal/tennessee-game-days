@@ -1,7 +1,5 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma"
-import { GetAllLibraryItems } from "./actions"
-import { LibraryListResponse } from "./response"
 
 export const revalidate = 0 //Very important
 
@@ -24,19 +22,52 @@ export const fetchCache = "force-no-store"
  *             schema:
  *               $ref: '#/components/schemas/LibraryListResponse'
  */
-export async function GET() {
+export async function GET(
+  request: NextRequest,
+) {
 
-  const [count, items] = await Promise.all([
-    prisma.libraryItem.count({
-      where: {
-        isHidden: false
-      }
-    }),
-    GetAllLibraryItems()
-  ])
+  const url = new URL(request.url);
+  const showHidden = url.searchParams.get("showHidden")
 
-  return NextResponse.json({
-    total: count,
-    list: items,
-  });
+  if (showHidden === 'true') {
+
+    const [count, items] = await Promise.all([
+      prisma.libraryItem.count(),
+      prisma.libraryItem.findMany({
+        include: {
+          boardGameGeekThing: true,
+        },
+      })
+    ])
+
+    return NextResponse.json({
+      total: count,
+      list: items,
+    })
+
+  } else {
+
+    const [count, items] = await Promise.all([
+      prisma.libraryItem.count({
+        where: {
+          isHidden: false
+        }
+      }),
+      prisma.libraryItem.findMany({
+        where: {
+          isHidden: false
+        },
+        include: {
+          boardGameGeekThing: true,
+        },
+      })
+    ])
+  
+    return NextResponse.json({
+      total: count,
+      list: items,
+    });
+
+  }
+
 }
