@@ -14,7 +14,7 @@
     "@turbo/gen": "^2.0.14",
     "@types/eslint": "^9.6.1",
     "@types/he": "^1.2.3",
-    "@types/node": "^22.4.1",
+    "@types/node": "^20.16.11",
     "@types/react": "^18.3.8",
     "@types/react-dom": "^18.2.25",
     "eslint": "^9.9.1",
