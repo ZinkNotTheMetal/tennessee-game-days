@@ -37,7 +37,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
 
     if (libraryItemToUpdate?.barcode !== libraryItemToEdit.barcode) {
-      console.log('change of barcode')
 
       await transaction.centralizedBarcode.update({
         where: {

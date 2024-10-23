@@ -94,7 +94,7 @@ interface BggResultRowProps {
 
 function BggResultRow({ result, onChange }: BggResultRowProps) : JSX.Element {
   return (
-    <tr className="hover:bg-green-50">
+    <tr key={result.id} className="hover:bg-green-50">
       <td className="py-4 px-6 border-b">
         <input 
           name="game-select" 
