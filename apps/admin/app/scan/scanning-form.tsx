@@ -192,6 +192,7 @@ export default function ScanningTerminalClient() {
               className="w-full p-2 pr-10 border border-gray-300 rounded" // Adjusted padding for icon space
               placeholder="Enter or scan a barcode"
               {...register(`barcodes.${index}.barcode`)}
+              ref={(el) => el?.focus()}
               key={id}
               onChange={(e) => {
                 if (e.target.value.trim() === '') {
