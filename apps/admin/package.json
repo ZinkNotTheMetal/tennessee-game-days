@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^14.2.6",
+    "@next/eslint-plugin-next": "^14.2.16",
     "@repo/eslint-config": "workspace:*",
     "@repo/firebase": "workspace:*",
     "@repo/shared": "workspace:*",
