@@ -9,7 +9,7 @@ interface Props {
 }
 
 async function getAllConventions() : Promise<ApiListResponse<IConvention>> {
-  const conventionListApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/convention/list`, {
+  const conventionListApi = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_PROTOCOL}${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}/api/convention/list?showHidden=true`, {
     cache: 'no-store',
     next: {
       tags: ['convention'],
