@@ -86,7 +86,7 @@ async function CheckOutLibraryItem(libraryItemId: number, attendeeId: number): P
 
 }
 
-async function LogPlayToWinPlay(playToWinItemId: number, attendeeIds: number[]): Promise<number> {
+async function LogPlayToWinPlay(playToWinItemId: number, attendeeIds: number[]): Promise<{ status: number, alreadyAddedAttendees: { firstName: string, preferredName?: string, lastName: string, barcode: string}[]}> {
   const response = await fetch(
     `/api/play-to-win/log`,
     {
@@ -98,12 +98,43 @@ async function LogPlayToWinPlay(playToWinItemId: number, attendeeIds: number[]):
     }
   )
   if (!response.ok) {
-    console.log(response.status)
-    return response.status
+    return {
+      status: response.status,
+      alreadyAddedAttendees: []
+    }
   }
-  return response.status
+
+  const data = await response.json()
+  const alreadyAddedAttendees = data.alreadyPlayedAttendees.map((attendee: AlreadyPlayedAttendee) => ({
+    firstName: attendee.attendee.person.firstName,
+    preferredName: attendee.attendee.person.preferredName,
+    lastName: attendee.attendee.person.lastName,
+    barcode: attendee.attendee.barcode
+  }));
+
+  return {
+    status: response.status,
+    alreadyAddedAttendees: alreadyAddedAttendees
+  }
 
 }
+
+export interface AlreadyPlayedAttendee {
+  attendeeId: number
+  attendee: Attendee
+}
+
+export interface Attendee {
+  barcode: string
+  person: Person
+}
+
+export interface Person {
+  firstName: string
+  preferredName?: string
+  lastName: string
+}
+
 
 export { CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem, LogPlayToWinPlay, CheckInAttendee }
 export type { BarcodeResponse }
