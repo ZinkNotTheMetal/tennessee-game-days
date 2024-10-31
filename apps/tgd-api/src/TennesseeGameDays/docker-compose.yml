@@ -1,6 +1,0 @@
-﻿services:
-  tennesseegamedays.api:
-    image: tennesseegamedays.api
-    build:
-      context: .
-      dockerfile: TennesseeGameDays.API/Dockerfile

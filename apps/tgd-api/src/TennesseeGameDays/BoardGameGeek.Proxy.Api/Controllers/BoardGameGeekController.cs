@@ -1,12 +1,12 @@
 using System.Net.Http.Headers;
 using System.Xml.Serialization;
 using AutoMapper;
+using BoardGameGeek.Proxy.Api.Helpers;
+using BoardGameGeek.Proxy.Api.Responses;
+using BoardGameGeek.Proxy.Api.Responses.BoardGameGeek;
 using Microsoft.AspNetCore.Mvc;
-using TennesseeGameDays.API.Helpers;
-using TennesseeGameDays.API.Responses;
-using TennesseeGameDays.API.Responses.BoardGameGeek;
 
-namespace TennesseeGameDays.API.Controllers;
+namespace BoardGameGeek.Proxy.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]

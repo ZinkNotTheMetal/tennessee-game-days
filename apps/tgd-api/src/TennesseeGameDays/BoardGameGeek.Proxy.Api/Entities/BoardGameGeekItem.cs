@@ -1,4 +1,4 @@
-namespace TennesseeGameDays.API.Entities;
+namespace BoardGameGeek.Proxy.Api.Entities;
 
 public class BoardGameGeekItem
 {

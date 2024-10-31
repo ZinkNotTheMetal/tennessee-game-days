@@ -1,6 +1,6 @@
 using System.Xml.Serialization;
 
-namespace TennesseeGameDays.API.Responses.BoardGameGeek;
+namespace BoardGameGeek.Proxy.Api.Responses.BoardGameGeek;
 
 [XmlRoot("items")]
 public class BoardGameGeekThingResponse

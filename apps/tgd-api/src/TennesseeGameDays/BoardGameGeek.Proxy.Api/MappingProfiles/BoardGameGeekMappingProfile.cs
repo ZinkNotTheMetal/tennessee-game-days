@@ -1,9 +1,9 @@
 using AutoMapper;
-using TennesseeGameDays.API.Entities;
-using TennesseeGameDays.API.Responses;
-using TennesseeGameDays.API.Responses.BoardGameGeek;
+using BoardGameGeek.Proxy.Api.Entities;
+using BoardGameGeek.Proxy.Api.Responses;
+using BoardGameGeek.Proxy.Api.Responses.BoardGameGeek;
 
-namespace TennesseeGameDays.API.MappingProfiles;
+namespace BoardGameGeek.Proxy.Api.MappingProfiles;
 
 public class BoardGameGeekMappingProfile : Profile
 {
@@ -42,30 +42,6 @@ public class BoardGameGeekMappingProfile : Profile
                     .Select(s => new GameMechanic { Id = s.Id, Name = s.Value })
                     .ToList() ?? new List<GameMechanic>()))
             ;
-        
-        
-        // votedBestPlayerCount: FindBestPlayerCount(
-        //     bggThingDto.polls.find((item) => item.name === "suggested_numplayers")
-        //         ?.results
-        // ),
-        
-        //  if (pollResults == null || pollResults.length === 0) return bestPlayerCount;
-
-        // pollResults.forEach((poll) => {
-        //   if (poll.resultItemList == null || poll.resultItemList.length === 0)
-        //     return 0;
-
-        //   poll.resultItemList.forEach((item) => {
-        //     if (item.value === "Best") {
-        //       const bestItemVotePerPlayer = item.numvotes ?? 0;
-
-        //       if (bestItemVotePerPlayer > highestBestVotes) {
-        //         highestBestVotes = bestItemVotePerPlayer;
-        //         bestPlayerCount = Number(poll.numplayers);
-        //       }
-        //     }
-        //   });
-        // });
     }
     
     private string DecodeAndReplaceHtmlEntities(string? description)

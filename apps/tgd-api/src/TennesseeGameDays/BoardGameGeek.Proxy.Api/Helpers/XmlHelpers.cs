@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace TennesseeGameDays.API.Helpers;
+namespace BoardGameGeek.Proxy.Api.Helpers;
 
 public static class XmlHelpers
 {

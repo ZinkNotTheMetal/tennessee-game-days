@@ -1,8 +1,8 @@
 using AutoMapper;
-using TennesseeGameDays.API.Responses;
-using TennesseeGameDays.API.Responses.BoardGameGeek;
+using BoardGameGeek.Proxy.Api.Responses;
+using BoardGameGeek.Proxy.Api.Responses.BoardGameGeek;
 
-namespace TennesseeGameDays.API.MappingProfiles;
+namespace BoardGameGeek.Proxy.Api.MappingProfiles;
 
 public class BestPlayerCountResolver : IValueResolver<Item, ItemSearchResponse, List<uint>>
 {
