@@ -47,6 +47,31 @@ export async function POST(request: NextRequest) {
 
   const createManyData = data.attendeeIds.map(attendeeId => ({ attendeeId }))
 
+  const alreadyPlayedAttendees = await prisma.playToWinPlayAttendee.findMany({
+    distinct: ['attendeeId'],
+    where: {
+      playToWinPlay: {
+        playToWinItemId: data.playToWinItemId
+      },
+      attendeeId: { in: data.attendeeIds }
+    },
+    select: {
+      attendeeId: true,
+      attendee: {
+        select: {
+          barcode: true,
+          person: {
+            select: {
+              firstName: true,
+              preferredName: true,
+              lastName: true
+            }
+          }
+        }
+      }
+    }
+  })
+
   await prisma.playToWinPlay.create({
     data: {
       conventionId: nextUpcomingConvention.id,
@@ -63,7 +88,8 @@ export async function POST(request: NextRequest) {
   revalidateTag('scanner')
 
   return NextResponse.json({
-    message: 'Successfully logged Play to Win Play'
+    message: 'Successfully logged Play to Win Play',
+    alreadyPlayedAttendees: alreadyPlayedAttendees
   }, { status: 200 })
 
 }

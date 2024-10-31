@@ -169,7 +169,17 @@ export default function ScanningTerminalClient() {
     } else if (scannedPlayToWinGames.length === 1 && scannedPlayToWinGames[0] && scannedAttendees.length >= 1) {
       try {
         const result = await LogPlayToWinPlay(scannedPlayToWinGames[0]?.entityId, scannedAttendees.map(m => m.entityId))
-        toast(`Successfully logged Play to Win play ${scannedPlayToWinGames[0].barcode} for ${scannedAttendees.length} ${scannedAttendees.length === 1 ? 'attendee' : 'attendees'}`, { type: "success" })
+        toast(`Successfully logged Play to Win play for ${scannedAttendees.length} ${scannedAttendees.length === 1 ? 'attendee' : 'attendees'}`, { type: "success" })
+
+        result.alreadyAddedAttendees.forEach(a => {
+          toast.warn(`${a.preferredName ?? a.firstName} ${a.lastName} (${a.barcode}) has previously played ${scannedLibraryItems[0]?.barcode}!`, {
+            autoClose: 9000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true
+          });
+        })
+
         playCompleteChime()
       } catch(error) {
         playErrorChime()
