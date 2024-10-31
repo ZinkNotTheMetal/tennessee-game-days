@@ -15,14 +15,12 @@ async function CheckBarcode(barcode: string) : Promise<BarcodeResponse | undefin
     }
   );
   if (!response.ok) {
-    console.log("Check barcode response", response)
-    console.log("Barcode response status", response.status)
+    console.log("CheckBarcode - full response", response)
+    console.log("CheckBarcode - response status", response.status)
     return undefined
   }
 
   const data = await response.json()
-
-  console.log("scanned barcode data:", data)
 
   return {
     barcode: barcode,
