@@ -119,7 +119,6 @@ export default function ScanningTerminalClient() {
   }
 
   const onSubmit: SubmitHandler<{ barcodes: { barcode: string; }[]; }> = async (data) => {
-    console.log('submitted', data)
 
     const scannedLibraryItems = barcodeResults.filter(f => f.entityType === 'LibraryItem')
     const scannedPlayToWinGames = barcodeResults
