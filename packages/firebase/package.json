@@ -8,7 +8,7 @@
     "access": "public"
   },
   "dependencies": {
-    "firebase": "^10.13.2",
+    "firebase": "^10.14.1",
     "typescript": "^4.5.2"
   },
   "devDependencies": {
