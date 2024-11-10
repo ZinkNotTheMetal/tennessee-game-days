@@ -10,14 +10,15 @@ export const dynamic = "force-dynamic";
 
 
 // TODO: Add docs
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const libraryItemId = (await params).id
   const libraryItemToEdit: ILibraryItemRequest = await request.json();
   const { boardGameGeekThing, additionalBoxContent } = libraryItemToEdit;
   const { mechanics, id, ...bggRest } = boardGameGeekThing;
 
   const libraryItemToUpdate = await prisma.libraryItem.findFirstOrThrow({
     where: {
-      id: Number(params.id)
+      id: Number(libraryItemId)
     }
   })
 
@@ -42,7 +43,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         where: {
           entityType_entityId: {
             entityType: 'LibraryItem',
-            entityId: Number(params.id)
+            entityId: Number(libraryItemId)
           }
         },
         data: {
@@ -54,7 +55,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     // 2. Check to see if the barcode is the same
     await transaction.libraryItem.update({
-      where: { id: Number(params.id) },
+      where: { id: Number(libraryItemId) },
       data: {
         alias:
           libraryItemToEdit?.alias?.trim() === ""

@@ -38,10 +38,10 @@ import { PlayToWinReportResponse } from "./response"
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { conventionId: string } }
+  { params }: { params: Promise<{ conventionId: string }> }
 ) {
-
-  const result = await GetPlayToWinReportByConvention(Number(params.conventionId))
+  const conventionId = Number((await params).conventionId)
+  const result = await GetPlayToWinReportByConvention(conventionId)
 
   if (result === null) return NextResponse.json({ message: "Convention not found" }, { status: 404 })
   return NextResponse.json<PlayToWinReportResponse[] | null>(result)

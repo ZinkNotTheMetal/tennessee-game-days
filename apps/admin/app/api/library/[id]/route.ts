@@ -36,9 +36,11 @@ export const dynamic = "force-dynamic"
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const response = await GetLibraryItemById(Number(params.id))
+  const libraryItemId = Number((await params).id)
+
+  const response = await GetLibraryItemById(libraryItemId)
   if (response === null) NextResponse.json({ message: "Game not found" }, { status: 404 })
 
   return NextResponse.json<ILibraryItem>(response ?? {} as ILibraryItem, { status: 200 })
@@ -77,15 +79,30 @@ export async function GET(
  *             schema:
  *                message: string
  */
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const libraryItemId = (await params).id
+  const libraryItem = await prisma.libraryItem.findFirst({
+    where: { id: Number(libraryItemId)}
+  })
+
+  if (libraryItem === null || libraryItem === undefined)
+    return NextResponse.json({ message: `Library item with ${libraryItemId} not found` }, { status: 404 });
+
+
+  await prisma.libraryCheckoutEvent.deleteMany({
+    where: {
+      libraryCopyId: Number(libraryItemId)
+    }
+  })
+
   await prisma.libraryItem.delete({
-    where: { id: Number(params.id) },
+    where: { id: Number(libraryItemId) },
   });
 
   await prisma.centralizedBarcode.delete({
     where: {
       entityType_entityId: {
-        entityId: Number(params.id),
+        entityId: Number(libraryItemId),
         entityType: "LibraryItem",
       },
     },
@@ -93,7 +110,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
   return NextResponse.json(
     {
-      message: `Successfully deleted library item - ${params.id}`,
+      message: `Successfully deleted library item - ${libraryItemId}`,
     },
     { status: 200 }
   );

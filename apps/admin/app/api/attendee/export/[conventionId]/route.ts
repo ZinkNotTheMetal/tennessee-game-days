@@ -4,9 +4,11 @@ import { stringify } from 'csv-stringify/sync'; // Using sync for simplicity
 
 const prisma = new PrismaClient();
 
-export async function GET(request: NextRequest, { params }: { params: { conventionId: string }}) {
+export async function GET(request: Request, { params }: { params: Promise<{ conventionId: string }> }) {
+  const conventionId = (await params).conventionId
+
   const conventionById = await prisma.convention.findFirst({
-    where: { id: Number(params.conventionId) },
+    where: { id: Number(conventionId) },
     include: {
       venue: true,
     },
@@ -16,7 +18,7 @@ export async function GET(request: NextRequest, { params }: { params: { conventi
     return NextResponse.json({ message: "Convention not found" }, { status: 404 });
   }
 
-  const csvFileName = `${conventionById.name}_${conventionById.startDateTimeUtc?.getFullYear()}${params.conventionId}_attendees.csv`;
+  const csvFileName = `${conventionById.name}_${conventionById.startDateTimeUtc?.getFullYear()}${conventionId}_attendees.csv`;
   const columns = ['Barcode', 'First Name', 'Preferred Name', 'Last Name', 'Volunteer', 'Conventions Attended', 'Email'];
 
   const attendees = await prisma.attendee.findMany({

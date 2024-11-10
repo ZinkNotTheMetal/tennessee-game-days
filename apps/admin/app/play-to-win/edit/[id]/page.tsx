@@ -2,7 +2,7 @@ import { IPlayToWinItem } from "@repo/shared";
 import { PlayToWinItemForm } from "../../play-to-win-form";
 
 interface Props {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 async function getPlayToWinItem(id: number) {
@@ -21,7 +21,8 @@ async function getPlayToWinItem(id: number) {
 export async function generateMetadata(
   { params }: Props
 ) {
-  const playToWinItem = await getPlayToWinItem(Number(params.id))
+  const playToWinItemId = Number((await params).id)
+  const playToWinItem = await getPlayToWinItem(playToWinItemId)
 
   return {
     title: `Edit - ${playToWinItem.barcode} - ${playToWinItem.gameName}`
@@ -30,7 +31,7 @@ export async function generateMetadata(
 
 
 export default async function Page({ params }: Props) {
-  const playToWinItemId = Number(params.id)
+  const playToWinItemId = Number((await params).id)
   const playToWinItem = await getPlayToWinItem(playToWinItemId)
 
   return(

@@ -1,20 +1,21 @@
 import prisma from "@/app/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { AddAdditionalPeopleUnderPurchasingPerson } from "../../actions";
 import { revalidateTag } from "next/cache";
 import { AddAttendeeResponse } from "../../response";
 import { IAddAttendeeWithRequest } from "@/app/api/requests/add-attendee-with-request";
 
-export async function POST(request: NextRequest, { params }: { params: { conventionId: string, attendeePersonId: string }}) {
+
+export async function POST(request: Request, { params }: { params: Promise<{ conventionId: string, attendeePersonId: string }>}) {
+  const conventionId = (await params).conventionId
+  const attendeePersonId = (await params).attendeePersonId
   const json: IAddAttendeeWithRequest = await request.json()
   const { people } = json
   let barcodesCreated: { personId: number, barcode: string | null }[] = []
 
-  console.log('request', params)
-
   // Ensure the convention exists that you are trying to add conventions to
   const conventionExists = await prisma.convention.count({
-    where: { id: Number(params.conventionId)}
+    where: { id: Number(conventionId)}
   })
 
   if (conventionExists <= 0) {
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest, { params }: { params: { convent
 
   const personToAddUnder = await prisma.person.findFirst({
     where: { 
-      id: Number(params.attendeePersonId)
+      id: Number(attendeePersonId)
     }
   })
 
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest, { params }: { params: { convent
   if (people !== undefined && people.length > 0) {
     console.log('Adding additional people...')
 
-    const barcodesForAdditionalPeople = await AddAdditionalPeopleUnderPurchasingPerson(Number(params.attendeePersonId), Number(params.conventionId), people, json.isVolunteer, json.passPurchased, json.isStayingOnSite);
+    const barcodesForAdditionalPeople = await AddAdditionalPeopleUnderPurchasingPerson(Number(attendeePersonId), Number(conventionId), people, json.isVolunteer, json.passPurchased, json.isStayingOnSite);
     barcodesForAdditionalPeople.forEach(barcode => barcodesCreated.push(barcode));
   }
 

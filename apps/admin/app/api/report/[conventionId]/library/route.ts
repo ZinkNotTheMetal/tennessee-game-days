@@ -49,17 +49,18 @@ import { LibraryReportResponse } from "./response"
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { conventionId: string } }
+  { params }: { params: Promise<{ conventionId: string }> }
 ) {
+  const conventionId = Number((await params).conventionId)
 
   const conventionForReport = await prisma.convention.findFirst({
-    where: { id: Number(params.conventionId) }
+    where: { id: conventionId }
   })
 
   if (conventionForReport === null) return NextResponse.json({ message: "Convention not found" }, { status: 404 })
   if (!conventionForReport.startDateTimeUtc) return NextResponse.json({ message: "Convention start date was not found" }, { status: 522 })
   if (!conventionForReport.endDateTimeUtc) return NextResponse.json({ message: "Convention end date was not found" }, { status: 522 })
 
-  const result = await GetLibraryPlaytimeCounts(Number(params.conventionId))
+  const result = await GetLibraryPlaytimeCounts(conventionId)
   return NextResponse.json<LibraryReportResponse | null>(result, { status: 200 })
 }
