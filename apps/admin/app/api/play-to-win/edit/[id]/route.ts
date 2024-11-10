@@ -57,7 +57,9 @@ import { revalidateTag } from "next/cache";
  *                   type: string
  *                   description: Error message indicating the play to win game was not found
  */
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const playToWinItemId = (await params).id
+
   const playToWinItem: IPlayToWinRequest = await request.json();
 
   const { boardGameGeekThing, _count, ...rest } = playToWinItem;
@@ -73,7 +75,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   });
 
   const updatePlayToWinItem = await prisma.playToWinItem.update({
-    where: { id: Number(params.id) },
+    where: { id: Number(playToWinItemId) },
     data: {
       ...rest
     },

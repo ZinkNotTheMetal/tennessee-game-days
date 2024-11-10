@@ -5,7 +5,7 @@ import ConventionSelectDropdown from "./convention-select-dropdown"
 import BackToTopButton from "@/app/components/back-to-top/back-to-top-button"
 
 interface Props {
-  params: { conventionId: string }
+  params: Promise<{ conventionId: string }>
 }
 
 async function getAllConventions() : Promise<ApiListResponse<IConvention>> {
@@ -32,7 +32,8 @@ async function getPlayToWinItems(conventionId: number): Promise<ApiListResponse<
 }
 
 export async function generateMetadata({ params }: Props) {
-  const playToWinItems = await getPlayToWinItems(Number(params.conventionId))
+  const conventionId = Number((await params).conventionId)
+  const playToWinItems = await getPlayToWinItems(conventionId)
   const playToWinItemCount = playToWinItems.total
 
   return {
@@ -41,7 +42,8 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function Page({ params }: Props) {
-  const playToWinItems = await getPlayToWinItems(Number(params.conventionId))
+  const conventionId = Number((await params).conventionId)
+  const playToWinItems = await getPlayToWinItems(conventionId)
   const conventions = await getAllConventions()
 
   return(
@@ -50,7 +52,7 @@ export default async function Page({ params }: Props) {
         <PlayToWinItemUploadButton />
       </div>
       <div className="flex justify-center py-4">
-        <ConventionSelectDropdown currentConvention={Number(params.conventionId)} conventionList={conventions.list} />
+        <ConventionSelectDropdown currentConvention={conventionId} conventionList={conventions.list} />
       </div>
       <div className="flex justify-center">
         <PlayToWinItemsTable

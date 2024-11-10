@@ -10,7 +10,7 @@ import { IConvention } from "@repo/shared"
 import ExportAttendeesButton from "./export-attendees-button"
 
 interface Props {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export async function GetConventionById(id: number) {
@@ -32,8 +32,8 @@ export async function GetConventionById(id: number) {
 export async function generateMetadata(
   { params }: Props
 ) {
-  
-  const convention = await GetConventionById(Number(params.id))
+  const conventionId = Number((await params).id)
+  const convention = await GetConventionById(conventionId)
 
   return {
     title: convention?.name
@@ -41,10 +41,12 @@ export async function generateMetadata(
 }
 
 export default async function Page({ params }: Props): Promise<JSX.Element> {
-  const convention = await GetConventionById(Number(params.id))
-  const attendeeCount = await GetAttendeeCounts(Number(params.id))
-  const libraryReport = await GetLibraryPlaytimeCounts(Number(params.id))
-  const playToWinReport = await GetPlayToWinReportByConvention(Number(params.id))
+  const conventionId = Number((await params).id)
+
+  const convention = await GetConventionById(conventionId)
+  const attendeeCount = await GetAttendeeCounts(conventionId)
+  const libraryReport = await GetLibraryPlaytimeCounts(conventionId)
+  const playToWinReport = await GetPlayToWinReportByConvention(conventionId)
 
   return (
     <main className="container mx-auto p-8">
@@ -55,7 +57,7 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
       <div className="bg-gray-100 rounded-md p-6 mb-8">
         <div className="flex justify-end space-x-4">
           <BackButton />
-          <EditConventionButton id={Number(params.id)} />
+          <EditConventionButton id={conventionId} />
         </div>
         <h2 className="text-xl font-semibold mb-4">Event Details:</h2>
         <div className="flex flex-wrap items-center mb-4">
@@ -90,8 +92,8 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
 
       <div className="bg-gray-100 rounded-md p-6 mb-8">
         <div className="flex justify-end space-x-4">
-          <ExportAttendeesButton conventionId={Number(params.id)} />
-          <ViewAttendeesForConventionButton conventionId={Number(params.id)} />
+          <ExportAttendeesButton conventionId={conventionId} />
+          <ViewAttendeesForConventionButton conventionId={conventionId} />
         </div>
         <h2 className="text-xl font-semibold mb-4">Attendance Counts:</h2>
         <p>All Attendees: {attendeeCount?.allAttendees}</p>
@@ -108,7 +110,7 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
 
       <div className="bg-gray-100 rounded-md p-6 mb-8">
         <div className="flex justify-end space-x-4">
-          <ViewPlayToWinGamesForConvention conventionId={Number(params.id)} />
+          <ViewPlayToWinGamesForConvention conventionId={conventionId} />
         </div>
         <h2 className="text-xl font-semibold mb-4">Play to Win Counts:</h2>
         <p>Total Play To Win Games: {playToWinReport?.length}</p>

@@ -75,7 +75,7 @@ export default function NavBar(): JSX.Element {
           <Link href="/play-to-win">Play to Win Games</Link>
         </li>
         <li
-          className={`flex items-center space-x-2 hover:text-blue-400 ${activeSegment === "play-to-win" ? "text-blue-400" : ""}`}
+          className={`flex items-center space-x-2 hover:text-blue-400 ${activeSegment === "attendee-check-in" ? "text-blue-400" : ""}`}
         >
           <FaPersonBooth className="fa h-5 w-5" />
           <Link href="/attendee-check-in">Check In</Link>

@@ -35,12 +35,14 @@ import { AttendeeBarcodeResponse, BarcodeResponse, LibraryBarcodeResponse } from
  *                message: string
  */
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { barcode: string } }
+  request: Request,
+  { params }: { params: Promise<{ barcode: string }> }
 ) {
 
+  const barcode = (await params).barcode
+
   const barcodeScanned = await prisma.centralizedBarcode.findFirst({
-    where: { barcode: params.barcode }
+    where: { barcode: barcode }
   })
 
   if (barcodeScanned === null) {
