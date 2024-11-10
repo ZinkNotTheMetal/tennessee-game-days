@@ -78,7 +78,7 @@ export async function GET() {
     INNER JOIN public.library_items AS l ON l.id = e.library_item_id
     INNER JOIN public.board_game_geek_items as b ON b.bgg_id = l.bgg_id
     GROUP BY library_item_id, l.bgg_id, library_item_name, b.bgg_average_rating, b.bgg_weight_rating, b.playing_time_min, b.min_player_count, b.max_player_count, voted_best_player_count
-    ORDER BY total_checkout_minutes DESC
+    ORDER BY total_checkout_events DESC
     LIMIT 20
   `
 
