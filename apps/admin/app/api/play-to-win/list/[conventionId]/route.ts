@@ -74,10 +74,11 @@ export const fetchCache = "force-no-store";
  */
 
 
-export async function GET(request: NextRequest,
-  { params }: { params: { conventionId: string } }
+export async function GET(request: Request,
+  { params }: { params: Promise<{ conventionId: string }> }
 ) {
 
+  const conventionId = Number((await params).conventionId)
   const url = new URL(request.url);
   const showHidden = url.searchParams.get("showHidden")
 
@@ -86,12 +87,12 @@ export async function GET(request: NextRequest,
     const [count, items] = await Promise.all([
       prisma.playToWinItem.count({
         where: {
-          conventionId: Number(params.conventionId)
+          conventionId: conventionId
         }
       }),
       prisma.playToWinItem.findMany({
         where: {
-          conventionId: Number(params.conventionId)
+          conventionId: conventionId
         },
         include: {
           boardGameGeekThing: true,
@@ -111,7 +112,7 @@ export async function GET(request: NextRequest,
         where: {
           AND: [
             { 
-              conventionId: Number(params.conventionId)
+              conventionId: conventionId
             },
             { 
               isHidden: false
@@ -123,7 +124,7 @@ export async function GET(request: NextRequest,
         where: {
           AND: [
             { 
-              conventionId: Number(params.conventionId)
+              conventionId: conventionId
             },
             { 
               isHidden: false

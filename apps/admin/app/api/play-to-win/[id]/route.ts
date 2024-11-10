@@ -63,11 +63,12 @@ import prisma from "@/app/lib/prisma"
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const playToWinId = (await params).id
 
   const playToWinItemById = await prisma.playToWinItem.findFirst({
-    where: { id: Number(params.id) },
+    where: { id: Number(playToWinId) },
     include: {
       boardGameGeekThing: true,
       _count: true,
@@ -134,8 +135,8 @@ export async function GET(
  *             schema:
  *                message: string
  */
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  const playToWinItemId = Number(params.id);
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const playToWinItemId = Number((await params).id);
 
   // Check if playToWinItem exists
   const playToWinItem = await prisma.playToWinItem.findUnique({
@@ -143,7 +144,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   });
 
   if (!playToWinItem) {
-    return NextResponse.json({ message: `Play to win item with id ${params.id} not found` }, { status: 404 });
+    return NextResponse.json({ message: `Play to win item with id ${playToWinItemId} not found` }, { status: 404 });
   }
 
   // Fetch all PlayToWinPlay IDs associated with this playToWinItem
@@ -182,7 +183,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
   return NextResponse.json(
     {
-      message: `Successfully deleted play to win item - ${params.id}`,
+      message: `Successfully deleted play to win item - ${playToWinItemId}`,
     },
     { status: 200 }
   );

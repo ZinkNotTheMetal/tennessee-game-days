@@ -3,7 +3,7 @@ import type { ILibraryItem } from "@repo/shared";
 import { LibraryItemEditButtons } from "./library-edit-buttons";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 async function getLibraryItem(id: number) {
@@ -20,15 +20,16 @@ async function getLibraryItem(id: number) {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const libraryItem = await getLibraryItem(Number(params.id));
+  const libraryItemId = Number((await params).id)
+  const libraryItem = await getLibraryItem(libraryItemId);
 
   return {
     title: `Edit - ${libraryItem.barcode} - ${libraryItem.alias || libraryItem.boardGameGeekThing?.itemName}`,
   };
 }
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const libraryItemId = Number(params.id);
+export default async function Page({ params }: Props) {
+  const libraryItemId = Number((await params).id)
   const libraryItem = await getLibraryItem(libraryItemId);
 
   return (

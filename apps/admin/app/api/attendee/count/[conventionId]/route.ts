@@ -31,8 +31,10 @@ export const fetchCache = "force-no-store"
  *             schema:
  *               $ref: '#/components/schemas/AttendeeCountResponse'
  */
-export async function GET(request: NextRequest, { params }: { params: { conventionId: string }}) {
-  const attendeeInformation = await GetAllAttendeesForConvention(Number(params.conventionId))
+export async function GET(request: Request, { params }: { params: Promise<{ conventionId: string }>}) {
+  const conventionId = (await params).conventionId
+
+  const attendeeInformation = await GetAllAttendeesForConvention(Number(conventionId))
 
   return NextResponse.json<AttendeeCountResponse>({
     total: attendeeInformation.filter(a => !a.hasCancelled).length,

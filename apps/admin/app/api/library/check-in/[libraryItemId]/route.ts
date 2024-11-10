@@ -37,11 +37,12 @@ import { DateTime } from "ts-luxon"
  *             schema:
  *                message: string
  */
-export async function PUT(request: NextRequest, { params }: { params: { libraryId: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ libraryItemId: string }> }) {
+  const libraryItemId = (await params).libraryItemId
   const checkedInTime = DateTime.utc()
 
   const libraryItem = await prisma.libraryItem.count({
-    where: { id: Number(params.libraryId) }
+    where: { id: Number(libraryItemId) }
   })
 
   if (libraryItem === null) return NextResponse.json({ message: "Library Item not found" }, { status: 404 })
@@ -49,7 +50,7 @@ export async function PUT(request: NextRequest, { params }: { params: { libraryI
   await prisma.$transaction(async t => {
 
     const result = await t.libraryCheckoutEvent.findFirst({
-      where: { libraryCopyId: Number(params.libraryId), checkedInTimeUtcIso: null }
+      where: { libraryCopyId: Number(libraryItemId), checkedInTimeUtcIso: null }
     })
 
     // If there are no current check out events then it will just return the 200
@@ -67,7 +68,7 @@ export async function PUT(request: NextRequest, { params }: { params: { libraryI
 
     await t.libraryItem.update({
       where: 
-      { id: Number(params.libraryId) },
+      { id: Number(libraryItemId) },
       data: {
         isCheckedOut: false,
         totalCheckedOutMinutes: {

@@ -35,11 +35,13 @@ export const dynamic = "force-dynamic"
  *                message: string
  */
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const conventionId = (await params).id
+
   const convention = await prisma.convention.findFirst({
-    where: { id: Number(params.id) },
+    where: { id: Number(conventionId) },
     include: {
       venue: true,
     },
@@ -80,9 +82,11 @@ export async function GET(
  *             schema:
  *                message: string
  */
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const conventionId = (await params).id
+
   const conventionById = await prisma.convention.findFirst({
-    where: { id: Number(params.id) },
+    where: { id: Number(conventionId) },
     include: {
       venue: true,
     },
@@ -93,14 +97,14 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
   // TODO: Fix 500 error (PTW items not deleted) or return unable to delete
   await prisma.convention.delete({
-    where: { id: Number(params.id) },
+    where: { id: Number(conventionId) },
   });
 
   revalidateTag('convention')
 
   return NextResponse.json(
     {
-      message: `Successfully deleted convention - ${params.id}`,
+      message: `Successfully deleted convention - ${conventionId}`,
     },
     { status: 200 }
   );

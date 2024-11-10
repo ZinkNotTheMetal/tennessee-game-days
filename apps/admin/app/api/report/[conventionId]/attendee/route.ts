@@ -28,14 +28,16 @@ import { ConventionAttendeeResponse } from "./response";
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { conventionId: string } }
+  { params }: { params: Promise<{ conventionId: string }> }
 ) {
-  const counts = await GetAttendeeCounts(Number(params.conventionId))
+  const conventionId = Number((await params).conventionId)
+
+  const counts = await GetAttendeeCounts(conventionId)
 
   if (counts === null) return NextResponse.json({ message: "Convention not found" }, { status: 404 })
 
   return NextResponse.json<ConventionAttendeeResponse>({
-    conventionId: Number(params.conventionId),
+    conventionId: conventionId,
     counts
   })
 

@@ -65,7 +65,8 @@ export const maxDuration = 10; // 10 seconds
  *             schema:
  *               message: string
  */
-export async function POST(request: NextRequest, { params }: { params: { conventionId: string }}) {
+export async function POST(request: Request, { params }: { params: Promise<{ conventionId: string }> }) {
+  const conventionId = (await params).conventionId;
   const json: IAddAttendeeRequest = await request.json();
   const { person, additionalPeople, isVolunteer, isStayingOnSite, passPurchased } = json
   const { emergencyContact } = person
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest, { params }: { params: { convent
 
   // Ensure the convention exists that you are trying to add conventions to
   const conventionExists = await prisma.convention.count({
-    where: { id: Number(params.conventionId)}
+    where: { id: Number(conventionId)}
   })
 
   if (conventionExists <= 0) {
@@ -91,9 +92,9 @@ export async function POST(request: NextRequest, { params }: { params: { convent
 
   if (attendeeAlreadyAdded) return NextResponse.json({ error: 'Attendee has already been added to this convention'}, { status: 400 })
 
-  console.log(`Adding Purchasing Person to Attendees - PersonID: ${personId} | ConventionID: ${params.conventionId}`)
+  console.log(`Adding Purchasing Person to Attendees - PersonID: ${personId} | ConventionID: ${conventionId}`)
 
-  let barcodeForPurchasingPerson = await GenerateBarcodeAndAddAttendee(Number(params.conventionId), personId, isVolunteer, passPurchased, isStayingOnSite)
+  let barcodeForPurchasingPerson = await GenerateBarcodeAndAddAttendee(Number(conventionId), personId, isVolunteer, passPurchased, isStayingOnSite)
   if (barcodeForPurchasingPerson.success) {
     barcodesCreated.push({ personId: personId, barcode: barcodeForPurchasingPerson.barcode })
   } else { 
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest, { params }: { params: { convent
   if (additionalPeople !== undefined && additionalPeople.length > 0) {
     console.log('Adding additional people...')
 
-    const barcodesForAdditionalPeople = await AddAdditionalPeopleUnderPurchasingPerson(personId,  Number(params.conventionId), additionalPeople, isVolunteer, passPurchased, isStayingOnSite);
+    const barcodesForAdditionalPeople = await AddAdditionalPeopleUnderPurchasingPerson(personId,  Number(conventionId), additionalPeople, isVolunteer, passPurchased, isStayingOnSite);
     barcodesForAdditionalPeople.forEach(barcode => barcodesCreated.push(barcode));
   }
 

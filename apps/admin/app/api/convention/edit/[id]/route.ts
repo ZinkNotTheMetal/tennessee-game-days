@@ -40,7 +40,9 @@ import { revalidateTag } from "next/cache";
  *             schema:
  *                message: string
  */
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const conventionId = (await params).id
+
   const conventionToEditRequest: IConventionRequest = await request.json();
   const { venue, ...convention } = conventionToEditRequest
   let venueAddedId: number = venue?.id || -1
@@ -58,7 +60,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 
   const updatedConvention = await prisma.convention.update({
-    where: { id: Number(params.id) },
+    where: { id: Number(conventionId) },
     data: {
       name: convention.name,
       startDateTimeUtc: (convention.startDateTimeUtc?.trim() ? convention.startDateTimeUtc : undefined),
