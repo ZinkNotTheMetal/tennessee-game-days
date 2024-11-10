@@ -78,6 +78,20 @@ export async function GET(
  *                message: string
  */
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const libraryItem = await prisma.libraryItem.findFirst({
+    where: { id: Number(params.id)}
+  })
+
+  if (libraryItem === null || libraryItem === undefined)
+    return NextResponse.json({ message: `Library item with ${params.id} not found` }, { status: 404 });
+
+
+  await prisma.libraryCheckoutEvent.deleteMany({
+    where: {
+      libraryCopyId: Number(params.id)
+    }
+  })
+
   await prisma.libraryItem.delete({
     where: { id: Number(params.id) },
   });

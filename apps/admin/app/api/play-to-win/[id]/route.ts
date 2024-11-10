@@ -135,29 +135,54 @@ export async function GET(
  *                message: string
  */
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  const playToWinItem = await prisma.playToWinItem.findFirst({
-    where: { id: Number(params.id)}
-  })
+  const playToWinItemId = Number(params.id);
 
-  if (playToWinItem === null || playToWinItem === undefined)
-    return NextResponse.json({ message: "Play to win item not found" }, { status: 404 });
+  // Check if playToWinItem exists
+  const playToWinItem = await prisma.playToWinItem.findUnique({
+    where: { id: playToWinItemId },
+  });
 
-  await prisma.libraryItem.delete({
-    where: { id: Number(params.id) },
+  if (!playToWinItem) {
+    return NextResponse.json({ message: `Play to win item with id ${params.id} not found` }, { status: 404 });
+  }
+
+  // Fetch all PlayToWinPlay IDs associated with this playToWinItem
+  const playToWinPlayIds = (
+    await prisma.playToWinPlay.findMany({
+      where: { playToWinItemId },
+      select: { id: true },
+    })
+  ).map((play: { id: string; }) => play.id);
+
+  // Delete all related PlayToWinPlayAttendee records
+  await prisma.playToWinPlayAttendee.deleteMany({
+    where: {
+      playToWinPlayId: { in: playToWinPlayIds },
+    },
+  });
+
+  // Delete all related PlayToWinPlay records
+  await prisma.playToWinPlay.deleteMany({
+    where: { playToWinItemId },
+  });
+
+  // Delete the PlayToWinItem record itself
+  await prisma.playToWinItem.delete({
+    where: { id: playToWinItemId },
   });
 
   await prisma.centralizedBarcode.delete({
     where: {
       entityType_entityId: {
-        entityId: Number(params.id),
-        entityType: "LibraryItem",
+        entityId: playToWinItemId,
+        entityType: "PlayToWinItem",
       },
     },
   });
 
   return NextResponse.json(
     {
-      message: `Successfully deleted library item - ${params.id}`,
+      message: `Successfully deleted play to win item - ${params.id}`,
     },
     { status: 200 }
   );
