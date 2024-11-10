@@ -96,7 +96,7 @@ function DisplayTopGamesBody({ showFullDetails, games, count }: DisplayTopGamesB
     <tbody className="text-center">
 
       { games.slice(0, count).map((game) => (
-        <ResultsTableRow showFullDetails={showFullDetails} game={game} />
+        <ResultsTableRow key={game.id} showFullDetails={showFullDetails} game={game} />
       ))}
 
     </tbody>
