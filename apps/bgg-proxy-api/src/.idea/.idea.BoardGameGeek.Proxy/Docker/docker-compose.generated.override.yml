@@ -1,0 +1,21 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  bgg-proxy-api:
+    build:
+      context: "/Users/william/Work/Personal/tennessee-game-days/apps/bgg-proxy-api/src"
+      dockerfile: "BoardGameGeek.Proxy.Api/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/BoardGameGeek.Proxy.Api.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "boardgamegeek.proxy.api:dev"
+    ports: []
+    volumes:
+    - "/Users/william/.nuget/packages:/home/app/.nuget/packages"
+    - "/Users/william/Work/Personal/tennessee-game-days/apps/bgg-proxy-api/src/BoardGameGeek.Proxy.Api:/app:rw"
+    - "/Users/william/Work/Personal/tennessee-game-days/apps/bgg-proxy-api/src:/src:rw"
+    working_dir: "/app"

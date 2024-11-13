@@ -1,0 +1,16 @@
+name: tgd-bgg-proxyapi
+
+services:
+  bgg-proxy-api:
+    container_name: bgg-proxy-api
+    build:
+      context: .
+      dockerfile: BoardGameGeek.Proxy.Api/Dockerfile
+    ports:
+      - 8081:8080
+    networks:
+      - bgg-proxy-api
+
+networks:
+  bgg-proxy-api:
+    driver: bridge
