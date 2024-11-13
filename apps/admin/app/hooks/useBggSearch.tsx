@@ -4,6 +4,28 @@ import { useState } from "react";
 import type { DebouncedState } from "use-debounce"
 import { useDebouncedCallback } from "use-debounce"
 
+
+interface ProxyBggApiResponse {
+  id: number
+  name: string
+  imageUrl: string
+  thumbnailUrl: string
+  description: string
+  yearPublished: number
+  minimumPlayerCount: number
+  maximumPlayerCount: number
+  minimumPlayerAge: number
+  type: string
+  ranking: number
+  minimumPlayingTimeMinutes: number
+  maximumPlayingTimeMinutes: number
+  averageUserRating: number
+  complexityRating: number
+  mechanics: Array<{ id: number, name: string }>
+  publishers: Array<{ id: number, name: string }>
+  votedBestPlayerCounts: Array<number>
+}
+
 export default function useBoardGameGeekSearch(
   query: string,
   searchById: boolean
@@ -21,17 +43,31 @@ export default function useBoardGameGeekSearch(
       setTotalResults(0);
       setResults([] as IBoardGameGeekEntity[]);
     } else {
-      SearchBoardGameGeek(query, searchById)
-        .then((results) => {
+
+      fetch(`http://localhost:5226/search/${query}?searchById=${searchById}`, {
+        method: 'GET'
+      })
+        .then((response) => response.json())
+        .then((json: ProxyBggApiResponse[]) => {
           setIsLoading(false)
-          setTotalResults(results.totalCount)
-          setResults(results.results.map((r) => MapToBoardGameEntity(r)))
+          setTotalResults(json.length)
+          setResults(json.map((r) => {
+            const bggEntity: IBoardGameGeekEntity = {
+              itemName: r.name,
+              publisherName: r.publishers[0]?.name ?? '',
+              playingTimeMinutes: r.maximumPlayingTimeMinutes,
+              votedBestPlayerCount: r.votedBestPlayerCounts[0] ?? 0,
+              ...r
+            }
+
+            return bggEntity
+          }))
         })
-        .catch((e) => {
-          setError(e)
-        });
+        .catch((error) => {
+          console.log('api search error', error)
+        })
     }
-  }, 225)
+  }, 500)
 
   return [isLoading, debounced, totalResults, results, error];
 }

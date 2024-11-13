@@ -14,9 +14,12 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("https://tennessee-game-days-admin.vercel.app")
+                .WithOrigins("https://tennessee-game-days-admin.vercel.app", "http://localhost:3000")
+                //.AllowAnyOrigin()
+                .AllowCredentials()
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .WithExposedHeaders("*");
         });
 });
 
@@ -29,14 +32,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseResponseCaching();
-
 app.UseCors();
 
+app.UseResponseCaching();
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
