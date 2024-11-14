@@ -10,14 +10,16 @@ export const dynamic = "force-dynamic";
 
 
 // TODO: Add docs
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> } ) {
+  const libraryItemIdToEdit = Number((await params).id)
+
   const libraryItemToEdit: ILibraryItemRequest = await request.json();
   const { boardGameGeekThing, additionalBoxContent } = libraryItemToEdit;
   const { mechanics, id, ...bggRest } = boardGameGeekThing;
 
   const libraryItemToUpdate = await prisma.libraryItem.findFirstOrThrow({
     where: {
-      id: Number(params.id)
+      id: libraryItemIdToEdit
     }
   })
 
@@ -25,15 +27,42 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     transaction: Prisma.TransactionClient
   ) => {
 
-    // 1. Update the BGG thing in the database
+    // 1. Add all mechanics if not already created
+    await Promise.all(
+      mechanics.map((gm) =>
+        transaction.mechanic.upsert({
+          where: { id: gm.id },
+          update: { name: gm.name },
+          create: {
+            id: gm.id,
+            name: gm.name,
+          },
+        })
+      )
+    );
+    
+    // Upsert board game geek db
     const upsertBggLibraryGame = await transaction.boardGameGeekThing.upsert({
       where: { id: id },
-      update: bggRest,
+      update: {
+        ...bggRest,
+        gameMechanics: {
+          deleteMany: {}, // Clear any existing mechanics for a fresh relation setup
+          create: mechanics.map((gm) => ({
+            mechanic: { connect: { id: gm.id } },
+          })),
+        },
+      },
       create: {
         ...bggRest,
-        id: id
-      }
-    })
+        id: id,
+        gameMechanics: {
+          create: mechanics.map((gm) => ({
+            mechanic: { connect: { id: gm.id } },
+          })),
+        },
+      },
+    });
 
 
     if (libraryItemToUpdate?.barcode !== libraryItemToEdit.barcode) {
@@ -42,7 +71,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         where: {
           entityType_entityId: {
             entityType: 'LibraryItem',
-            entityId: Number(params.id)
+            entityId: libraryItemIdToEdit
           }
         },
         data: {
@@ -54,7 +83,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     // 2. Check to see if the barcode is the same
     await transaction.libraryItem.update({
-      where: { id: Number(params.id) },
+      where: { id: libraryItemIdToEdit },
       data: {
         alias:
           libraryItemToEdit?.alias?.trim() === ""
@@ -67,34 +96,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         updatedAtUtc: DateTime.utc().toISO(),
       },
     })
-
-    for (const gm of mechanics) {
-      await transaction.mechanic.upsert({
-        where: { id: gm.id },
-        update: { name: gm.name },
-        create: {
-          id: gm.id,
-          name: gm.name,
-        },
-      })
-
-      await transaction.gameMechanic.upsert({
-        where: {
-          boardGameGeekId_mechanicId: {
-            boardGameGeekId: upsertBggLibraryGame.id,
-            mechanicId: gm.id,
-          },
-        },
-        create: {
-          mechanicId: gm.id,
-          boardGameGeekId: upsertBggLibraryGame.id,
-        },
-        update: {
-          mechanicId: gm.id,
-          boardGameGeekId: upsertBggLibraryGame.id,
-        },
-      });
-    }
 
   })
 
