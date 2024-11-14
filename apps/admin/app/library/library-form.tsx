@@ -47,46 +47,38 @@ export function LibraryForm({
     },
   });
 
+  const handleAddLibraryItem = async (data: ILibraryItem) => {
+    const response = await fetch(`/api/library/add`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.ok;
+  };
+  
+  const handleUpdateLibraryItem = async (data: ILibraryItem) => {
+    const response = await fetch(`/api/library/edit/${data.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.ok;
+  };
+  
   const onSubmit: SubmitHandler<ILibraryItem> = async (data) => {
     setOnSubmitting(true);
-    // Updating
-    if (data.id && data.id > 0) {
-      const response = await fetch(`/api/library/edit/${data.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data)
-      })
+    const isEdit = data.id && data.id > 0
 
-      if (response.ok) {
-        toast(`Successfully edited ${data.boardGameGeekThing.itemName}`, {
-          type: "success",
-        })
-      } else {
-        toast(
-          `Failed to edit ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
-          { type: "error" }
-        );
-      }
-
-    } else {
-      const response = await fetch(`/api/library/add`, {
-        method: 'POST',
-        body: JSON.stringify(data)
-      })
-
-      if (response.ok) {
-        toast(
-          `Successfully added ${data.boardGameGeekThing.itemName} to the library`,
-          { type: "success" }
-        );
-      } else {
-        toast(
-          `Failed to add ${data.boardGameGeekThing.itemName} to the library (check the logs)`,
-          { type: "error" }
-        );
-      }
-    }
-
-    setOnSubmitting(false)
+    const isSuccess = isEdit
+      ? await handleUpdateLibraryItem(data)
+      : await handleAddLibraryItem(data);
+  
+    toast(
+      isSuccess
+        ? `Successfully ${isEdit ? 'edited' : 'added'} ${data.boardGameGeekThing?.itemName}`
+        : `Failed to ${isEdit ? 'edit' : 'add'} ${data.boardGameGeekThing?.itemName} (check the logs)`,
+      { type: isSuccess ? "success" : "error" }
+    );
+  
+    setOnSubmitting(false);
     router.replace("/library");
   };
 

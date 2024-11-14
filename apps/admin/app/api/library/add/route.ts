@@ -47,93 +47,88 @@ export async function POST(request: NextRequest) {
   const { boardGameGeekThing, additionalBoxContent } = libraryItemToAdd;
   const { mechanics, id, ...bggRest } = boardGameGeekThing;
 
-  const upsertBggLibraryGame = await prisma.boardGameGeekThing.upsert({
-    where: { id: id },
-    update: bggRest,
-    create: {
-      ...bggRest,
-      id: id,
-    },
-  });
+  const createdId = await prisma.$transaction(async (t) => {
 
-  await prisma.centralizedBarcode.create({
-    data: {
-      entityId: 0,
-      entityType: "LibraryItem",
-      barcode: libraryItemToAdd.barcode,
-    },
-  });
-
-  const createdLibraryItem = await prisma.libraryItem.create({
-    data: {
-      alias:
-        libraryItemToAdd?.alias?.trim() === "" ? null : libraryItemToAdd.alias,
-      barcode: libraryItemToAdd.barcode,
-      isHidden: libraryItemToAdd.isHidden,
-      owner: libraryItemToAdd.owner,
-      boardGameGeekId: upsertBggLibraryGame.id,
-      isCheckedOut: false,
-      updatedAtUtc: DateTime.utc().toISO(),
-      dateAddedUtc: DateTime.utc().toISO(),
-    },
-  });
-
-  await prisma.centralizedBarcode.update({
-    where: { barcode: libraryItemToAdd.barcode },
-    data: {
-      entityId: Number(createdLibraryItem.id),
-    },
-  });
-
-  for (const gm of mechanics) {
-    await prisma.mechanic.upsert({
-      where: { id: gm.id },
-      update: { name: gm.name },
-      create: {
-        id: gm.id,
-        name: gm.name,
+    const centralizedBarcode = await t.centralizedBarcode.create({
+      data: {
+        entityId: 0,
+        entityType: "LibraryItem",
+        barcode: libraryItemToAdd.barcode,
       },
-    });
+    })
 
-    await prisma.gameMechanic.upsert({
-      where: {
-        boardGameGeekId_mechanicId: {
-          boardGameGeekId: upsertBggLibraryGame.id,
-          mechanicId: gm.id,
+    await Promise.all(
+      mechanics.map((gm) =>
+        t.mechanic.upsert({
+          where: { id: gm.id },
+          update: { name: gm.name },
+          create: {
+            id: gm.id,
+            name: gm.name,
+          },
+        })
+      )
+    );
+    
+    const upsertBggLibraryGame = await t.boardGameGeekThing.upsert({
+      where: { id: id },
+      update: {
+        ...bggRest,
+        gameMechanics: {
+          deleteMany: {}, // Clear any existing mechanics for a fresh relation setup
+          create: mechanics.map((gm) => ({
+            mechanic: { connect: { id: gm.id } },
+          })),
         },
       },
       create: {
-        mechanicId: gm.id,
-        boardGameGeekId: upsertBggLibraryGame.id,
+        ...bggRest,
+        id: id,
+        gameMechanics: {
+          create: mechanics.map((gm) => ({
+            mechanic: { connect: { id: gm.id } },
+          })),
+        },
       },
-      update: {
-        mechanicId: gm.id,
-        boardGameGeekId: upsertBggLibraryGame.id,
-      },
-    })
-  }
+    });
 
-  // Add centralized barcode
-  await prisma.centralizedBarcode.upsert({
-    where: { barcode: libraryItemToAdd.barcode },
-    create: {
-      barcode: libraryItemToAdd.barcode,
-      entityId: createdLibraryItem.id,
-      entityType: 'LibraryItem'
-    },
-    update: {
-      entityId: createdLibraryItem.id,
-      entityType: 'LibraryItem'
-    }
+    const createdLibraryItem = await t.libraryItem.create({
+      data: {
+        alias:
+          libraryItemToAdd?.alias?.trim() === "" ? null : libraryItemToAdd.alias,
+        barcode: libraryItemToAdd.barcode,
+        isHidden: libraryItemToAdd.isHidden,
+        owner: libraryItemToAdd.owner,
+        boardGameGeekId: upsertBggLibraryGame.id,
+        isCheckedOut: false,
+        updatedAtUtc: DateTime.utc().toISO(),
+        dateAddedUtc: DateTime.utc().toISO(),
+      },
+    });
+
+    await t.centralizedBarcode.update({
+      where: { barcode: libraryItemToAdd.barcode },
+      data: {
+        entityId: Number(createdLibraryItem.id),
+      },
+    });
+
+    return createdLibraryItem.id
   })
 
-  revalidateTag('library')
+  if (createdId) {
+    revalidateTag('library')
 
-  return NextResponse.json(
-    {
-      message: "Successfully added new game to library",
-      created: `/library/edit/${createdLibraryItem.id}`,
-    },
-    { status: 201 }
-  );
+    return NextResponse.json(
+      {
+        message: "Successfully added new game to library",
+        created: `/library/edit/${createdId}`,
+      },
+      { status: 201 })
+  } else {
+    return NextResponse.json({
+      message: "Failed to add new game to library, please contact your administrator"
+    }, 
+    { status: 500})
+  }
 }

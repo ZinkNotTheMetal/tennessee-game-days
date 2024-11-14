@@ -25,13 +25,14 @@ import { BggSearchResponse } from "./response";
  *             schema:
  *               $ref: '#/components/schemas/LibraryListResponse'
  */
-export async function GET(request: NextRequest, { params }: { params: { bggId: string } }) {
-  const libraryCountWithBggId = await prisma.libraryItem.count({ where: { boardGameGeekId: Number(params.bggId)} });
+export async function GET(request: NextRequest, { params }: { params: Promise<{ bggId: string }> }) {
+  const bggId = Number(((await params).bggId))
+  const libraryCountWithBggId = await prisma.libraryItem.count({ where: { boardGameGeekId: bggId } });
 
   if (libraryCountWithBggId == 0) return NextResponse.json({ total: 0, results: []}, { status: 200 })
 
   const libraryItemsWithBggId = await prisma.libraryItem.findMany({
-    where: { boardGameGeekId: Number(params.bggId) },
+    where: { boardGameGeekId: bggId },
     include: {
       boardGameGeekThing: true
     }

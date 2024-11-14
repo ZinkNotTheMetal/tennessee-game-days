@@ -51,13 +51,27 @@ export default function useBoardGameGeekSearch(
         .then((json: ProxyBggApiResponse[]) => {
           setIsLoading(false)
           setTotalResults(json.length)
-          setResults(json.map((r) => {
+          setResults(json.map((r: ProxyBggApiResponse) => {
+            const { name, ...rest } = r
+
             const bggEntity: IBoardGameGeekEntity = {
+              id: r.id,
               itemName: r.name,
+              imageUrl: r.imageUrl,
+              description: r.description,
+              type: r.type,
+              ranking: r.ranking,
+              yearPublished: r.yearPublished,
+              thumbnailUrl: r.thumbnailUrl,
+              minimumPlayerAge: r.minimumPlayerAge,
+              maximumPlayerCount: r.maximumPlayerCount,
+              minimumPlayerCount: r.minimumPlayerCount,
+              averageUserRating: r.averageUserRating,
+              complexityRating: r.complexityRating,
+              mechanics: r.mechanics,
               publisherName: r.publishers[0]?.name ?? '',
               playingTimeMinutes: r.maximumPlayingTimeMinutes,
-              votedBestPlayerCount: r.votedBestPlayerCounts[0] ?? 0,
-              ...r
+              votedBestPlayerCount: r.votedBestPlayerCounts[0] ?? 0
             }
 
             return bggEntity

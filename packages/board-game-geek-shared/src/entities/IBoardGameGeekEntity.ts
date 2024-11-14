@@ -28,6 +28,7 @@ interface IBoardGameGeekEntity {
   averageUserRating: number;
   /** @format double */
   complexityRating: number;
+  
   mechanics: {id: number, name: string}[]
 }
 

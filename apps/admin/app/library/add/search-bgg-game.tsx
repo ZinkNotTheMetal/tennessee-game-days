@@ -16,7 +16,7 @@ export default function UserSearchBggGame(): JSX.Element {
   const [isLoading, debounced, resultsCount, results, error] = useBoardGameGeekSearch(
     search.query,
     search.searchById
-  );
+  )
   const [gameSelected, setGameSelected] = useState<IBoardGameGeekEntity | undefined>(undefined)
 
   useEffect(() => {
@@ -25,6 +25,10 @@ export default function UserSearchBggGame(): JSX.Element {
       query: "",
     }));
   }, [search.searchById])
+
+  useEffect(() => {
+    console.log(results)
+  }, [results])
 
   const handleSearchInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;

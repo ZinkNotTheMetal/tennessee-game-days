@@ -34,6 +34,8 @@ export default function AddBggGameToLibrary({ gameSelected, clear }: AddBggGameT
         }
       })
 
+      console.log(libraryItem)
+
   }, [gameSelected])
 
   const libraryItem: ILibraryItem = {
