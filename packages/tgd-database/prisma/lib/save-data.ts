@@ -4,6 +4,7 @@ import {
 import { IBoardGameGeekEntity } from "@repo/board-game-geek-shared/src/entities/IBoardGameGeekEntity";
 import { PrismaClient } from "@prisma/client";
 import { DateTime } from 'ts-luxon'
+import SearchBoardGameGeekProxy from "./search-bgg";
 
 export const prisma = new PrismaClient();
 
@@ -13,25 +14,21 @@ function sleep (ms: number) {
   })
 }
 
-async function LookupGameById(bggId: number) {
+async function LookupGameById(bggId: number) : Promise<IBoardGameGeekEntity> {
 
-  const result = await SearchBoardGameGeek(String(bggId), true);
+  const result = await SearchBoardGameGeekProxy(String(bggId), true)
 
-  await sleep(1900)
+  if (result.length === 0 || result[0] === undefined) return {} as IBoardGameGeekEntity;
 
-  if (result.totalCount === 0) return;
-  if (result.results === undefined || result.results.length === 0) return;
-  if (result.results[0] === undefined) return;
-
-  if (result.results[0].id !== bggId) {
+  if (result[0]?.id !== bggId) {
     console.log(
       "Error: Did not match on ID properly",
       bggId,
-      result.results[0].id
+      result[0]?.id
     );
   }
 
-  return result.results[0]
+  return result[0]
 }
 
 export default async function AddLibraryItemToDatabase(
@@ -43,10 +40,7 @@ export default async function AddLibraryItemToDatabase(
   const bggResultFromIdToAdd = await LookupGameById(bggIdToAdd);
 
   if (bggResultFromIdToAdd === undefined) return;
-
-  const bggGame: IBoardGameGeekEntity =
-    MapToBoardGameEntity(bggResultFromIdToAdd);
-  const { mechanics, id, ...allOtherProperties } = bggGame;
+  const { mechanics, id, ...allOtherProperties } = bggResultFromIdToAdd;
 
   // Upsert BGG Game from library
   const bggAddedId = await UpsertBggGame(id, allOtherProperties, mechanics);
@@ -56,10 +50,7 @@ export default async function AddLibraryItemToDatabase(
     console.log(" Included Item:", includedItemInBox);
     let bggContentInBox = await LookupGameById(includedItemInBox);
     if (bggContentInBox === undefined) return;
-
-    let boxContentGame: IBoardGameGeekEntity =
-      MapToBoardGameEntity(bggContentInBox);
-    const { mechanics, id, ...contentProperties } = boxContentGame;
+    const { mechanics, id, ...contentProperties } = bggContentInBox;
 
     // Upsert BGG Game from library
     await UpsertBggGame(id, contentProperties, mechanics);
