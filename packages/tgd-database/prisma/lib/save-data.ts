@@ -1,5 +1,4 @@
 import {
-  SearchBoardGameGeek,
   MapToBoardGameEntity,
 } from "@repo/board-game-geek-shared";
 import { IBoardGameGeekEntity } from "@repo/board-game-geek-shared/src/entities/IBoardGameGeekEntity";
@@ -50,7 +49,7 @@ export default async function AddLibraryItemToDatabase(
   const { mechanics, id, ...allOtherProperties } = bggGame;
 
   // Upsert BGG Game from library
-  const bggAddedId = await UpsertBggGame(id, allOtherProperties);
+  const bggAddedId = await UpsertBggGame(id, allOtherProperties, mechanics);
 
   // Add other content here
   for (const includedItemInBox of includedItems) {
@@ -63,7 +62,7 @@ export default async function AddLibraryItemToDatabase(
     const { mechanics, id, ...contentProperties } = boxContentGame;
 
     // Upsert BGG Game from library
-    await UpsertBggGame(id, contentProperties);
+    await UpsertBggGame(id, contentProperties, mechanics);
   }
 
   await AddMechanicsToDatabase(bggAddedId, mechanics)
@@ -142,37 +141,19 @@ async function AddMechanicsToDatabase(
   bggId: number,
   mechanics: { id: number; name: string }[]
 ) {
-  // Add mechanics to base table (id / name)
-  for (const mechanic of mechanics) {
-    const upsertMechanic = await prisma.mechanic.upsert({
-      where: { id: mechanic.id },
-      create: {
-        id: mechanic.id,
-        name: mechanic.name,
-      },
-      update: {
-        id: mechanic.id,
-        name: mechanic.name,
-      },
-    });
-
-    await prisma.gameMechanic.upsert({
-      where: {
-        boardGameGeekId_mechanicId: {
-          boardGameGeekId: bggId,
-          mechanicId: upsertMechanic.id,
+  await Promise.all(
+    mechanics.map((gm) =>
+      prisma.mechanic.upsert({
+        where: { id: gm.id },
+        update: { name: gm.name },
+        create: {
+          id: gm.id,
+          name: gm.name,
         },
-      },
-      create: {
-        boardGameGeekId: bggId,
-        mechanicId: mechanic.id,
-      },
-      update: {
-        boardGameGeekId: bggId,
-        mechanicId: mechanic.id,
-      },
-    });
-  }
+      })
+    )
+  );
+
 }
 
 function DetermineGameOwner(barcode: string) {
@@ -204,17 +185,32 @@ async function UpsertBggGame(
     averageUserRating: number
     complexityRating: number
     votedBestPlayerCount: number | null
-  }
+  },
+  mechanics: { id: number; name: string }[]
 ): Promise<number> {
 
-  const upsertGame = await prisma.boardGameGeekThing.upsert({
+
+  const upsertBggLibraryGame = await prisma.boardGameGeekThing.upsert({
     where: { id: bggItemToAdd },
-    update: bggProperties,
+    update: {
+      ...bggProperties,
+      gameMechanics: {
+        deleteMany: {}, // Clear any existing mechanics for a fresh relation setup
+        create: mechanics.map((gm) => ({
+          mechanic: { connect: { id: gm.id } },
+        })),
+      },
+    },
     create: {
       ...bggProperties,
       id: bggItemToAdd,
+      gameMechanics: {
+        create: mechanics.map((gm) => ({
+          mechanic: { connect: { id: gm.id } },
+        })),
+      },
     },
   });
 
-  return upsertGame.id;
+  return upsertBggLibraryGame.id;
 }

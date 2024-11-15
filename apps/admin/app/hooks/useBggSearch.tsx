@@ -1,30 +1,7 @@
-import { SearchBoardGameGeek, MapToBoardGameEntity } from "@repo/board-game-geek-shared";
-import type { IBoardGameGeekEntity } from "@repo/board-game-geek-shared";
+import type { IBoardGameGeekEntity, IProxyBggApiResponse } from "@repo/board-game-geek-shared";
 import { useState } from "react";
 import type { DebouncedState } from "use-debounce"
 import { useDebouncedCallback } from "use-debounce"
-
-
-interface ProxyBggApiResponse {
-  id: number
-  name: string
-  imageUrl: string
-  thumbnailUrl: string
-  description: string
-  yearPublished: number
-  minimumPlayerCount: number
-  maximumPlayerCount: number
-  minimumPlayerAge: number
-  type: string
-  ranking: number
-  minimumPlayingTimeMinutes: number
-  maximumPlayingTimeMinutes: number
-  averageUserRating: number
-  complexityRating: number
-  mechanics: Array<{ id: number, name: string }>
-  publishers: Array<{ id: number, name: string }>
-  votedBestPlayerCounts: Array<number>
-}
 
 export default function useBoardGameGeekSearch(
   query: string,
@@ -44,34 +21,22 @@ export default function useBoardGameGeekSearch(
       setResults([] as IBoardGameGeekEntity[]);
     } else {
 
-      fetch(`http://localhost:5226/search/${query}?searchById=${searchById}`, {
+      fetch(`${process.env.BGG_PROXY_BASE_API_URL}/search/${query}?searchById=${searchById}`, {
         method: 'GET'
       })
         .then((response) => response.json())
-        .then((json: ProxyBggApiResponse[]) => {
+        .then((json: IProxyBggApiResponse[]) => {
           setIsLoading(false)
           setTotalResults(json.length)
-          setResults(json.map((r: ProxyBggApiResponse) => {
+          setResults(json.map((r: IProxyBggApiResponse) => {
             const { name, ...rest } = r
 
             const bggEntity: IBoardGameGeekEntity = {
-              id: r.id,
               itemName: r.name,
-              imageUrl: r.imageUrl,
-              description: r.description,
-              type: r.type,
-              ranking: r.ranking,
-              yearPublished: r.yearPublished,
-              thumbnailUrl: r.thumbnailUrl,
-              minimumPlayerAge: r.minimumPlayerAge,
-              maximumPlayerCount: r.maximumPlayerCount,
-              minimumPlayerCount: r.minimumPlayerCount,
-              averageUserRating: r.averageUserRating,
-              complexityRating: r.complexityRating,
-              mechanics: r.mechanics,
               publisherName: r.publishers[0]?.name ?? '',
               playingTimeMinutes: r.maximumPlayingTimeMinutes,
-              votedBestPlayerCount: r.votedBestPlayerCounts[0] ?? 0
+              votedBestPlayerCount: r.votedBestPlayerCounts[0] ?? 0,
+              ...rest
             }
 
             return bggEntity

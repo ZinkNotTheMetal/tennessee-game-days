@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma";
-import { MapToBoardGameEntity, SearchBoardGameGeek } from "@repo/board-game-geek-shared";
 import { DateTime } from "ts-luxon";
 import { Sleep, UpsertBoardGameGeekMechanics } from "./actions";
 
@@ -51,82 +50,7 @@ import { Sleep, UpsertBoardGameGeekMechanics } from "./actions";
  *                   description: Error message indicating no upcoming convention was found
  */
 export async function POST(request: NextRequest) {
-
-  try {
-
-    const nextUpcomingConvention = await prisma.convention.findFirst({
-      where: {
-        endDateTimeUtc: {
-          gt: DateTime.utc().toISO()
-        }
-      },
-      include: {
-        venue: true
-      },
-      orderBy: {
-        startDateTimeUtc: 'asc'
-      }
-    })
-  
-    if (nextUpcomingConvention === null) {
-      return NextResponse.json({ error: "Cannot log play to win as there are no conventions to log this play against" }, { status: 516 })
-    }
-
-    const playToWinItemsInSystem = await prisma.playToWinItem.findMany({
-      where: { conventionId: nextUpcomingConvention.id }
-    })
-
-    for(const ptwItem of playToWinItemsInSystem) {
-      if (!ptwItem.gameName) continue
-      const bggResults = await SearchBoardGameGeek(ptwItem.gameName, false)
-
-      if (bggResults && bggResults.totalCount > 0) {
-
-        // Sometimes the query is weird and gives back other games where the name doesn't exactly match
-        const found = bggResults.results.find((result) => result.name === ptwItem.gameName)
-
-        if (found) {
-          const { mechanics, ...bggGame } = MapToBoardGameEntity(found)
-          
-          // Add the bgg item
-          await prisma.boardGameGeekThing.upsert({
-            where: { id: bggGame.id },
-            update: bggGame,
-            create: bggGame,
-          });
-
-          // Add mechanics
-          await UpsertBoardGameGeekMechanics(bggGame.id, mechanics)
-
-          // Update PTW item with bggId
-          await prisma.playToWinItem.update({
-            where: { id: ptwItem.id },
-            data: {
-              boardGameGeekId: bggGame.id
-            }
-          })
-
-        } else {
-          console.log("Could not properly match BGG Item", ptwItem.gameName, bggResults.totalCount)
-          continue
-        }
-
-      } else {
-        // No results at all from BGG
-        console.log("No results from BGG:", ptwItem.gameName)
-        continue
-      }
-
-      await Sleep(1900)
-    }
-
-
-  } catch (error) {
-    console.log(error)
-    return NextResponse.json({
-      error: error
-    }, { status: 500})
-  }
+  // # Not sure I need this anymore...
 
   return NextResponse.json({
     message: 'Successfully updated play to win items'
