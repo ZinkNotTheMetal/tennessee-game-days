@@ -64,7 +64,6 @@ Table board_game_geek_items {
   complexityRating Decimal
   libraryItems library_items [not null]
   libraryItemContains library_item_contents [not null]
-  playToWinGames play_to_win_items [not null]
   gameMechanics game_mechanics [not null]
 }
 
@@ -139,7 +138,6 @@ Table play_to_win_items {
   id Int [pk, increment]
   barcode String [unique, not null]
   boardGameGeekId Int
-  boardGameGeekThing board_game_geek_items
   gameName String
   conventionId Int [not null]
   convention conventions [not null]
@@ -230,8 +228,6 @@ Ref: library_item_contents.libraryItemId > library_items.id
 Ref: library_item_contents.boardGameGeekId > board_game_geek_items.id
 
 Ref: people.relatedPersonId - people.id
-
-Ref: play_to_win_items.boardGameGeekId > board_game_geek_items.id
 
 Ref: play_to_win_items.conventionId > conventions.id
 

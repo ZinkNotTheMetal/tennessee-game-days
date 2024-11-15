@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/app/lib/prisma";
 import { PlayToWinCsvRow } from "../../requests/ptw-csv-request"
 import { DateTime } from "ts-luxon";
-import { ParseCsvFile, StandardizeGameName } from "./actions";
+import SearchBoardGameGeekProxy, { ParseCsvFile, StandardizeGameName } from "./actions";
 import { revalidateTag } from "next/cache";
+import { IBoardGameGeekEntity } from "@repo/board-game-geek-shared";
 
 
 // https://stackoverflow.com/questions/73839916/how-to-run-functions-that-take-more-than-10s-on-vercel
@@ -79,45 +80,49 @@ export async function POST(request: NextRequest) {
       const results = await ParseCsvFile<PlayToWinCsvRow>(file)
 
       for(const ptwItem of results) {
-        // Add barcode
-        await prisma.centralizedBarcode.create({
-          data: {
-            entityId: 0,
-            entityType: "PlayToWinItem",
-            barcode: ptwItem.barcode,
-          },
-        })
 
-        const gameName = StandardizeGameName(ptwItem.gameName)
+        await prisma.$transaction(async (t) => {
 
-        // Add to PTW Games
-        const ptwAdded = await prisma.playToWinItem.create({
-          data: {
-            barcode: ptwItem.barcode,
-            isHidden: false,
-            conventionId: conventionId,
-            gameName: gameName,
-            publisherName: ptwItem.publisher || null,
-            dateAddedUtc: DateTime.utc().toISO(),
-          }
-        })
-        
-        // Update barcode
-        await prisma.centralizedBarcode.update({
-          where: { barcode: ptwItem.barcode },
-          data: {
-            entityId: Number(ptwAdded.id),
-          },
+          // 1. Add new centralized barcode
+          await t.centralizedBarcode.create({
+            data: {
+              entityId: 0,
+              entityType: "PlayToWinItem",
+              barcode: ptwItem.barcode,
+            },
+          })
+
+          //2. Standardize name input from CSV
+          const gameName = StandardizeGameName(ptwItem.title)
+          const publisher = ptwItem.publisher?.replace(/ -$/, "").replace(/ -$ /, "");
+          const bggId = ptwItem?.bggId ? Number(ptwItem.bggId) : undefined
+
+          //3. Add play to win game with barcode
+          const ptwGameToAdd = await t.playToWinItem.create({
+            data: {
+              barcode: ptwItem.barcode,
+              isHidden: false,
+              conventionId: conventionId,
+              boardGameGeekId: bggId,
+              gameName: gameName,
+              publisherName: publisher || null,
+              dateAddedUtc: DateTime.utc().toISO(),
+            }
+          })
+
+          //4. Update centralized barcode
+          await t.centralizedBarcode.update({
+            where: { barcode: ptwItem.barcode },
+            data: {
+              entityId: Number(ptwGameToAdd.id),
+            },
+          })
+
         })
       }
 
     } catch (error) {
-      console.log('Error parsing CSV fle:', error)
-      return NextResponse.json({
-        error: 'Error parsing CSV file',
-        },
-        { status: 500 }
-      )
+      throw error
     }
   }
   revalidateTag('play-to-win')

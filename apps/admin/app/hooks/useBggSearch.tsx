@@ -29,13 +29,13 @@ export default function useBoardGameGeekSearch(
           setIsLoading(false)
           setTotalResults(json.length)
           setResults(json.map((r: IProxyBggApiResponse) => {
-            const { name, ...rest } = r
+            const { name, publishers, maximumPlayingTimeMinutes, minimumPlayingTimeMinutes, votedBestPlayerCounts, ...rest } = r
 
             const bggEntity: IBoardGameGeekEntity = {
-              itemName: r.name,
-              publisherName: r.publishers[0]?.name ?? '',
-              playingTimeMinutes: r.maximumPlayingTimeMinutes,
-              votedBestPlayerCount: r.votedBestPlayerCounts[0] ?? 0,
+              itemName: name,
+              publisherName: publishers[0]?.name ?? '',
+              playingTimeMinutes: maximumPlayingTimeMinutes,
+              votedBestPlayerCount: votedBestPlayerCounts[0] ?? 0,
               ...rest
             }
 

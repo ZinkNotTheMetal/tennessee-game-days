@@ -10,7 +10,6 @@ namespace BoardGameGeek.Proxy.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[ResponseCache(Duration = 30)]
 public class BoardGameGeekSearchController (HttpClient httpClient, IMapper mapper) : ControllerBase
 {
     private readonly string _boardGameGeekBaseUrl = "https://www.boardgamegeek.com";

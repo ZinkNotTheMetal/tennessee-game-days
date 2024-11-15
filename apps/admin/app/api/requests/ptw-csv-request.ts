@@ -1,6 +1,7 @@
 interface PlayToWinCsvRow {
+  bggId?: string
   barcode: string
-  gameName: string
+  title: string
   publisher?: string
 }
 

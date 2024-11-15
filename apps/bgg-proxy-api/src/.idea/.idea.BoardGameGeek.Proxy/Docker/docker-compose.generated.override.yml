@@ -15,7 +15,7 @@ services:
     image: "boardgamegeek.proxy.api:dev"
     ports: []
     volumes:
-    - "/Users/william/.nuget/packages:/home/app/.nuget/packages"
     - "/Users/william/Work/Personal/tennessee-game-days/apps/bgg-proxy-api/src/BoardGameGeek.Proxy.Api:/app:rw"
     - "/Users/william/Work/Personal/tennessee-game-days/apps/bgg-proxy-api/src:/src:rw"
+    - "/Users/william/.nuget/packages:/home/app/.nuget/packages"
     working_dir: "/app"
