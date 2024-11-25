@@ -30,7 +30,7 @@
     "@repo/board-game-geek-shared": "workspace:*",
     "@repo/tgd-database": "workspace:*",
     "@tanstack/react-table": "^8.20.5",
-    "csv-parse": "^5.5.6",
+    "csv-parse": "^5.6.0",
     "csv-stringify": "^6.5.1",
     "firebase": "^10.14.1",
     "next": "^15.0.3",
