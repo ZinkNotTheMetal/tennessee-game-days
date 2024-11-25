@@ -12,7 +12,7 @@
     "ts-node": "10.9.2"
   },
   "devDependencies": {
-    "dotenv-cli": "^7.4.2",
+    "dotenv-cli": "^7.4.4",
     "prisma": "5.22.0",
     "prisma-dbml-generator": "^0.12.0"
   },
