@@ -1,0 +1,16 @@
+meta {
+  name: GET - Board Game Geek query (with parameter)
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://www.boardgamegeek.com/xmlapi2/search?query=concordia&type=boardgame,boardgamexpansion
+  body: none
+  auth: none
+}
+
+params:query {
+  query: concordia
+  type: boardgame,boardgamexpansion
+}

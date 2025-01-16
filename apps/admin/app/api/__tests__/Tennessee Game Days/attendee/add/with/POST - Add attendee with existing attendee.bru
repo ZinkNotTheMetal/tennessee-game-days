@@ -1,0 +1,30 @@
+meta {
+  name: POST - Add attendee with existing attendee
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{tgd.api_url}}/api/attendee/add/1/with/796
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tgd.api_key}}
+}
+
+body:json {
+  {
+     "people":[
+       {
+         "firstName":"Omar",
+         "lastName":"Acevedo",
+         "isAdult":"1"
+       }
+     ],
+     "isStayingAtConvention":false,
+     "passPurchased":"Free"
+  }
+  
+}

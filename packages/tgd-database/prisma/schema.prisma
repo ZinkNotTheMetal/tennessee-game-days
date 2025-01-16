@@ -8,6 +8,7 @@ generator client {
   provider = "prisma-client-js"
   //output = "../node_modules/.prisma/client"
   //output = "../../node_modules/.prisma/client"
+  //output = "../../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -69,6 +70,7 @@ model Venue {
   postalCode    String   @map(name: "postal_code")
   latitude      Decimal? @map(name: "latitude")
   longitude     Decimal? @map(name: "longitude")
+  timeZone      String?  @map(name: "time_zone")
 
   convention Convention[]
 
@@ -232,8 +234,8 @@ model PlayToWinPlay {
 
 model PlayToWinPlayAttendee {
   id                        String        @id @default(cuid()) @map(name: "id")
-  playToWinItemId           String        @map(name: "play_to_win_play_id")
-  playToWinPlay             PlayToWinPlay @relation(fields: [playToWinItemId], references: [id])
+  playToWinPlayId           String        @map(name: "play_to_win_play_id")
+  playToWinPlay             PlayToWinPlay @relation(fields: [playToWinPlayId], references: [id])
   attendeeId                Int           @map(name: "attendee_id")
   attendee                  Attendee      @relation(fields: [attendeeId], references: [id])
 
@@ -253,7 +255,7 @@ model Attendee {
   checkedInUtc       DateTime?          @map(name: "checked_in_utc") @db.Timestamptz()
   dateRegistered     DateTime           @map(name: "registered_date_utc") @db.Timestamptz()
   isVolunteer        Boolean            @default(false) @map(name: "is_volunteer")
-  idTgdOrganizer     Boolean            @default(false) @map(name: "is_organizer")
+  isTgdOrganizer     Boolean            @default(false) @map(name: "is_organizer")
   passPurchased      PassTypePurchased  @map(name: "pass_purchased")
 
   centralizedBarcode CentralizedBarcode    @relation(fields: [barcode], references: [barcode])

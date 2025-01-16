@@ -1,4 +1,6 @@
 import prisma from "@/app/lib/prisma"
+import { ILibraryItem } from "@repo/shared";
+import { IAttendee } from "@repo/shared/src/interfaces/attendee";
 
 export async function GetLibraryItemById(id: number) {
   const libraryItemById = await prisma.libraryItem.findFirst({
@@ -8,11 +10,12 @@ export async function GetLibraryItemById(id: number) {
       checkOutEvents: {
         orderBy: {
           checkedInTimeUtcIso: 'desc'
-        }
+        },
       },
       boardGameGeekThing: true,
     },
   });
+
 
   if (libraryItemById === null)
     return null
@@ -29,13 +32,36 @@ export async function GetLibraryItemById(id: number) {
     },
   });
 
-  const response = {
+  const libraryItem: ILibraryItem = {
     ...libraryItemById,
-    boardGameGeekThing: { 
+    dateAddedUtc: libraryItemById.dateAddedUtc.toISOString(),
+    updatedAtUtc: libraryItemById.updatedAtUtc.toISOString(),
+    additionalBoxContent: libraryItemById.additionalBoxContent.map(content => content.boardGameGeekId),
+    boardGameGeekThing: {
       ...libraryItemById.boardGameGeekThing,
-      mechanics: [...mechanics.map((m: { mechanic: { id: number, name: string }}) => ({ id: m.mechanic.id, name: m.mechanic.name }))]
-    }
+      description: libraryItemById.boardGameGeekThing.description ?? '',
+      thumbnailUrl: libraryItemById.boardGameGeekThing.thumbnailUrl ?? '',
+      imageUrl: libraryItemById.boardGameGeekThing.imageUrl ?? '',
+      yearPublished: libraryItemById.boardGameGeekThing.yearPublished ?? 0,
+      playingTimeMinutes: libraryItemById.boardGameGeekThing.playingTimeMinutes ?? 0,
+      minimumPlayerCount: libraryItemById.boardGameGeekThing.minimumPlayerCount ?? 0,
+      maximumPlayerCount: libraryItemById.boardGameGeekThing.maximumPlayerCount ?? 0,
+      minimumPlayerAge: libraryItemById.boardGameGeekThing.minimumPlayerAge ?? 0,
+      votedBestPlayerCount: libraryItemById.boardGameGeekThing.votedBestPlayerCount ?? 0,
+      averageUserRating: Number(libraryItemById.boardGameGeekThing.averageUserRating ?? 0),
+      complexityRating: Number(libraryItemById.boardGameGeekThing.complexityRating ?? 0),
+      mechanics: mechanics.map(m => ({
+        id: m.mechanic.id,
+        name: m.mechanic.name
+      }))
+    },
+    checkOutEvents: libraryItemById.checkOutEvents.map(event => ({
+      ...event,
+      checkedInTimeUtcIso: event.checkedInTimeUtcIso?.toISOString(),
+      checkedOutTimeUtcIso: event.checkedOutTimeUtcIso.toISOString(),
+      attendee: {} as IAttendee
+    }))
   }
 
-  return response
+  return libraryItem;
 }

@@ -4,11 +4,17 @@ import {
   IEmergencyContact,
 } from "@/app/api/requests/add-attendee-request";
 import prisma from "@/app/lib/prisma";
+import { convertToTitleCase } from "@/utils/stringUtils";
+import { Prisma } from '@prisma/client'
 import { DateTime } from "ts-luxon";
 
+
+
+// Might need to this
 export async function GenerateBarcodeAndAddAttendee(
   conventionId: number,
   personId: number,
+  isVolunteer: boolean,
   passPurchased: "Free" | "Individual" | "Couple" | "Family",
   stayingOnSite: boolean
 ): Promise<{ success: boolean; barcode: string | null }> {
@@ -17,7 +23,6 @@ export async function GenerateBarcodeAndAddAttendee(
   try {
     const generatedBarcode = `${DateTime.now().toFormat("yy")}${conventionId}-${personId}`;
 
-    // 4. Add a new barcode in a transaction
     prisma.$transaction(async (transaction) => {
       // 1. Ensure there is not already a code
       const existingBarcode = await transaction.centralizedBarcode.findUnique({
@@ -59,19 +64,9 @@ export async function GenerateBarcodeAndAddAttendee(
         },
       });
 
-      await transaction.centralizedBarcode.update({
-        where: { id: newBarcode.id },
-        data: {
-          entityId: newAttendee.id,
-        },
-      });
-    });
-    success = true;
-    barcode = generatedBarcode;
   } catch (error) {
+    console.error(error);
     throw error;
-  } finally {
-    return { success: success, barcode: barcode };
   }
 }
 
@@ -79,7 +74,7 @@ export async function AddPurchasingPersonIntoSystem(
   person: IPurchasingPerson,
   emergencyContact: IEmergencyContact | undefined
 ): Promise<number | undefined> {
-  let personId: number;
+  let personDbId: number;
 
   // Find first person with as much information as we can
   const isPersonInSystem = await prisma.person.findFirst({
@@ -98,55 +93,61 @@ export async function AddPurchasingPersonIntoSystem(
         },
       ],
     },
-  });
+  })
 
   if (!isPersonInSystem) {
     const personToAdd = await prisma.person.create({
       data: {
-        // Merge existing data with provided data
-        firstName: person.firstName,
-        preferredName: person.preferredName,
-        lastName: person.lastName,
+        firstName: convertToTitleCase(person.firstName),
+        preferredName: person.preferredName ? convertToTitleCase(person.preferredName) : null,
+        lastName: convertToTitleCase(person.lastName),
         email: person.email,
         phoneNumber: person.phoneNumber,
         zipCode: person.zipCode,
-        emergencyContactName: emergencyContact?.name,
+        emergencyContactName: emergencyContact?.name ? convertToTitleCase(emergencyContact.name) : null,
         emergencyContactPhoneNumber: emergencyContact?.phoneNumber,
         emergencyContactRelationship: emergencyContact?.relationship,
       },
-    });
-    personId = personToAdd.id;
+    })
+    personDbId = personToAdd.id;
   } else {
     const personToUpdate = await prisma.person.update({
       where: { id: isPersonInSystem.id },
       data: {
         // Merge existing data with provided data
-        firstName: person.firstName || isPersonInSystem?.firstName,
+        firstName: convertToTitleCase(person.firstName) || isPersonInSystem?.firstName,
         preferredName: person.preferredName || isPersonInSystem?.preferredName,
-        lastName: person.lastName || isPersonInSystem?.lastName,
+        lastName: convertToTitleCase(person.lastName) || isPersonInSystem?.lastName,
         email: person.email || isPersonInSystem?.email,
         phoneNumber: person.phoneNumber || isPersonInSystem?.phoneNumber,
       },
-    });
-    personId = personToUpdate.id;
+    })
+    personDbId = personToUpdate.id
   }
 
-  return personId;
+  return personDbId;
 }
 
 export async function AddAdditionalPeopleUnderPurchasingPerson(
   personId: number,
   conventionId: number,
   additionalAttendees: IPerson[],
+  isVolunteer: boolean,
   passPurchased: "Free" | "Individual" | "Couple" | "Family",
   isStayingOnSite: boolean
 ): Promise<{ personId: number; barcode: string | null }[]> {
   let barcodesCreated: { personId: number; barcode: string | null }[] = [];
+  let personDbId: number;
 
-  console.log(`Adding ${additionalAttendees.length} people under the person`);
+  console.log(
+    `Adding ${additionalAttendees.length} people under the person: ${personId}`
+  )
 
   for (const additionalAttendee of additionalAttendees) {
-    let attendeeId: number = 0;
+    console.log(
+      `Adding additional person to purchasing person Person ID: ${personId} - Name: ${additionalAttendee.preferredName ?? additionalAttendee.firstName} | Last Name: `
+    )
+
     // Find first person with as much information as we can
     const additionalAttendeeInSystem = await prisma.person.findFirst({
       where: {
@@ -179,7 +180,7 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
           },
         ],
       },
-    });
+    })
 
     if (!additionalAttendeeInSystem) {
       const additionalAttendeeToAdd = await prisma.person.create({
@@ -192,9 +193,13 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
           phoneNumber: additionalAttendee.phoneNumber,
           relatedPersonId: personId,
         },
-      });
-      attendeeId = additionalAttendeeToAdd.id;
+      })
+      personDbId = additionalAttendeeToAdd.id;
     } else {
+      console.log(
+        `** Match found** - ${additionalAttendeeInSystem.id} | First Name: ${additionalAttendee.firstName} | Last Name: ${additionalAttendee.lastName} | Preferred Name: ${additionalAttendee.preferredName}`
+      )
+
       const additionalAttendeeToUpdate = await prisma.person.update({
         where: { id: additionalAttendeeInSystem.id },
         data: {
@@ -206,20 +211,33 @@ export async function AddAdditionalPeopleUnderPurchasingPerson(
           phoneNumber: additionalAttendee.phoneNumber,
           relatedPersonId: personId,
         },
-      });
-      attendeeId = additionalAttendeeToUpdate.id;
+      })
+      personDbId = additionalAttendeeToUpdate.id;
     }
 
-    const response = await GenerateBarcodeAndAddAttendee(
-      conventionId,
-      attendeeId,
-      passPurchased,
-      isStayingOnSite
-    );
-    if (response.success) {
-      barcodesCreated.push({ personId: attendeeId, barcode: response.barcode });
+    try {
+      const response = await GenerateBarcodeAndAddAttendee(
+        conventionId,
+        personDbId,
+        isVolunteer,
+        passPurchased,
+        isStayingOnSite
+      )
+
+      if (response.success) {
+        barcodesCreated.push({
+          personId: personDbId,
+          barcode: response.barcode,
+        });
+      } else {
+        console.error(
+          "Failed to Generate Barcode for additional people under purchasing person"
+        )
+      }
+    } catch (e) {
+      console.log("transaction error", e)
     }
   }
 
-  return barcodesCreated;
+  return barcodesCreated
 }

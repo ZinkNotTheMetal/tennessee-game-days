@@ -2,9 +2,12 @@
 
 import { useSelectedLayoutSegment } from "next/navigation";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
+import { FaPersonBooth } from "react-icons/fa6";
 
 export default function NavBar(): JSX.Element {
   const activeSegment = useSelectedLayoutSegment();
+  const session = useSession();
 
   return (
     <nav className="relative flex justify-between items-center py-4 px-2 bg-slate-900 text-white">
@@ -72,6 +75,12 @@ export default function NavBar(): JSX.Element {
           <Link href="/play-to-win">Play to Win Games</Link>
         </li>
         <li
+          className={`flex items-center space-x-2 hover:text-blue-400 ${activeSegment === "attendee-check-in" ? "text-blue-400" : ""}`}
+        >
+          <FaPersonBooth className="fa h-5 w-5" />
+          <Link href="/attendee-check-in">Check In</Link>
+        </li>
+        <li
           className={`flex items-center space-x-2 hover:text-blue-400 ${activeSegment === "scan" ? "text-blue-400" : ""}`}
         >
           <svg
@@ -93,6 +102,16 @@ export default function NavBar(): JSX.Element {
       </ul>
       {/* Sign In vs Name */}
       <div className="pr-1"></div>
+      <div>
+        {session.data?.user?.email && (
+          <button
+            type="button"
+            onClick={() => signOut()}
+          >
+            {session.data.user?.email}
+          </button>
+        )}
+      </div>
     </nav>
   );
 }

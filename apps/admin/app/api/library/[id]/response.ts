@@ -1,5 +1,29 @@
-import { Prisma } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
+
+interface Mechanic {
+  id: number;
+  name: string;
+}
+
+interface BoardGameGeekThing {
+  id: number;
+  itemName: string;
+  type: string;
+  description: string | null;
+  thumbnailUrl: string | null;
+  imageUrl: string | null;
+  yearPublished: number | null;
+  publisherName: string | null;
+  playingTimeMinutes: number | null;
+  minimumPlayerCount: number | null;
+  maximumPlayerCount: number | null;
+  minimumPlayerAge: number | null;
+  ranking: number | null;
+  votedBestPlayerCount: number | null;
+  averageUserRating: Decimal | null;
+  complexityRating: Decimal | null;
+  mechanics: Mechanic[];
+}
 
 /**
  * @swagger
@@ -117,42 +141,7 @@ import { Decimal } from "@prisma/client/runtime/library";
  *           description: Checkout events for the item
  *         boardGameGeekThing:
  *           $ref: '#/components/schemas/BoardGameGeekThing'
- *     LibraryItemResponse:
- *       type: object
- *       properties:
- *         item:
- *           $ref: '#/components/schemas/LibraryItem'
  */
-export interface LibraryItemResponse {
-  item: LibraryItem | null
-}
-
-
-interface Mechanic {
-  id: number;
-  name: string;
-}
-
-interface BoardGameGeekThing {
-  id: number;
-  itemName: string;
-  type: string;
-  description: string | null;
-  thumbnailUrl: string |null;
-  imageUrl: string | null;
-  yearPublished: number | null;
-  publisherName: string | null;
-  playingTimeMinutes: number | null;
-  minimumPlayerCount: number | null;
-  maximumPlayerCount: number | null;
-  minimumPlayerAge: number | null;
-  ranking: number | null;
-  votedBestPlayerCount: number | null;
-  averageUserRating: Decimal | null;
-  complexityRating: Decimal | null;
-  mechanics: Mechanic[];
-}
-
 interface LibraryItem {
   id: number;
   boardGameGeekId: number;

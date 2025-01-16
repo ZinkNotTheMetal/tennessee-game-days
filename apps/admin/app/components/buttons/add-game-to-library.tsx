@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-export default function AddGameToLibraryButton(): JSX.Element {
+export default function AddGameToLibraryButton() : JSX.Element {
   const router = useRouter();
 
   return (

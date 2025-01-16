@@ -41,6 +41,7 @@ Table venues {
   postalCode String [not null]
   latitude Decimal
   longitude Decimal
+  timeZone String
   convention conventions [not null]
 }
 
@@ -171,7 +172,7 @@ Table play_to_win_plays {
 
 Table play_to_win_play_players {
   id String [pk]
-  playToWinItemId String [not null]
+  playToWinPlayId String [not null]
   playToWinPlay play_to_win_plays [not null]
   attendeeId Int [not null]
   attendee attendees [not null]
@@ -190,7 +191,7 @@ Table attendees {
   checkedInUtc DateTime
   dateRegistered DateTime [not null]
   isVolunteer Boolean [not null, default: false]
-  idTgdOrganizer Boolean [not null, default: false]
+  isTgdOrganizer Boolean [not null, default: false]
   passPurchased PassTypePurchased [not null]
   centralizedBarcode centralized_barcodes [not null]
   checkOutEvents library_checkout_events [not null]
@@ -244,7 +245,7 @@ Ref: play_to_win_plays.playToWinItemId > play_to_win_items.id
 
 Ref: play_to_win_plays.conventionId > conventions.id
 
-Ref: play_to_win_play_players.playToWinItemId > play_to_win_plays.id
+Ref: play_to_win_play_players.playToWinPlayId > play_to_win_plays.id
 
 Ref: play_to_win_play_players.attendeeId > attendees.id
 

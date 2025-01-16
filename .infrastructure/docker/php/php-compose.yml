@@ -1,0 +1,24 @@
+# docker compose -f php-compose.yml --watch up -d
+
+services:
+  php-tgd-public:
+    image: zinknotthemetal/php-tgd-public
+    container_name: php-tgd-public
+    build:
+      context: .
+      dockerfile: ./dockerfile
+      tags:
+        - "zinknotthemetal/php-tgd-public:latest"
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /var/www/html
+          ignore:
+            - php-compose.yml
+            - dockerfile
+    restart: unless-stopped
+    ports:
+      - 3030:80
+    environment:
+      NODE_ENV: development

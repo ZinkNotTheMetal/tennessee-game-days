@@ -1,0 +1,20 @@
+meta {
+  name: PATCH - Update attendee cancelled
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{tgd.api_url}}/api/attendee/cancelled
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstName": "Nick",
+    "lastName": "Cavin",
+    "email": "nick23394@gmail.com",
+    "barcode": "241-636"
+  }
+}

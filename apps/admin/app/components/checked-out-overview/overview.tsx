@@ -1,17 +1,21 @@
 'use client'
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { DateTime } from "ts-luxon";
 
 interface CheckedOutItemRow {
+  id: number
   gameName: string
   checkOutTimeUtcIso: string
   attendeePreferredName: string
   attendeeLastName: string
+  attendeeBadgeNumber: string
 }
 
-export default function GameCheckoutItemOverview({ gameName, checkOutTimeUtcIso, attendeePreferredName, attendeeLastName }: CheckedOutItemRow): JSX.Element {
+export default function GameCheckoutItemOverview({ id, gameName, checkOutTimeUtcIso, attendeePreferredName, attendeeLastName, attendeeBadgeNumber }: CheckedOutItemRow): JSX.Element {
   const [elapsedTime, setElapsedTime] = useState<string>('');
+  const router = useRouter()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -22,9 +26,13 @@ export default function GameCheckoutItemOverview({ gameName, checkOutTimeUtcIso,
   }, [checkOutTimeUtcIso]);
 
   return (
-    <>
-      <span>{gameName} - {attendeePreferredName} {attendeeLastName}</span>
+    <div 
+      className="flex justify-between hover:bg-green-300 rounded-md cursor-pointer px-1" 
+      onClick={() => router.push(`/library/edit/${id}`)}
+      key={id}
+    >
+      <span>{gameName} - {attendeePreferredName} {attendeeLastName} ({attendeeBadgeNumber})</span>
       <span>{elapsedTime}</span>
-    </>
+    </div>
   );
 }

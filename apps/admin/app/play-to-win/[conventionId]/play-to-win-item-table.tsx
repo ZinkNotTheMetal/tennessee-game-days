@@ -32,14 +32,6 @@ interface IPlayToWinTableProps {
   total: number;
 }
 
-declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData extends RowData, TValue> {
-    sortAscIcon: JSX.Element;
-    sortDescIcon: JSX.Element;
-    sortIcon: JSX.Element;
-  }
-}
-
 export function PlayToWinItemsTable({
   items,
   total,
@@ -60,6 +52,7 @@ export function PlayToWinItemsTable({
         sortAscIcon: <FcNumericalSorting12 className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcNumericalSorting21 className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: false
       },
     }),
     columnHelper.accessor("gameName", {
@@ -68,6 +61,7 @@ export function PlayToWinItemsTable({
         sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: false
       },
     }),
     columnHelper.accessor("boardGameGeekId", {
@@ -76,6 +70,7 @@ export function PlayToWinItemsTable({
         sortAscIcon: <FcNumericalSorting12 className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcNumericalSorting21 className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: true
       }
     }),
     columnHelper.accessor("isHidden", {
@@ -113,13 +108,15 @@ export function PlayToWinItemsTable({
   return (
     <>
       <div className="w-2/3 pb-6">
-        <Search
-          onChange={(e) => {
-            setQuery(e.target.value);
-          }}
-          placeholder={`Search ${total} games...`}
-          value={query}
-        />
+        <div className="mb-1 md:mb-3">
+          <Search
+            onChange={(e) => {
+              setQuery(e.target.value);
+            }}
+            placeholder={`Search ${total} games...`}
+            value={query}
+          />
+        </div>
 
         {items !== undefined && items.length > 0 && (
           <table className="min-w-full divide-y-0 divide-gray-300 bg-white rounded-t-xl rounded-b-xl">

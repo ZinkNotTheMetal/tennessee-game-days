@@ -3,11 +3,11 @@
 
 import { useRouter } from 'next/navigation'
 
-interface EditConventionButtonProps {
+interface ViewAttendeesForConventionButtonProps {
   conventionId: number
 }
 
-export default function ViewAttendeesForConvention({ conventionId }: EditConventionButtonProps): JSX.Element {
+export default function ViewAttendeesForConventionButton({ conventionId }: ViewAttendeesForConventionButtonProps): JSX.Element {
   const router = useRouter()
 
   const navigateToPlayToWinGames = (conventionId: number): void => {

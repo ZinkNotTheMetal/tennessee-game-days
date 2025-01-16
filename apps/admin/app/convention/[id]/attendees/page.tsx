@@ -1,22 +1,26 @@
-import { GetConventionById } from "@/app/api/convention/[id]/actions";
 import { AttendeesTable } from "./attendee-table"
 import { GetAllAttendeesForConvention } from "@/app/api/attendee/count/[conventionId]/actions"
+import BackToTopButton from "@/app/components/back-to-top/back-to-top-button";
+import { GetConventionById } from "../page";
 
 interface Props {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
-  const convention = await GetConventionById(Number(params.id))
+  const conventionId = Number((await params).id)
+  const convention = await GetConventionById(conventionId)
 
   return {
     title: `${convention?.name} - Attendees`,
   };
 }
 
-export default async function Page({ params }: { params: { id: string }}): Promise<JSX.Element> {
-  const allAttendees = await GetAllAttendeesForConvention(Number(params.id))
-  const convention = await GetConventionById(Number(params.id))
+export default async function Page({ params }: Props): Promise<JSX.Element> {
+  const conventionId = Number((await params).id)
+
+  const allAttendees = await GetAllAttendeesForConvention(conventionId)
+  const convention = await GetConventionById(conventionId)
 
   return(
     <main className="py-16 md:w-full">
@@ -31,6 +35,7 @@ export default async function Page({ params }: { params: { id: string }}): Promi
       { allAttendees.length > 0 && (
         <div className="py-8 flex justify-center">
           <AttendeesTable attendees={allAttendees} total={allAttendees.length} />
+          <BackToTopButton />
         </div>
       )}
     </main>

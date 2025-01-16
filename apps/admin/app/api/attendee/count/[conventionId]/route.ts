@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server"
-import prisma from "@/app/lib/prisma"
 import { GetAllAttendeesForConvention } from "./actions"
 import { AttendeeCountResponse } from "./response"
 
@@ -32,52 +31,16 @@ export const fetchCache = "force-no-store"
  *             schema:
  *               $ref: '#/components/schemas/AttendeeCountResponse'
  */
-export async function GET(request: NextRequest, { params }: { params: { conventionId: string }}) {
+export async function GET(request: Request, { params }: { params: Promise<{ conventionId: string }>}) {
+  const conventionId = (await params).conventionId
 
-  const [cancelledCount, nonCancelledCount, checkedInCount, attendees] = await Promise.all([
-    prisma.attendee.count({
-      where: {
-        AND: [
-          { 
-            hasCancelled: true,
-          },
-          {
-            conventionId: Number(params.conventionId)
-          }
-        ]
-      }
-    }),
-    prisma.attendee.count({
-      where: {
-        AND: [
-          { 
-            hasCancelled: false,
-          },
-          {
-            conventionId: Number(params.conventionId)
-          }
-        ]
-      }
-    }),
-    prisma.attendee.count({
-      where: {
-        AND: [
-          {
-            isCheckedIn: true
-          },
-          {
-            conventionId: Number(params.conventionId)
-          }
-        ]
-      }
-    }),
-    GetAllAttendeesForConvention(Number(params.conventionId))
-  ])
+  const attendeeInformation = await GetAllAttendeesForConvention(Number(conventionId))
 
   return NextResponse.json<AttendeeCountResponse>({
-    total: cancelledCount + nonCancelledCount,
-    cancelled: cancelledCount,
-    checkedIn: checkedInCount,
-    list: attendees,
+    total: attendeeInformation.filter(a => !a.hasCancelled).length,
+    cancelled: attendeeInformation.filter(a => a.hasCancelled).length,
+    checkedIn: attendeeInformation.filter(a => a.checkedInUtc).length,
+    volunteers: attendeeInformation.filter(a => a.isTgdOrganizer || a.isVolunteer).length,
+    list: attendeeInformation,
   });
 }

@@ -1,9 +1,7 @@
 "use client"
 
-import { Prisma } from "@prisma/client"
 import { ApiListResponse, IConvention } from "@repo/shared"
 import { IVenue } from "@repo/shared/src/interfaces/venue"
-import { revalidateTag } from "next/cache"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
@@ -11,12 +9,10 @@ import { toast } from "react-toastify"
 import { DateTime } from "ts-luxon"
 
 interface ConventionFormProps {
-  payload?: Prisma.ConventionGetPayload<{ include: { venue: true }}>
+  payload?: IConvention
 }
 
 export function ConventionForm({ payload }: ConventionFormProps): JSX.Element {
-  type ConventionFormType = Prisma.ConventionGetPayload<{ include: { venue: true }}>
-
   const [onSubmitting, setOnSubmitting] = useState<boolean>(false)
   const [isNewVenue, setIsNewVenue] = useState<boolean>(false)
   const [venueList, setVenueList] = useState<IVenue[]>([])
@@ -41,53 +37,54 @@ export function ConventionForm({ payload }: ConventionFormProps): JSX.Element {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<ConventionFormType>({
+  } = useForm<IConvention>({
     values: {
-      ...payload ?? {} as ConventionFormType
+      ...payload ?? {} as IConvention,
+      endDateTimeUtc: DateTime.fromISO(payload?.startDateTimeUtc?.toString() ?? '').toLocal().toFormat('yyyy-MM-dd HH:mm'),
+      startDateTimeUtc: DateTime.fromISO(payload?.startDateTimeUtc?.toString() ?? '').toLocal().toFormat('yyyy-MM-dd HH:mm'),
+      extraHoursStartDateTimeUtc: DateTime.fromISO(payload?.startDateTimeUtc?.toString() ?? '').toLocal().toFormat('yyyy-MM-dd HH:mm')
     },
   });
 
-  const onSubmit: SubmitHandler<ConventionFormType> = async (data) => {
+  const onSubmit: SubmitHandler<IConvention> = async (data) => {
     setOnSubmitting(true)
-
-    console.log(data)
 
     // Updating
     if (data.id && data.id > 0) {
-      fetch(`/api/convention/edit/${data.id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(data)
-      })
-        .then((response) => {
-          if (response.ok) {
-            toast(
-              `Successfully edited ${data.name}`,
-              { type: "success" }
-            );
-          } else {
-            toast(
-              `Failed to edit ${data.name} convention (check the logs)`,
-              { type: "error" }
-            );
-          }
+
+      try {
+        const editResponse = await fetch(`/api/convention/edit/${data.id}`, {
+          method: "PUT",
+          body: JSON.stringify(data)
         })
-        .catch((error) => {
-          console.log(error)
+
+        if (editResponse.ok) {
+          toast(
+            `Successfully edited ${data.name}`,
+            { type: "success" }
+          );
+        } else {
           toast(
             `Failed to edit ${data.name} convention (check the logs)`,
             { type: "error" }
           );
-        });
-    } else {
-      fetch(`/api/convention/add`,
-        {
-          method: "POST",
-          body: JSON.stringify(data),
         }
-      )
-        .then((response) => {
-          if (response.ok) {
+      } catch (e) {
+        console.log(e)
+        toast(
+          `Failed to edit ${data.name} convention (check the logs)`,
+          { type: "error" }
+        );
+      }
+
+    } else {
+        try {
+          const addResult = await fetch(`/api/convention/add`, {
+            method: "POST",
+            body: JSON.stringify(data),
+          })
+
+          if (addResult.ok) {
             toast(
               `Successfully added ${data.name}`,
               { type: "success" }
@@ -98,19 +95,18 @@ export function ConventionForm({ payload }: ConventionFormProps): JSX.Element {
               { type: "error" }
             );
           }
-        })
-        .catch((error) => {
-          console.log(error)
+        } catch (e) {
+          console.log(e)
           toast(
             `Failed to add ${data.name} convention (check the logs)`,
             { type: "error" }
           );
-        });
-    }
+        }
+      }
 
-    revalidateTag('convention')
-    router.replace("/convention");
-    router.refresh()
+    setOnSubmitting(false)
+
+    router.replace("/convention")
   };
 
   return (
@@ -122,32 +118,29 @@ export function ConventionForm({ payload }: ConventionFormProps): JSX.Element {
       </div>
 
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="startDateTime">Start Date</label>
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="startDateTimeUtc">Start Date</label>
         <input
           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
           type="datetime-local"
-          {...register("startDateTimeUtc", { setValueAs: (value) => DateTime.fromISO(value).toUTC().toISO()} )}
-          defaultValue={(payload?.startDateTimeUtc && DateTime.fromJSDate(payload?.startDateTimeUtc).toFormat('yyyy-MM-dd HH:mm')) ?? undefined }
+          {...register("startDateTimeUtc", { setValueAs: (value) => DateTime.fromISO(value).toUTC().toISO()} ) }        
         />
       </div>
 
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="endDateTime">End Date</label>
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="endDateTimeUtc">End Date</label>
         <input
           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
           type="datetime-local"
-          {...register("endDateTimeUtc", { setValueAs: (value) => DateTime.fromISO(value).toUTC().toISO()} )}
-          defaultValue={(payload?.endDateTimeUtc && DateTime.fromJSDate(payload?.endDateTimeUtc).toFormat('yyyy-MM-dd HH:mm')) ?? undefined }
+          {...register("endDateTimeUtc", { setValueAs: (value) => DateTime.fromISO(value).toUTC().toISO()} ) }        
         />
       </div>
 
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="endDateTime">Extra hours for Hotel & Volunteer Start Time</label>
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="extraHoursStartDateTimeUtc">Extra hours for Hotel & Volunteer Start Time</label>
         <input
           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
           type="datetime-local"
-          {...register("extraHoursStartDateTimeUtc", { setValueAs: (value) => DateTime.fromISO(value).toUTC().toISO()} )}
-          defaultValue={(payload?.extraHoursStartDateTimeUtc && DateTime.fromJSDate(payload?.extraHoursStartDateTimeUtc).toFormat('yyyy-MM-dd HH:mm')) ?? undefined }
+          {...register("extraHoursStartDateTimeUtc", { setValueAs: (value) => DateTime.fromISO(value).toUTC().toISO()} ) }        
         />
       </div>
 
@@ -262,8 +255,9 @@ export function ConventionForm({ payload }: ConventionFormProps): JSX.Element {
             <select
               className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               {...register("venue.id")}
+              value={payload?.venueId ?? "-99"}
             >
-              <option value="-99" selected disabled className="text-gray-500">Select a venue</option>
+              <option value="-99" disabled className="text-gray-500">Select a venue</option>
                 {venueList.map(v => (
                   <option key={v.id} value={v.id}>{v.name}</option>
                 ))}

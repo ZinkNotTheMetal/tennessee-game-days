@@ -15,14 +15,12 @@ async function CheckBarcode(barcode: string) : Promise<BarcodeResponse | undefin
     }
   );
   if (!response.ok) {
-    console.log("Check barcode response", response)
-    console.log("Barcode response status", response.status)
+    console.log("CheckBarcode - full response", response)
+    console.log("CheckBarcode - response status", response.status)
     return undefined
   }
 
   const data = await response.json()
-
-  console.log("scanned barcode data:", data)
 
   return {
     barcode: barcode,
@@ -39,6 +37,9 @@ async function CheckInLibraryItem(libraryItemId: number) : Promise<number> {
     `/api/library/check-in/${libraryItemId}`,
     {
       method: "PUT",
+      next: {
+        tags: ['scanner']
+      }
     }
   )
   if (!response.ok) {
@@ -50,11 +51,12 @@ async function CheckInLibraryItem(libraryItemId: number) : Promise<number> {
 }
 
 async function CheckInAttendee(attendeeId: number): Promise<number> {
-  const response = await fetch(
-    `/api/attendee/check-in/${attendeeId}`,
-    {
+  const response = await fetch(`/api/attendee/check-in/${attendeeId}`, {
       method: "PATCH",
-    }
+      next: {
+        tags: ['scanner']
+      }
+    },
   )
   if (!response.ok) {
     console.log(response.status)
@@ -68,7 +70,10 @@ async function CheckOutLibraryItem(libraryItemId: number, attendeeId: number): P
     `/api/library/check-out`,
     {
       method: "POST",
-      body: JSON.stringify({ libraryId: libraryItemId, attendeeId: attendeeId })
+      body: JSON.stringify({ libraryId: libraryItemId, attendeeId: attendeeId }),
+      next: {
+        tags: ['scanner']
+      }
     }
   )
   if (!response.ok) {
@@ -79,21 +84,55 @@ async function CheckOutLibraryItem(libraryItemId: number, attendeeId: number): P
 
 }
 
-async function LogPlayToWinPlay(playToWinItemId: number, attendeeIds: number[]): Promise<number> {
+async function LogPlayToWinPlay(playToWinItemId: number, attendeeIds: number[]): Promise<{ status: number, alreadyAddedAttendees: { firstName: string, preferredName?: string, lastName: string, barcode: string}[]}> {
   const response = await fetch(
     `/api/play-to-win/log`,
     {
       method: "POST",
-      body: JSON.stringify({ playToWinItemId: playToWinItemId, attendeeIds: attendeeIds })
+      body: JSON.stringify({ playToWinItemId: playToWinItemId, attendeeIds: attendeeIds }),
+      next: {
+        tags: ['scanner']
+      }
     }
   )
   if (!response.ok) {
-    console.log(response.status)
-    return response.status
+    return {
+      status: response.status,
+      alreadyAddedAttendees: []
+    }
   }
-  return response.status
+
+  const data = await response.json()
+  const alreadyAddedAttendees = data.alreadyPlayedAttendees.map((attendee: AlreadyPlayedAttendee) => ({
+    firstName: attendee.attendee.person.firstName,
+    preferredName: attendee.attendee.person.preferredName,
+    lastName: attendee.attendee.person.lastName,
+    barcode: attendee.attendee.barcode
+  }));
+
+  return {
+    status: response.status,
+    alreadyAddedAttendees: alreadyAddedAttendees
+  }
 
 }
+
+export interface AlreadyPlayedAttendee {
+  attendeeId: number
+  attendee: Attendee
+}
+
+export interface Attendee {
+  barcode: string
+  person: Person
+}
+
+export interface Person {
+  firstName: string
+  preferredName?: string
+  lastName: string
+}
+
 
 export { CheckBarcode, CheckInLibraryItem, CheckOutLibraryItem, LogPlayToWinPlay, CheckInAttendee }
 export type { BarcodeResponse }

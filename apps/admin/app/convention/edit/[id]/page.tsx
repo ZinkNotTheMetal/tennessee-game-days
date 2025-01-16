@@ -1,22 +1,23 @@
-import { GetConventionById } from "@/app/api/convention/[id]/actions";
+import { GetConventionById } from "../../[id]/page";
 import { ConventionForm } from "../../convention-form"
 import DeleteConventionButton from "./delete-convention-button"
 import BackButton from "@/app/components/buttons/back-button"
 
 interface Props {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
-  const convention = await GetConventionById(Number(params.id));
+  const conventionId = Number((await params).id)
+  const convention = await GetConventionById(conventionId);
 
   return {
     title: `Edit - ${convention?.name}`,
   };
 }
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const conventionId = Number(params.id);
+export default async function Page({ params }: Props) {
+  const conventionId = Number((await params).id)
   const convention = await GetConventionById(conventionId)
 
   return (
@@ -28,7 +29,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       <div className="flex justify-end space-x-4">
         <BackButton />
         <DeleteConventionButton
-          id={Number(params.id)}
+          id={conventionId}
           conventionName={convention?.name ?? ''}
         />
       </div>

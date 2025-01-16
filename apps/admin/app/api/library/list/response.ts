@@ -9,10 +9,10 @@ import { Prisma } from "@prisma/client";
  *       properties:
  *         total:
  *           type: number
- *           description: Total amount of Conventions
+ *           description: Total (non hidden) count of library games
  *         list:
  *           type: array
- *           description: Only limited to 15 conventions
+ *           description: Library Game
  *           items:
  *             $ref: '#/components/schemas/LibraryItemResponse'
  */

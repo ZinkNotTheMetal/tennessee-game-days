@@ -1,4 +1,5 @@
 import prisma from "@/app/lib/prisma";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { DateTime } from "ts-luxon";
 
@@ -32,21 +33,25 @@ import { DateTime } from "ts-luxon";
  *             schema:
  *                message: string
  */
-export async function PATCH(request: NextRequest, { params }: { params: { attendeeId: string }}) {
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ attendeeId: string }> }) {
+  const attendeeId = (await params).attendeeId
 
   const attendee = await prisma.attendee.findFirst({
-    where: { id: Number(params.attendeeId)}
+    where: { id: Number(attendeeId)}
   })
 
   if (attendee === null) return NextResponse.json({ error: "Unable to find attendee in the system for this convention" }, { status: 404 })
 
   await prisma.attendee.update({
-    where: { id: Number(params.attendeeId) },
+    where: { id: Number(attendeeId) },
     data: {
       checkedInUtc: DateTime.utc().toISO(),
       isCheckedIn: true
     }
   })
+
+  revalidateTag('scanner')
 
   return NextResponse.json(
     {

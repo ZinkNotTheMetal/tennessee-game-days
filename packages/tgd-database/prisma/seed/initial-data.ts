@@ -463,6 +463,8 @@ const gamesToSeed = [
   { bggIdToAdd: 374173, barcode: "823013-GO-00-1", alias: null, includedItems: [] }, // 461
   { bggIdToAdd: 11, barcode: "620016-RR-01-2", alias: null, includedItems: [] }, // 462
   { bggIdToAdd: 11, barcode: "620016-RK-02-1", alias: null, includedItems: [] }, // 463
+  { bggIdToAdd: 421374, barcode: "524014-TGD-22-1", alias: null, includedItems: []},
+  { bggIdToAdd: 360058, barcode: "624001-RR-9-1", alias: null, includedItems: []},
 ]
 
 

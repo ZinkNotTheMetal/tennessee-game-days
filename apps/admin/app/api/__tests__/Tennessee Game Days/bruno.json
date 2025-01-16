@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Tennessee Game Days",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

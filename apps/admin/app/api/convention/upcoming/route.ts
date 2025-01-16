@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import prisma from "@/app/lib/prisma";
-import { DateTime } from "ts-luxon";
 import { UpcomingConventionResponse } from "./response";
+import { revalidateTag } from "next/cache";
+import { GetCurrentOrUpcomingConvention } from "./actions";
 
 export const revalidate = 0; //Very important
 
@@ -25,25 +25,11 @@ export const fetchCache = "force-no-store";
  *               $ref: '#/components/schemas/UpcomingConventionResponse'
  */
 export async function GET() {
-  const nextUpcomingConvention = await prisma.convention.findFirst({
-    where: {
-      startDateTimeUtc: {
-        not: null
-      },
-      endDateTimeUtc: {
-        not: null,
-        gt: DateTime.utc().toISO()
-      }
-    },
-    include: {
-      venue: true
-    },
-    orderBy: {
-      startDateTimeUtc: 'asc'
-    }
-  })
+  const convention = await GetCurrentOrUpcomingConvention()
+
+  revalidateTag("convention");
 
   return NextResponse.json<UpcomingConventionResponse>({
-    convention: nextUpcomingConvention
-  })
+    convention: convention,
+  });
 }

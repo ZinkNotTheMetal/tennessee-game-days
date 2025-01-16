@@ -1,6 +1,5 @@
 'use client'
 
-import { Prisma } from "@prisma/client"
 import {
   FcAlphabeticalSortingAz,
   FcAlphabeticalSortingZa,
@@ -17,27 +16,19 @@ import {
   getSortedRowModel,
   SortingState,
   Row,
-  FilterFn,
-  RowData,
+  FilterFn
 } from "@tanstack/react-table"
 import Search from "@/app/components/search/search"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { AttendeeWithPreviousConventions } from "@/app/api/attendee/count/[conventionId]/response";
 
 
-type AttendeePrismaRowType = Prisma.AttendeeGetPayload<{ include: { person: { include: { relatedTo: true, _count: { select: { attendee: true }} }} } }>
+type AttendeePrismaRowType = AttendeeWithPreviousConventions
 
 interface AttendeeTableProps {
   attendees: AttendeePrismaRowType[]
   total: number
-}
-
-declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData extends RowData, TValue> {
-    sortAscIcon: JSX.Element;
-    sortDescIcon: JSX.Element;
-    sortIcon: JSX.Element;
-  }
 }
 
 export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.Element {
@@ -57,15 +48,21 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
         sortAscIcon: <FcNumericalSorting12 className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcNumericalSorting21 className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: false
       },
     }),
     columnHelper.accessor("person.firstName", {
-      header: () => "Preferred",
-      cell: ({ cell }) => cell.row.original.person.preferredName ?? cell.row.original.person.firstName,
+      header: () => "First/Preferred",
+      cell: ({ cell }) => <span>
+          {!cell.row.original.person.preferredName || cell.row.original.person.preferredName.trim() === ""
+            ? cell.row.original.person.firstName
+            : cell.row.original.person.preferredName}
+        </span>,
       meta: {
         sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: false
       },
     }),
     columnHelper.accessor("person.lastName", {
@@ -74,6 +71,7 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
         sortAscIcon: <FcAlphabeticalSortingAz className="pl-3 h-9 w-9" />,
         sortDescIcon: <FcAlphabeticalSortingZa className="pl-3 h-9 w-9" />,
         sortIcon: <></>,
+        canHide: false
       },
       enableGlobalFilter: true,
     }),
@@ -105,35 +103,28 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
         )
       }
     }),
-    columnHelper.accessor("isStayingOnSite", {
-      header: () => "Staying on Site",
-      cell: ({ cell }) => {
-        return (
-          <span className="flex justify-center">
-            { cell.getValue() ? (
-              <FaCheckCircle className="text-green-400 h-4 w-4" />
-            ) : (
-              <FaTimesCircle className="text-red-400 h-4 w-4" />
-            )}
-          </span>
-        )
-      }
+    columnHelper.accessor("person.phoneNumber", {
+      header: () => "Phone"
     }),
-    columnHelper.accessor("passPurchased", {
-      header: () => "Pass Purchased"
-    }),
-    columnHelper.accessor("person._count.attendee", {
-      header: () => "Conferences Attended",
-      cell: ({ cell }) => <span>{ cell.row.original.person._count.attendee }</span>
+    columnHelper.accessor("person.email", {
+      header: () => "Email"
     }),
     columnHelper.accessor("person.relatedPersonId", {
       header: () => "With",
       cell: ({ cell }) => {
         return (
-          <span>{ cell.row.original.person.relatedTo?.preferredName ?? cell.row.original.person.relatedTo?.firstName } { cell.row.original.person.relatedTo?.lastName }</span>
+          <span>
+            {!cell.row.original.person.relatedTo?.preferredName || cell.row.original.person.relatedTo?.preferredName.trim() === ""
+              ? cell.row.original.person.relatedTo?.firstName
+              : cell.row.original.person.relatedTo?.preferredName }&nbsp;{ cell.row.original.person.relatedTo?.lastName }
+          </span>
         )
       }
-    })
+    }),
+    columnHelper.accessor("previousConventionsAttended", {
+      header: () => "Previously attended",
+      cell: ({ cell }) => <span>{ cell.row.original.previousConventionsAttended }</span>
+    }),
   ]
 
   const customGlobalFilter: FilterFn<any> = (
@@ -169,13 +160,15 @@ export function AttendeesTable({ attendees, total }: AttendeeTableProps) : JSX.E
   return(
     <>
       <div className="w-4/5 pb-6">
-        <Search
-          onChange={(e) => {
-            setQuery(e.target.value);
-          }}
-          placeholder={`Search ${total} attendees...`}
-          value={query}
-        />
+        <div className="mb-1 md:mb-3">
+          <Search
+            onChange={(e) => {
+              setQuery(e.target.value);
+            }}
+            placeholder={`Search ${total} attendees...`}
+            value={query}
+          />
+        </div>
 
         {attendees !== undefined && attendees.length > 0 && (
           <table className="min-w-full divide-y-0 divide-gray-300 bg-white rounded-t-xl rounded-b-xl">
