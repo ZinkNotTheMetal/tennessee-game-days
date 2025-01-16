@@ -87,7 +87,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ con
   if (personId === undefined) return NextResponse.json({ message: 'Unable to successfully add Purchasing Person into the system'}, { status: 523 })
 
   const attendeeAlreadyAdded = await prisma.attendee.findFirst({
-    where: { personId: personId }
+    where: {
+      AND: [
+        {
+          personId: personId,
+        },
+        {
+          conventionId: Number(conventionId)
+        }
+      ]
+    }
   })
 
   if (attendeeAlreadyAdded) return NextResponse.json({ error: 'Attendee has already been added to this convention'}, { status: 400 })
